@@ -15,10 +15,10 @@
   </head>
   <body>
 
-  <!-- Navigation -->
+  <#-- Navigation -->
   <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
-      <!-- Brand and toggle get grouped for better mobile display -->
+      <#-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#g-app-navbar-collapse">
           <span class="sr-only">Toggle navigation</span>
@@ -28,7 +28,7 @@
         </button>
         <a class="navbar-brand" href="/g/index">BookLib</a>
       </div>
-      <!-- Collect the nav links, forms, and other content for toggling -->
+      <#-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="g-app-navbar-collapse">
         <ul class="nav navbar-nav">
           <li><a href="#">Authors</a></li>
@@ -37,9 +37,9 @@
           <li><a href="#">About</a></li>
         </ul>
       </div>
-      <!-- /.navbar-collapse -->
+      <#-- /.navbar-collapse -->
     </div>
-    <!-- /.container -->
+    <#-- /.container -->
   </nav>
 
   <div id="main-content" class="container">
@@ -49,11 +49,13 @@
   <div id="footer">
   </div>
 
-  <script type="text/javascript" src="/static/app/js/ns.js"></script>
+  <script type="text/javascript" src="/static/app/js/ns.js"></script><#-- < Sets up global namespace -->
+  <#-- Vendor Scripts -->
   <script type="text/javascript" src="/static/jquery-2.1.1/jquery.js"></script>
   <script type="text/javascript" src="/static/bootstrap-3.3.1/js/bootstrap.js"></script>
+  <#-- Custom Page Scripts -->
   <script type="text/javascript" src="/static/app/js/appbase.js"></script>
-  </body>
+</body>
 </html>
 
 </#macro>
