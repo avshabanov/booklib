@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+  <context:annotation-config/>
+
+  <bean class="com.alexshabanov.booklib.web.controllers.PublicController"/>
+  <!--<bean class="com.alexshabanov.booklibb.controllers.ControllersPackage" factory-method="createPubController"/>-->
+  <bean class="com.alexshabanov.booklib.web.controllers.RestController">
+    <constructor-arg ref="svc.userService"/>
+  </bean>
+
+  <!-- Annotation driven support for MVC controllers -->
+  <mvc:annotation-driven>
+    <!-- custom jackson marshallers (for some reason they are created twice) -->
+    <mvc:message-converters>
+      <bean class="com.alexshabanov.booklib.web.mapping.MappingPackage" factory-method="createDomainModelConverter"/>
+    </mvc:message-converters>
+  </mvc:annotation-driven>
+
+  <!-- freemarker config -->
+  <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+    <property name="templateLoaderPath" value="classpath:/freemarker"/>
+  </bean>
+
+  <!-- Spring MVC view resolver -->
+  <bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+    <property name="cache" value="true"/>
+    <property name="prefix" value=""/>
+    <property name="suffix" value=".ftl"/>
+  </bean>
+
+  <bean id="handlerMapping" class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+    <property name="alwaysUseFullPath" value="true"/>
+  </bean>
+</beans>
