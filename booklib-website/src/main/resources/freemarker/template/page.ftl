@@ -9,9 +9,9 @@
 
     <title>BookLib &raquo; ${title?html}</title>
 
-    <link rel="stylesheet" type="text/css" href="/static/bootstrap-3.3.1/css/bootstrap.css" />
-    <link rel="stylesheet" type="text/css" href="/static/bootstrap-3.3.1/css/bootstrap-theme.css" />
-    <link rel="stylesheet" type="text/css" href="/static/app/css/global.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/bootstrap-3.3.1/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/bootstrap-3.3.1/css/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/app/css/global.css" />
   </head>
   <body>
 
@@ -49,12 +49,12 @@
   <div id="footer">
   </div>
 
-  <script type="text/javascript" src="/static/app/js/ns.js"></script><#-- < Sets up global namespace -->
+  <script type="text/javascript" src="/assets/app/js/ns.js"></script><#-- < Sets up global namespace -->
   <#-- Vendor Scripts -->
-  <script type="text/javascript" src="/static/jquery-2.1.1/jquery.js"></script>
-  <script type="text/javascript" src="/static/bootstrap-3.3.1/js/bootstrap.js"></script>
+  <script type="text/javascript" src="/assets/jquery-2.1.1/jquery.js"></script>
+  <script type="text/javascript" src="/assets/bootstrap-3.3.1/js/bootstrap.js"></script>
   <#-- Custom Page Scripts -->
-  <script type="text/javascript" src="/static/app/js/appbase.js"></script>
+  <script type="text/javascript" src="/assets/app/js/appbase.js"></script>
 </body>
 </html>
 

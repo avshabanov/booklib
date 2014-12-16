@@ -34,7 +34,7 @@ fun main(args: Array<String>) {
   val server = Server(8080)
 
   val resourceHandler = ResourceHandler()
-  resourceHandler.setBaseResource(Resource.newClassPathResource("/foliage"))
+  resourceHandler.setBaseResource(Resource.newClassPathResource("/static"))
 
   val contextHandler = ServletContextHandler(ServletContextHandler.SESSIONS or ServletContextHandler.NO_SECURITY)
   contextHandler.setContextPath("/")
