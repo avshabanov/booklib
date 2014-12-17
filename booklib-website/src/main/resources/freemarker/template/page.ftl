@@ -9,6 +9,7 @@
 
     <title>BookLib &raquo; ${title?html}</title>
 
+    <#-- TODO: conditional inclusion: DEV, MINIFIED, LIVE -->
     <link rel="stylesheet" type="text/css" href="/assets/bootstrap-3.3.1/css/bootstrap.css" />
     <link rel="stylesheet" type="text/css" href="/assets/bootstrap-3.3.1/css/bootstrap-theme.css" />
     <link rel="stylesheet" type="text/css" href="/assets/app/css/global.css" />
@@ -49,6 +50,7 @@
   <div id="footer">
   </div>
 
+  <#-- TODO: conditional inclusion: DEV, MINIFIED, LIVE -->
   <script type="text/javascript" src="/assets/app/js/ns.js"></script><#-- < Sets up global namespace -->
   <#-- Vendor Scripts -->
   <script type="text/javascript" src="/assets/jquery-2.1.1/jquery.js"></script>
