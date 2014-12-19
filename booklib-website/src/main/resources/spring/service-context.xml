@@ -1,20 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
   <context:annotation-config/>
 
-  <context:property-placeholder location="classpath:app.properties"/>
+  <!--<util:list id="config.propertyLocations">-->
+    <!--<value>classpath:/settings/core.properties</value>-->
+    <!--<value>${booklib.settings.path}</value>-->
+  <!--</util:list>-->
+
+  <!--<context:property-placeholder location-ref=""/>-->
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <util:list>
+        <value>classpath:/settings/core.properties</value>
+        <value>${booklib.settings.path}</value>
+      </util:list>
+    </property>
+  </bean>
 
   <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
     <property name="basename" value="classpath:/messages"/>
     <property name="defaultEncoding" value="UTF-8"/>
   </bean>
 
+  <!-- DAO -->
+  <import resource="dao-context.xml" />
+
   <!-- Services -->
+
+  <bean id="svc.bookService" class="com.alexshabanov.booklib.service.BookService">
+    <constructor-arg ref="dao.bookDao"/>
+    <constructor-arg ref="dao.namedValueDao"/>
+  </bean>
 
   <bean id="svc.resultCreator" class="com.truward.ascetic.ImmediateCallResultCreator"/>
 

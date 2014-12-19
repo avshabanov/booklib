@@ -31,10 +31,13 @@ private fun initSpringContext(context: ServletContextHandler) {
  * @author Alexander Shabanov
  */
 fun main(args: Array<String>) {
+  var configPath = "classpath:settings/default.properties"
+  System.setProperty("booklib.settings.path", configPath)
+
   val server = Server(8080)
 
   val resourceHandler = ResourceHandler()
-  resourceHandler.setBaseResource(Resource.newClassPathResource("/static"))
+  resourceHandler.setBaseResource(Resource.newClassPathResource("/web/static"))
 
   val contextHandler = ServletContextHandler(ServletContextHandler.SESSIONS or ServletContextHandler.NO_SECURITY)
   contextHandler.setContextPath("/")

@@ -13,14 +13,20 @@ import com.alexshabanov.booklib.service.GetUserProfilesResponse
 import com.alexshabanov.booklib.service.GetUserProfilesRequest
 import java.util.Arrays
 import com.alexshabanov.booklib.service.UserProfile
+import com.alexshabanov.booklib.service.BookDao
+import com.alexshabanov.booklib.model.BookMeta
+import com.alexshabanov.booklib.model.NamedValue
+import com.alexshabanov.booklib.model.Book
+import java.util.ArrayList
+import com.alexshabanov.booklib.service.BookService
 
 //
 // Spring MVC controllers
 //
 
 /** Public HTML controller. */
-req(array("/g")) controller class PublicController {
-  req(array("/index")) fun test(): String = "index"
+req(array("/g")) controller class PublicController(val bookService: BookService) {
+  req(array("/index")) fun index() = ModelAndView("index", "randomBooks", bookService.getRandomBooks())
 
   req(array("/hello")) fun hello(par("greeting", defaultValue = "Hello") greeting: String): ModelAndView =
       ModelAndView("hello", "greeting", greeting)

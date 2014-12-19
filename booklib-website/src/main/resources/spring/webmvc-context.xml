@@ -9,8 +9,10 @@
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
   <context:annotation-config/>
 
-  <bean class="com.alexshabanov.booklib.web.controllers.PublicController"/>
-  <!--<bean class="com.alexshabanov.booklibb.controllers.ControllersPackage" factory-method="createPubController"/>-->
+  <bean class="com.alexshabanov.booklib.web.controllers.PublicController">
+    <constructor-arg ref="svc.bookService"/>
+  </bean>
+
   <bean class="com.alexshabanov.booklib.web.controllers.RestController">
     <constructor-arg ref="svc.userService"/>
   </bean>
@@ -25,7 +27,7 @@
 
   <!-- freemarker config -->
   <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
-    <property name="templateLoaderPath" value="classpath:/freemarker"/>
+    <property name="templateLoaderPath" value="classpath:/web/freemarker"/>
   </bean>
 
   <!-- Spring MVC view resolver -->

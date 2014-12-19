@@ -6,8 +6,9 @@
 <p><a href="/g/hello">Hello page</a></p>
 
 <ul>
-  <@books.book title="J2EE without EJB"/>
-  <@books.book title="Effective Java"/>
+  <#list randomBooks as book>
+    <@books.book title="${book.meta.title}" authors=book.authors genres=book.genres />
+  </#list>
 </ul>
 
 </@pt.page>

@@ -1,20 +1,12 @@
---
--- Targeted
---
 
-DELETE FROM book_author WHERE book_id=(SELECT id FROM book_meta WHERE origin_id=(SELECT id FROM book_origin WHERE code='my_origin'));
-DELETE FROM book_genre WHERE book_id=(SELECT id FROM book_meta WHERE origin_id=(SELECT id FROM book_origin WHERE code='my_origin'));
-DELETE FROM book_meta WHERE origin_id=(SELECT id FROM book_origin WHERE code='my_origin');
-DELETE FROM book_origin WHERE code='my_origin';
+DROP TABLE book_author;
+DROP TABLE book_genre;
+DROP TABLE book_origin;
+DROP TABLE book_series;
 
-
---
--- All
---
-
-DELETE FROM book_author;
-DELETE FROM book_genre;
-DELETE FROM book_origin WHERE code != 'unknown';
-DELETE FROM book_meta;
-
-SELECT * FROM book_origin;
+DROP TABLE book_meta;
+DROP TABLE author;
+DROP TABLE genre;
+DROP TABLE origin;
+DROP TABLE lang_code;
+DROP TABLE series;
