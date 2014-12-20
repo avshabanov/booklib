@@ -40,11 +40,11 @@ class DaoTest {
   }
 
   Test fun shouldGetAuthors() {
-    assertEquals(listOf(NamedValue(id = 1, name = "Jack London")), namedValueDao.getAuthorsByIds(listOf(1)))
+    assertEquals(mapOf(Pair(2L, listOf(NamedValue(id = 7, name = "Victor Pelevin")))), namedValueDao.getAuthorsOfBooks(listOf(2)))
   }
 
   Test fun shouldGetGenres() {
-    assertEquals(listOf(NamedValue(id = 1, name = "sci_fi")), namedValueDao.getGenresByIds(listOf(1)))
+    assertEquals(mapOf(Pair(2L, listOf(NamedValue(id = 3, name = "essay")))), namedValueDao.getGenresOfBooks(listOf(2)))
   }
 
   Test fun shouldGetAuthorsWithBooks() {

@@ -10,6 +10,8 @@ import org.springframework.jdbc.core.PreparedStatementCreator
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.core.JdbcTemplate
+import java.util.HashMap
+import java.util.ArrayList
 
 //
 // Interface
@@ -28,9 +30,9 @@ trait BookDao {
 }
 
 trait NamedValueDao {
-  fun getAuthorsByIds(authorIds: List<Long>): List<NamedValue>
+  fun getAuthorsOfBooks(bookIds: List<Long>): Map<Long, List<NamedValue>>
 
-  fun getGenresByIds(genresIds: List<Long>): List<NamedValue>
+  fun getGenresOfBooks(bookIds: List<Long>): Map<Long, List<NamedValue>>
 }
 
 //
@@ -73,12 +75,39 @@ private val NAMED_VALUE_ROW_MAPPER = RowMapper() {(rs: ResultSet, i: Int) ->
   NamedValue(id = rs.getInt("id").toLong(), name = rs.getString("name"))
 }
 
-class NamedValueDaoImpl(val db: NamedParameterJdbcOperations): NamedValueDao {
-  override fun getAuthorsByIds(authorIds: List<Long>) = db.query(
-      "SELECT id, f_name AS name FROM author WHERE id IN (:authorIds)",
-      mapOf(Pair("authorIds", authorIds)), NAMED_VALUE_ROW_MAPPER)
+private val BOOK_ID_WITH_NAMED_VALUE_ROW_MAPPER = RowMapper() {(rs: ResultSet, i: Int) ->
+  Pair(rs.getLong("book_id"), NamedValue(id = rs.getInt("id").toLong(), name = rs.getString("name")))
+}
 
-  override fun getGenresByIds(genresIds: List<Long>) = db.query(
-      "SELECT id, code AS name FROM genre WHERE id IN (:genresIds)",
-      mapOf(Pair("genresIds", genresIds)), NAMED_VALUE_ROW_MAPPER)
+class NamedValueDaoImpl(val db: NamedParameterJdbcOperations): NamedValueDao {
+  override fun getAuthorsOfBooks(bookIds: List<Long>) = getBookToNamedValuesMap(bookIds,
+      "SELECT ba.book_id, a.id, a.f_name AS name FROM author AS a\n" +
+      "INNER JOIN book_author AS ba ON a.id=ba.author_id WHERE ba.book_id IN (:bookIds)")
+
+  override fun getGenresOfBooks(bookIds: List<Long>) = getBookToNamedValuesMap(bookIds,
+      "SELECT bg.book_id, g.id, g.code AS name FROM genre AS g\n" +
+          "INNER JOIN book_genre AS bg ON g.id=bg.genre_id WHERE bg.book_id IN (:bookIds)")
+
+  //
+  // Private
+  //
+
+  private fun getBookToNamedValuesMap(bookIds: List<Long>, sqlQuery: String): Map<Long, List<NamedValue>> {
+    val pairs = db.query(sqlQuery,
+        mapOf(Pair("bookIds", bookIds)), BOOK_ID_WITH_NAMED_VALUE_ROW_MAPPER)
+
+    val result = HashMap<Long, MutableList<NamedValue>>(pairs.size())
+
+    for (pair in pairs) {
+      var list = result.get(pair.first)
+      if (list == null) {
+        list = ArrayList<NamedValue>()
+        result.put(pair.first, list)
+      }
+
+      list.add(pair.second)
+    }
+
+    return result
+  }
 }
