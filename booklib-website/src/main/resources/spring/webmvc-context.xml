@@ -14,12 +14,7 @@
   </bean>
 
   <!-- Annotation driven support for MVC controllers -->
-  <mvc:annotation-driven>
-    <!-- custom jackson marshallers (for some reason they are created twice) -->
-    <mvc:message-converters>
-      <bean class="com.alexshabanov.booklib.web.mapping.MappingPackage" factory-method="createDomainModelConverter"/>
-    </mvc:message-converters>
-  </mvc:annotation-driven>
+  <mvc:annotation-driven/>
 
   <!-- freemarker config -->
   <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">

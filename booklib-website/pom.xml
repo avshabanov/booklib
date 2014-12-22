@@ -68,21 +68,6 @@
       <artifactId>spring-webmvc</artifactId>
     </dependency>
 
-    <!-- Jackson JSON serialization -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
-
     <!-- DB -->
     <dependency>
       <groupId>com.h2database</groupId>
