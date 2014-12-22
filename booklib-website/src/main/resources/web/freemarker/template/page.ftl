@@ -35,7 +35,7 @@
           <li><a href="#">Authors</a></li>
           <li><a href="#">Genres</a></li>
           <li class="nav-divider"></li>
-          <li><a href="#">About</a></li>
+          <li><a href="/g/about">About</a></li>
         </ul>
       </div>
       <#-- /.navbar-collapse -->

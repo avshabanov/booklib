@@ -10,43 +10,39 @@ import com.fasterxml.jackson.databind.SerializationConfig
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.MapperFeature
 import org.springframework.http.MediaType
-import com.truward.ascetic.Request
-import com.truward.ascetic.Response
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.core.Version
 import com.fasterxml.jackson.databind.JsonSerializer
-import com.alexshabanov.booklib.service.GetUserProfilesResponse
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.SerializerProvider
-import com.alexshabanov.booklib.service.UserProfile
-import com.alexshabanov.booklib.service.GetUserProfilesRequest
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
+import com.alexshabanov.booklib.model.DomainModel
 
 //
 // Mappers
 //
 
-private class UserProfileSerializer: JsonSerializer<UserProfile>() {
-  override fun serialize(v: UserProfile, jg: JsonGenerator, p: SerializerProvider) {
-    jg.writeStartObject()
-    if (v.id != null) {
-      jg.writeNumberField("id", v.id)
-    }
-    jg.writeStringField("n", v.name)
-    jg.writeStringField("a", v.avatarUrl)
-    jg.writeEndObject()
-  }
-}
-
-private class GetUserProfilesResponseSerializer: JsonSerializer<GetUserProfilesResponse>() {
-  override fun serialize(v: GetUserProfilesResponse, jg: JsonGenerator, p: SerializerProvider) {
-    jg.writeStartObject()
-    jg.writeObjectField("profiles", v.profiles)
-    jg.writeEndObject()
-  }
-}
+//private class UserProfileSerializer: JsonSerializer<UserProfile>() {
+//  override fun serialize(v: UserProfile, jg: JsonGenerator, p: SerializerProvider) {
+//    jg.writeStartObject()
+//    if (v.id != null) {
+//      jg.writeNumberField("id", v.id)
+//    }
+//    jg.writeStringField("n", v.name)
+//    jg.writeStringField("a", v.avatarUrl)
+//    jg.writeEndObject()
+//  }
+//}
+//
+//private class GetUserProfilesResponseSerializer: JsonSerializer<GetUserProfilesResponse>() {
+//  override fun serialize(v: GetUserProfilesResponse, jg: JsonGenerator, p: SerializerProvider) {
+//    jg.writeStartObject()
+//    jg.writeObjectField("profiles", v.profiles)
+//    jg.writeEndObject()
+//  }
+//}
 
 //
 // Configuration code
@@ -64,8 +60,8 @@ private fun configMapper(mapper: ObjectMapper) {
   //mod.addDeserializer(javaClass<Foo>(), FooDeserializer())
 
   // - serializers
-  mod.addSerializer(javaClass<UserProfile>(), UserProfileSerializer())
-  mod.addSerializer(javaClass<GetUserProfilesResponse>(), GetUserProfilesResponseSerializer())
+//  mod.addSerializer(javaClass<UserProfile>(), UserProfileSerializer())
+//  mod.addSerializer(javaClass<GetUserProfilesResponse>(), GetUserProfilesResponseSerializer())
 
   mapper.registerModule(mod)
 }
@@ -77,11 +73,11 @@ private class CustomJsonHttpMessageConverter(): MappingJackson2HttpMessageConver
   }
 
   override fun canRead(clazz: Class<out Any?>?, mediaType: MediaType?): Boolean {
-    return canRead(mediaType) && javaClass<Request>().isAssignableFrom(clazz)
+    return canRead(mediaType) && javaClass<DomainModel>().isAssignableFrom(clazz)
   }
 
   override fun canWrite(clazz: Class<out Any?>?, mediaType: MediaType?): Boolean {
-    return canWrite(mediaType) && javaClass<Response>().isAssignableFrom(clazz)
+    return canWrite(mediaType) && javaClass<DomainModel>().isAssignableFrom(clazz)
   }
 }
 

@@ -38,10 +38,4 @@
     <constructor-arg ref="dao.bookDao"/>
     <constructor-arg ref="dao.namedValueDao"/>
   </bean>
-
-  <bean id="svc.resultCreator" class="com.truward.ascetic.ImmediateCallResultCreator"/>
-
-  <bean id="svc.userService" class="com.alexshabanov.booklib.service.UserServiceImpl">
-    <constructor-arg ref="svc.resultCreator"/>
-  </bean>
 </beans>

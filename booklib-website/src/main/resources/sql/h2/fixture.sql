@@ -122,6 +122,135 @@ INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
 INSERT INTO book_author (book_id, author_id) VALUES (12, 5);
 INSERT INTO book_genre (book_id, genre_id) VALUES (12, 4);
 
+
+--
+-- Inaccurate Additions
+--
+
+-- From Beyond
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (13, 'From Beyond', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (13, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (13, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (13, 4);
+
+-- The Land of Crimson Clouds
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (14, 'The Land of Crimson Clouds', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (14, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (14, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (14, 4);
+
+-- The Way to Amalthea
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (15, 'The Way to Amalthea', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (15, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (15, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (15, 4);
+
+-- Escape Attempt
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (16, 'Escape Attempt', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (16, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (16, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (16, 4);
+
+-- The Cruise of the Dazzler
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (17, 'The Cruise of the Dazzler', 0, '2014-08-10', 1, 2);
+INSERT INTO book_author (book_id, author_id) VALUES (17, 1);
+INSERT INTO book_genre (book_id, genre_id) VALUES (17, 4);
+
+-- A Daughter of the Snows
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (18, 'A Daughter of the Snows', 0, '2014-08-10', 1, 2);
+INSERT INTO book_author (book_id, author_id) VALUES (18, 1);
+INSERT INTO book_genre (book_id, genre_id) VALUES (18, 4);
+
+-- The Call of the Wild
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (19, 'The Call of the Wild', 0, '2014-08-10', 1, 2);
+INSERT INTO book_author (book_id, author_id) VALUES (19, 1);
+INSERT INTO book_genre (book_id, genre_id) VALUES (19, 4);
+
+-- Monday Begins on Saturday
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (20, 'Monday Begins on Saturday', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (20, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (20, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (20, 4);
+
+-- The Final Circle of Paradise
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (21, 'The Final Circle of Paradise', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (21, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (21, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (21, 4);
+
+-- Disquiet
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (22, 'Disquiet', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (22, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (22, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (22, 4);
+
+-- Snail on the Slope
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (30, 'Disquiet', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (30, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (30, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (30, 4);
+
+-- The Ugly Swans
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (31, 'The Ugly Swans', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (31, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (31, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (31, 4);
+
+-- The Second Invasion from Mars
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (32, 'The Second Invasion from Mars', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (32, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (32, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (32, 4);
+
+-- Tale of the Troika
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (33, 'Tale of the Troika', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (33, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (33, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (33, 4);
+
+-- Prisoners of Power
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (34, 'Prisoners of Power', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (34, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (34, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (34, 4);
+
+-- The Planet with all the Conveniences
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (35, 'The Planet with all the Conveniences', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (35, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (35, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (35, 4);
+
+-- Space Mowgli
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (36, 'Space Mowgli', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (36, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (36, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (36, 4);
+
+-- Roadside Picnic
+INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
+  VALUES (37, 'Roadside Picnic', 0, '2014-08-10', 2, 4);
+INSERT INTO book_author (book_id, author_id) VALUES (37, 5);
+INSERT INTO book_author (book_id, author_id) VALUES (37, 6);
+INSERT INTO book_genre (book_id, genre_id) VALUES (37, 4);
+
+
 --
 -- EOF
 --

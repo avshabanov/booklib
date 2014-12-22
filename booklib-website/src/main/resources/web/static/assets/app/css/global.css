@@ -8,3 +8,13 @@ body {
 .inlet {
   padding: 24px;
 }
+
+ul.book-list {
+  list-style: none outside none;
+  padding: 0;
+}
+
+ul.book-list li {
+  border-top: 1px solid #eee;
+  padding-bottom: 1em;
+}

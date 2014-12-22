@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.core.JdbcTemplate
 import java.util.HashMap
 import java.util.ArrayList
+import com.alexshabanov.booklib.model.asUtcTime
 
 //
 // Interface
@@ -20,6 +21,9 @@ import java.util.ArrayList
 val DEFAULT_LIMIT = 8
 
 trait BookDao {
+
+  fun getBookById(bookId: Long): BookMeta
+
   fun getBooksByTitleTerm(titleSqlMask: String, limit: Int = DEFAULT_LIMIT): List<BookMeta>
 
   fun getBookAuthors(bookId: Long): List<Long>
@@ -27,12 +31,21 @@ trait BookDao {
   fun getBookGenres(bookId: Long): List<Long>
 
   fun getRandomBooks(limit: Int = DEFAULT_LIMIT): List<BookMeta>
+
+  fun getBooksOfAuthor(authorId: Long, nextBookId: Long? = null, limit: Int = DEFAULT_LIMIT): List<BookMeta>
+
+  fun getBooksOfGenre(genreId: Long, nextBookId: Long? = null, limit: Int = DEFAULT_LIMIT): List<BookMeta>
 }
 
 trait NamedValueDao {
+
   fun getAuthorsOfBooks(bookIds: List<Long>): Map<Long, List<NamedValue>>
 
   fun getGenresOfBooks(bookIds: List<Long>): Map<Long, List<NamedValue>>
+
+  fun getAuthorById(id: Long): NamedValue
+
+  fun getGenreById(id: Long): NamedValue
 }
 
 //
@@ -41,27 +54,35 @@ trait NamedValueDao {
 
 private val BOOK_META_ROW_MAPPER = RowMapper() {(rs: ResultSet, i: Int) ->
   BookMeta(id = rs.getLong("id"), title = rs.getString("title"), fileSize = rs.getInt("f_size"),
-      lang = rs.getString("lang_name"), origin = rs.getString("origin_name"), addDate = rs.getDate("add_date"))
+      lang = rs.getString("lang_name"), origin = rs.getString("origin_name"), addDate = asUtcTime(rs, "add_date"))
 }
+
+private val BOOK_QUERY_SQL_HEAD =
+    "SELECT bm.id, bm.title, bm.f_size, bm.add_date, bo.code AS origin_name, lc.code AS lang_name FROM book_meta AS bm\n" +
+    "INNER JOIN book_origin AS bo ON bm.origin_id=bo.id\n" +
+    "INNER JOIN lang_code AS lc ON bm.lang_id=lc.id\n"
 
 class BookDaoImpl(val db: JdbcOperations): BookDao {
 
+  override fun getBookById(bookId: Long) = db.queryForObject(
+        BOOK_QUERY_SQL_HEAD + "WHERE bm.id=?",
+        BOOK_META_ROW_MAPPER,
+        bookId)
+
   override fun getBooksByTitleTerm(titleSqlMask: String, limit: Int) = db.query(
-        "SELECT bm.id, bm.title, bm.f_size, bm.add_date, bo.code AS origin_name, lc.code AS lang_name FROM book_meta AS bm\n" +
-            "INNER JOIN book_origin AS bo ON bm.origin_id=bo.id\n" +
-            "INNER JOIN lang_code AS lc ON bm.lang_id=lc.id\n" +
-            "WHERE bm.title LIKE ? LIMIT ?",
+        BOOK_QUERY_SQL_HEAD + "WHERE bm.title LIKE ? LIMIT ?",
         BOOK_META_ROW_MAPPER,
         titleSqlMask,
         limit)
 
   override fun getRandomBooks(limit: Int) = db.query(
         //SELECT id FROM book_meta ORDER BY RAND() LIMIT ?; <-- performs too badly even on average tables
-        "SELECT bm.id, bm.title, bm.f_size, bm.add_date, bo.code AS origin_name, lc.code AS lang_name FROM book_meta AS bm\n" +
-            "INNER JOIN book_origin AS bo ON bm.origin_id=bo.id\n" +
-            "INNER JOIN lang_code AS lc ON bm.lang_id=lc.id\n" +
+        BOOK_QUERY_SQL_HEAD +
+            "WHERE bm.id >= (RAND() * (SELECT MAX(id) FROM book_meta) - ?)\n" +
+            "ORDER BY bm.id\n" +
             "LIMIT ?",
         BOOK_META_ROW_MAPPER,
+        limit,
         limit)
 
   override fun getBookAuthors(bookId: Long) = db.queryForList(
@@ -69,6 +90,22 @@ class BookDaoImpl(val db: JdbcOperations): BookDao {
 
   override fun getBookGenres(bookId: Long) = db.queryForList(
       "SELECT genre_id FROM book_genre WHERE book_id=?", bookId.javaClass, bookId)
+
+  override fun getBooksOfAuthor(authorId: Long, nextBookId: Long?, limit: Int) = db.query(
+      BOOK_QUERY_SQL_HEAD +
+          "INNER JOIN book_author AS ba ON bm.id=ba.book_id\n" +
+          "WHERE ba.author_id=? AND ((? IS NULL) OR (bm.id > ?))\n" +
+          "ORDER BY bm.id\n" +
+          "LIMIT ?",
+      BOOK_META_ROW_MAPPER, authorId, nextBookId, nextBookId, limit)
+
+  override fun getBooksOfGenre(genreId: Long, nextBookId: Long?, limit: Int) = db.query(
+      BOOK_QUERY_SQL_HEAD +
+          "INNER JOIN book_genre AS bg ON bm.id=bg.book_id\n" +
+          "WHERE bg.genre_id=? AND ((? IS NULL) OR (bm.id > ?))\n" +
+          "ORDER BY bm.id\n" +
+          "LIMIT ?",
+      BOOK_META_ROW_MAPPER, genreId, nextBookId, nextBookId, limit)
 }
 
 private val NAMED_VALUE_ROW_MAPPER = RowMapper() {(rs: ResultSet, i: Int) ->
@@ -87,6 +124,12 @@ class NamedValueDaoImpl(val db: NamedParameterJdbcOperations): NamedValueDao {
   override fun getGenresOfBooks(bookIds: List<Long>) = getBookToNamedValuesMap(bookIds,
       "SELECT bg.book_id, g.id, g.code AS name FROM genre AS g\n" +
           "INNER JOIN book_genre AS bg ON g.id=bg.genre_id WHERE bg.book_id IN (:bookIds)")
+
+  override fun getAuthorById(id: Long) = db.queryForObject(
+      "SELECT id, f_name AS name FROM author WHERE id=:id", mapOf(Pair("id", id)), NAMED_VALUE_ROW_MAPPER)
+
+  override fun getGenreById(id: Long) = db.queryForObject(
+      "SELECT id, code AS name FROM genre WHERE id=:id", mapOf(Pair("id", id)), NAMED_VALUE_ROW_MAPPER)
 
   //
   // Private

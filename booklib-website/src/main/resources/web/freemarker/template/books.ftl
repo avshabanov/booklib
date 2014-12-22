@@ -1,13 +1,25 @@
-<#macro book title authors genres>
+<#macro book model>
 <li>
-  <span>${title?html}</span>
-  <span>&nbsp;|&nbsp;</span>
-  <#list authors as author>
-    <a href="#" about="Author# ${author.id}">${author.name}</a><#if author_has_next>,&nbsp</#if>
-  </#list>
-  <span>&nbsp;|&nbsp;</span>
-  <#list genres as genre>
-    <a href="#" about="Genre# ${genre.id}">${genre.name}</a><#if genre_has_next>,&nbsp</#if>
-  </#list>
+  <div class="container">
+    <!-- Title -->
+    <div class="row">
+      <div class="col-md-12">
+        <a href="#"><h3><small>${model.meta.id}</small>&nbsp;${model.meta.title?html}</h3></a>
+      </div>
+    </div>
+    <!-- Authors and Genres -->
+    <div class="row">
+      <div class="col-md-6">
+        <#list model.authors as author>
+          <a href="/g/author/${author.id}" about="${author.name?html}">${author.name?html}</a><#if author_has_next>,&nbsp</#if>
+        </#list>
+      </div>
+      <div class="col-md-6">
+        <#list model.genres as genre>
+          <a href="/g/genre/${genre.id}" about="${genre.name?html}">${genre.name}</a><#if genre_has_next>,&nbsp</#if>
+        </#list>
+      </div>
+    </div>
+  </div>
 </li>
 </#macro>

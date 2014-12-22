@@ -19,20 +19,31 @@ import com.alexshabanov.booklib.service.DEFAULT_LIMIT
 import com.alexshabanov.booklib.service.NamedValueDao
 import com.alexshabanov.booklib.model.NamedValue
 import com.alexshabanov.booklib.service.BookService
+import com.alexshabanov.booklib.model.BookMeta
+import java.util.Calendar
+import com.alexshabanov.booklib.model.UTC_TIMEZONE
+import java.text.SimpleDateFormat
+import com.alexshabanov.booklib.model.UtcTime
+import com.alexshabanov.booklib.model.parseUtcDate
 
 
 RunWith(javaClass<SpringJUnit4ClassRunner>())
 ContextConfiguration(locations = array("/spring/DaoTest-context.xml"))
 class DaoTest {
-  Resource(name = "dao.bookDao") var bookDao: BookDao = mock(javaClass<BookDao>())
+  Resource(name = "dao.bookDao") var bookDao: BookDao = mock(javaClass<BookDao>()) // HERE: mocks to silence compiler
   Resource(name = "dao.namedValueDao") var namedValueDao: NamedValueDao = mock(javaClass<NamedValueDao>())
+
+  Test fun shouldGetBookById() {
+    assertEquals(BookMeta(id = 1, title = "Far Rainbow", fileSize = 255365, addDate = parseUtcDate("2007-10-23"),
+        lang = "ru", origin = "RussianBooks"), bookDao.getBookById(1))
+  }
 
   Test fun shouldGetBookByTitle() {
     val results1 = bookDao.getBooksByTitleTerm(titleSqlMask = "%the%", limit = 5)
     assertFalse(results1.isEmpty(), "Results should not be empty")
 
     val results2 = bookDao.getBooksByTitleTerm(titleSqlMask = "Far Rainbow", limit = 5)
-    assertEquals(1, results2.size(), "Results should not be empty")
+    assertEquals(listOf(bookDao.getBookById(1)), results2)
   }
 
   Test fun shouldGetRandomBooks() {
@@ -43,8 +54,31 @@ class DaoTest {
     assertEquals(mapOf(Pair(2L, listOf(NamedValue(id = 7, name = "Victor Pelevin")))), namedValueDao.getAuthorsOfBooks(listOf(2)))
   }
 
+  Test fun shouldGetAuthorById() {
+    assertEquals(NamedValue(7L, "Victor Pelevin"), namedValueDao.getAuthorById(7))
+  }
+
+  Test fun shouldGetGenreById() {
+    assertEquals(NamedValue(3L, "essay"), namedValueDao.getGenreById(3))
+  }
+
   Test fun shouldGetGenres() {
     assertEquals(mapOf(Pair(2L, listOf(NamedValue(id = 3, name = "essay")))), namedValueDao.getGenresOfBooks(listOf(2)))
+  }
+
+  Test fun shouldGetFirstBooksOfAuthor() {
+    val books = bookDao.getBooksOfAuthor(authorId = 1, limit = 2)
+    assertEquals(listOf(bookDao.getBookById(17), bookDao.getBookById(18)), books)
+  }
+
+  Test fun shouldGetNextBooksOfAuthor() {
+    val books = bookDao.getBooksOfAuthor(authorId = 1, nextBookId = 18, limit = 2)
+    assertEquals(listOf(bookDao.getBookById(19)), books)
+  }
+
+  Test fun shouldGetFirstBooksOfGenre() {
+    val books = bookDao.getBooksOfGenre(genreId = 4, limit = 2)
+    assertEquals(listOf(bookDao.getBookById(1), bookDao.getBookById(4)), books)
   }
 
   Test fun shouldGetAuthorsWithBooks() {
@@ -58,3 +92,4 @@ class DaoTest {
     assertEquals(setOf(NamedValue(1, "sci_fi"), NamedValue(4, "novel")), book.genres.toSet())
   }
 }
+

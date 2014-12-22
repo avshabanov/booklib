@@ -13,10 +13,6 @@
     <constructor-arg ref="svc.bookService"/>
   </bean>
 
-  <bean class="com.alexshabanov.booklib.web.controllers.RestController">
-    <constructor-arg ref="svc.userService"/>
-  </bean>
-
   <!-- Annotation driven support for MVC controllers -->
   <mvc:annotation-driven>
     <!-- custom jackson marshallers (for some reason they are created twice) -->
