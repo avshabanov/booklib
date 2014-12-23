@@ -13,6 +13,14 @@
     <constructor-arg ref="svc.bookService"/>
   </bean>
 
+  <bean class="com.alexshabanov.booklib.web.controllers.AuthorController">
+    <constructor-arg ref="svc.bookService"/>
+  </bean>
+
+  <bean class="com.alexshabanov.booklib.web.controllers.GenreController">
+    <constructor-arg ref="svc.bookService"/>
+  </bean>
+
   <!-- Annotation driven support for MVC controllers -->
   <mvc:annotation-driven/>
 

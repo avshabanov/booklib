@@ -11,7 +11,12 @@ import com.alexshabanov.booklib.model.NamedValue
 
 data class Book(val meta: BookMeta, val authors: List<NamedValue>, val genres: List<NamedValue>)
 
-data class NamedValuePage(val namedValue: NamedValue, val books: List<Book>, val nextBookId: Long?)
+data class NamedValuePage(val namedValue: NamedValue, val books: List<Book>, nextBookId: Long?)
+
+private fun asNamedValuePage(namedValue: NamedValue, books: List<Book>, limit: Int) = NamedValuePage(
+    namedValue = namedValue,
+    books = books,
+    nextBookId = (if (books.size() < limit) null else books.last().meta.id))
 
 //
 // Service Implementation
@@ -31,21 +36,16 @@ class BookService(val bookDao: BookDao, val namedValueDao: NamedValueDao) {
     }
   }
 
-  fun getAuthorPageModel(authorId: Long, nextBookId: Long?): NamedValuePage {
-    val author = namedValueDao.getAuthorById(authorId)
-    val limit = DEFAULT_LIMIT
-    val books = getBooksByMeta(bookDao.getBooksOfAuthor(authorId, nextBookId, limit))
-    val newNextBookId = (if (books.size() < limit) null else books.last().meta.id)
+  fun getAuthorPageModel(authorId: Long, startBookId: Long?, limit: Int = DEFAULT_LIMIT) = asNamedValuePage(
+      namedValueDao.getAuthorById(authorId), getBooksByMeta(bookDao.getBooksOfAuthor(authorId, startBookId, limit)), limit)
 
-    return NamedValuePage(namedValue = author, books = books, nextBookId = newNextBookId)
-  }
+  fun getGenrePageModel(genreId: Long, startBookId: Long?, limit: Int = DEFAULT_LIMIT) = asNamedValuePage(
+      namedValueDao.getGenreById(genreId), getBooksByMeta(bookDao.getBooksOfGenre(genreId, startBookId, limit)), limit)
 
-  fun getGenrePageModel(genreId: Long, nextBookId: Long?): NamedValuePage {
-    val author = namedValueDao.getGenreById(genreId)
-    val limit = DEFAULT_LIMIT
-    val books = getBooksByMeta(bookDao.getBooksOfGenre(genreId, nextBookId, limit))
-    val newNextBookId = (if (books.size() < limit) null else books.last().meta.id)
+  fun getGenres() = namedValueDao.getGenres()
 
-    return NamedValuePage(namedValue = author, books = books, nextBookId = newNextBookId)
-  }
+  fun getAuthorNameHint(namePrefix: String? = null) = namedValueDao.getAuthorNameHint(namePrefix)
+
+  fun getAuthorsByNamePrefix(namePrefix: String, startWithName: String? = null, limit: Int = DEFAULT_LIMIT) =
+      namedValueDao.getAuthorsByNamePrefix(namePrefix, startWithName, limit)
 }

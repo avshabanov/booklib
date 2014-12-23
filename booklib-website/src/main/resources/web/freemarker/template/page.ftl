@@ -32,8 +32,8 @@
       <#-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="g-app-navbar-collapse">
         <ul class="nav navbar-nav">
-          <li><a href="#">Authors</a></li>
-          <li><a href="#">Genres</a></li>
+          <li><a href="/g/authors">Authors</a></li>
+          <li><a href="/g/genres">Genres</a></li>
           <li class="nav-divider"></li>
           <li><a href="/g/about">About</a></li>
         </ul>

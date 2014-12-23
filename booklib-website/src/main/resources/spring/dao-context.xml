@@ -3,6 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+  <!-- TODO: use poolable connection in live app, move into DS bean into separate config (and use DriverManagerDataSource in tests) -->
   <bean id="dao.dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     <property name="driverClassName" value="org.h2.Driver" />
     <property name="url" value="${booklib.dao.dataSource.url}" />

@@ -91,5 +91,23 @@ class DaoTest {
     assertEquals(setOf(NamedValue(5, "Arkady Strugatsky"), NamedValue(6, "Boris Strugatsky")), book.authors.toSet())
     assertEquals(setOf(NamedValue(1, "sci_fi"), NamedValue(4, "novel")), book.genres.toSet())
   }
+
+  Test fun shouldGetAuthorNamesHint() {
+    assertEquals(listOf("A", "B", "E", "J", "S", "V"), namedValueDao.getAuthorNameHint())
+  }
+
+  Test fun shouldGetAuthorNamesHintByPrefix() {
+    assertEquals(listOf("Ja", "Jo"), namedValueDao.getAuthorNameHint("J"))
+  }
+
+  Test fun shouldGetAuthorsByNamePrefix() {
+    assertEquals(listOf(NamedValue(1, "Jack London"), NamedValue(8, "Jason Ciaramella"), NamedValue(4, "Joe Hill")),
+        namedValueDao.getAuthorsByNamePrefix("J"))
+
+    assertEquals(listOf(NamedValue(8, "Jason Ciaramella"), NamedValue(4, "Joe Hill")),
+        namedValueDao.getAuthorsByNamePrefix("J", "Jack London"))
+
+    assertEquals(listOf(NamedValue(8, "Jason Ciaramella")), namedValueDao.getAuthorsByNamePrefix("J", "Jack London", 1))
+  }
 }
 

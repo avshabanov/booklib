@@ -46,6 +46,12 @@ trait NamedValueDao {
   fun getAuthorById(id: Long): NamedValue
 
   fun getGenreById(id: Long): NamedValue
+
+  fun getGenres(): List<NamedValue>
+
+  fun getAuthorNameHint(namePrefix: String? = null): List<String>
+
+  fun getAuthorsByNamePrefix(namePrefix: String, startWithName: String? = null, limit: Int = DEFAULT_LIMIT): List<NamedValue>
 }
 
 //
@@ -130,6 +136,22 @@ class NamedValueDaoImpl(val db: NamedParameterJdbcOperations): NamedValueDao {
 
   override fun getGenreById(id: Long) = db.queryForObject(
       "SELECT id, code AS name FROM genre WHERE id=:id", mapOf(Pair("id", id)), NAMED_VALUE_ROW_MAPPER)
+
+  override fun getGenres() = db.query("SELECT id, code AS name FROM genre ORDER BY code", NAMED_VALUE_ROW_MAPPER)
+
+  override fun getAuthorNameHint(namePrefix: String?) = db.queryForList(
+      "SELECT DISTINCT SUBSTR(f_name, 0, :char_count) AS name_part FROM author\n" +
+          "WHERE (:name_prefix IS NULL OR f_name LIKE :name_prefix)\n" +
+          "ORDER BY name_part",
+      mapOf(Pair("name_prefix", if (namePrefix != null) namePrefix + "%" else null),
+          Pair("char_count", if (namePrefix != null) namePrefix.length() + 1 else 1)),
+      javaClass<String>())
+
+  override fun getAuthorsByNamePrefix(namePrefix: String, startWithName: String?, limit: Int) = db.query(
+      "SELECT id, f_name AS name FROM author\n" +
+          "WHERE f_name LIKE :name_prefix AND (:start_name IS NULL OR f_name > :start_name) LIMIT :limit",
+      mapOf(Pair("name_prefix", namePrefix + "%"), Pair("start_name", startWithName), Pair("limit", limit)),
+      NAMED_VALUE_ROW_MAPPER)
 
   //
   // Private
