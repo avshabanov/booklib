@@ -20,6 +20,8 @@
 
     <jetty.version>8.1.10.v20130312</jetty.version>
 
+    <awssdk.version>1.9.13</awssdk.version>
+
     <aspectj.version>1.6.10</aspectj.version>
     <spring.version>3.2.3.RELEASE</spring.version>
 
@@ -68,6 +70,13 @@
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.version}</version>
+      </dependency>
+
+      <!-- AWS SDK -->
+      <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>aws-java-sdk-s3</artifactId>
+        <version>${awssdk.version}</version>
       </dependency>
 
       <!-- Jetty -->

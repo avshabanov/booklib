@@ -2,11 +2,16 @@
 <@pt.page title="Book &raquo; ${book.meta.title}">
 
 <h2>${book.meta.title}</h2>
+
 <hr/>
 
 <!-- Information -->
 <table class="book-info">
   <tbody>
+    <tr>
+      <td>ID:</td>
+      <td>${book.meta.id?c}</td>
+    </tr>
     <tr>
       <td>Authors:</td>
       <td>
@@ -44,6 +49,6 @@
 
 <hr/>
 
-<h3><a href="#">Download&nbsp;<span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></h3>
+<h3><a href="/g/book/${book.meta.id?c}/download">Download&nbsp;<span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></h3>
 
 </@pt.page>

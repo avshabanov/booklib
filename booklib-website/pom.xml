@@ -38,6 +38,11 @@
       <artifactId>jetty-servlet</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-s3</artifactId>
+    </dependency>
+
     <!-- Freemarker -->
     <dependency>
       <groupId>org.freemarker</groupId>

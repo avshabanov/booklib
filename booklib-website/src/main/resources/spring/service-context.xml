@@ -9,11 +9,6 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
   <context:annotation-config/>
 
-  <!--<util:list id="config.propertyLocations">-->
-    <!--<value>classpath:/settings/core.properties</value>-->
-    <!--<value>${booklib.settings.path}</value>-->
-  <!--</util:list>-->
-
   <!--<context:property-placeholder location-ref=""/>-->
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="locations">
@@ -38,4 +33,7 @@
     <constructor-arg ref="dao.bookDao"/>
     <constructor-arg ref="dao.namedValueDao"/>
   </bean>
+
+  <bean id="svc.downloadServiceFactory" class="com.alexshabanov.booklib.service.BookDownloadServiceFactory"/>
+  <bean id="svc.downloadService" factory-bean="svc.downloadServiceFactory" factory-method="getDownloadService" />
 </beans>

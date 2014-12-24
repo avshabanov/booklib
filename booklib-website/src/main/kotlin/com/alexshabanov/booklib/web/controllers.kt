@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ResponseBody as respBody
 import org.springframework.web.servlet.ModelAndView
 import com.alexshabanov.booklib.service.BookService
 import com.alexshabanov.booklib.service.DEFAULT_LIMIT
+import javax.servlet.http.HttpServletResponse
+import com.alexshabanov.booklib.service.BookDownloadService
 
 //
 // Spring MVC controllers
@@ -15,21 +17,30 @@ import com.alexshabanov.booklib.service.DEFAULT_LIMIT
 
 val MAX_NAME_HINT_LENGTH = 3
 
-req(array("/g"), produces = "text/html; encoding=UTF-8") controller open class StandardHtmlController
+/** Base HTML controller. */
+req(array("/g")) controller open class StandardHtmlController
 
 /** Generic pages controller. */
-class PublicController(val bookService: BookService): StandardHtmlController() {
+class GenericController(val bookService: BookService): StandardHtmlController() {
 
   req(array("/index")) fun index() = ModelAndView("index", "randomBooks", bookService.getRandomBooks())
 
   req(array("/about")) fun about() = "about"
+}
+
+/** Book-specific pages */
+class BookController(val bookService: BookService, val downloadService: BookDownloadService): StandardHtmlController() {
 
   req(array("/book/{id}")) fun book(pathVar("id") bookId: Long) =
       ModelAndView("book", "book", bookService.getBookById(bookId))
+
+  req(array("/book/{id}/download")) fun downloadBook(pathVar("id") bookId: Long, response: HttpServletResponse) {
+    downloadService.download(bookId, response)
+  }
 }
 
 /** Genre-specific pages */
-req(array("/g")) controller class GenreController(val bookService: BookService) {
+class GenreController(val bookService: BookService): StandardHtmlController() {
 
   req(array("/genre/{id}")) fun genre(pathVar("id") genreId: Long,
                                       par("startBookId", required = false) startBookId: Long?) =
@@ -41,7 +52,7 @@ req(array("/g")) controller class GenreController(val bookService: BookService) 
 }
 
 /** Author-specific pages */
-req(array("/g")) controller class AuthorController(val bookService: BookService) {
+class AuthorController(val bookService: BookService): StandardHtmlController() {
 
   req(array("/author/{id}")) fun author(pathVar("id") authorId: Long,
                                         par("startBookId", required = false) startBookId: Long?) =
