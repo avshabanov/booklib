@@ -34,6 +34,20 @@
     <constructor-arg ref="dao.namedValueDao"/>
   </bean>
 
-  <bean id="svc.downloadServiceFactory" class="com.alexshabanov.booklib.service.BookDownloadServiceFactory"/>
+  <bean id="svc.downloadServiceFactory" class="com.alexshabanov.booklib.service.BookDownloadServiceFactory">
+    <constructor-arg ref="dao.bookDao"/>
+
+    <property name="downloadMode" value="${booklib.download.mode}"/>
+
+    <property name="accessKey" value="${booklib.aws.accessKey}"/>
+    <property name="secretKey" value="${booklib.aws.secretKey}"/>
+
+    <property name="bucketName" value="${booklib.download.s3.bucket}"/>
+    <property name="bucketKeySuffix" value="${booklib.download.s3.bucketKeySuffix}"/>
+    <property name="bucketKeyPrefix" value="${booklib.download.s3.bucketKeyPrefix}"/>
+
+    <property name="urlExpirationMillis" value="${booklib.download.s3.urlExpirationTimeoutMillis}"/>
+  </bean>
+
   <bean id="svc.downloadService" factory-bean="svc.downloadServiceFactory" factory-method="getDownloadService" />
 </beans>
