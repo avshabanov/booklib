@@ -11,12 +11,12 @@ import com.alexshabanov.booklib.model.NamedValue
 
 data class Book(val meta: BookMeta, val authors: List<NamedValue>, val genres: List<NamedValue>)
 
-data class NamedValuePage(val namedValue: NamedValue, val books: List<Book>, nextBookId: Long?)
+data class NamedValuePage(val namedValue: NamedValue, val books: List<Book>, val startBookId: Long?)
 
 private fun asNamedValuePage(namedValue: NamedValue, books: List<Book>, limit: Int) = NamedValuePage(
     namedValue = namedValue,
     books = books,
-    nextBookId = (if (books.size() < limit) null else books.last().meta.id))
+    startBookId = (if (books.size() < limit) null else books.last().meta.id))
 
 //
 // Service Implementation

@@ -1,9 +1,12 @@
 <#import "template/page.ftl" as pt/>
 <#import "template/books.ftl" as books/>
+<#import "template/pager.ftl" as pager/>
 <@pt.page title="Genre &raquo; ${pageModel.namedValue.name?html}">
 
 <h2>${pageModel.namedValue.name?html}</h2>
 <p>Bibliography:</p>
+
+<@pager.firstNextBook pageUrl="/g/genre/${pageModel.namedValue.id?c}" curBookId=curBookId!0 startBookId=pageModel.startBookId />
 
 <ul class="book-list">
   <#list pageModel.books as bookModel>
@@ -11,15 +14,6 @@
   </#list>
 </ul>
 
-<div>
-  <nav>
-    <ul class="pager">
-      <li><a href="/g/genre/${pageModel.namedValue.id?c}">&lArr; First Page</a></li>
-      <#if pageModel.startBookId??>
-        <li><a href="/g/genre/${pageModel.namedValue.id?c}?startBookId=${pageModel.startBookId?c}">Next Page &rarr;</a></li>
-      </#if>
-    </ul>
-  </nav>
-</div>
+<@pager.firstNextBook pageUrl="/g/genre/${pageModel.namedValue.id?c}" curBookId=curBookId!0 startBookId=pageModel.startBookId />
 
 </@pt.page>

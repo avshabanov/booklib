@@ -30,7 +30,9 @@ req(array("/g")) controller class GenreController(val bookService: BookService) 
 
   req(array("/genre/{id}")) fun genre(pathVar("id") genreId: Long,
                                       par("startBookId", required = false) startBookId: Long?) =
-      ModelAndView("genre", "pageModel", bookService.getGenrePageModel(genreId, startBookId))
+      ModelAndView("genre", mapOf(
+          Pair("curBookId", startBookId),
+          Pair("pageModel", bookService.getGenrePageModel(genreId, startBookId))))
 
   req(array("/genres")) fun genres() = ModelAndView("genre-list", "genreList", bookService.getGenres())
 }
@@ -40,7 +42,9 @@ req(array("/g")) controller class AuthorController(val bookService: BookService)
 
   req(array("/author/{id}")) fun author(pathVar("id") authorId: Long,
                                         par("startBookId", required = false) startBookId: Long?) =
-      ModelAndView("author", "pageModel", bookService.getAuthorPageModel(authorId, startBookId))
+      ModelAndView("author", mapOf(
+          Pair("curBookId", startBookId),
+          Pair("pageModel", bookService.getAuthorPageModel(authorId, startBookId))))
 
   req(array("/authors")) fun authors(par("namePrefix", required = false) namePrefix: String?,
                                      par("startName", required = false) startName: String?): ModelAndView {

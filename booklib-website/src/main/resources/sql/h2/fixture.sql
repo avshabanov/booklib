@@ -1,4 +1,5 @@
 -- Fixture Data
+-- NOTE: There should be no zero values assigned to 'id' fields.
 
 INSERT INTO author (id, f_name) VALUES (1, 'Jack London');
 INSERT INTO author (id, f_name) VALUES (2, 'Edgar Poe');
