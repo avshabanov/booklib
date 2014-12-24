@@ -9,6 +9,8 @@
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
   <context:annotation-config/>
 
+  <!-- Controllers -->
+
   <bean class="com.alexshabanov.booklib.web.controllers.GenericController">
     <constructor-arg ref="svc.bookService"/>
   </bean>
@@ -25,6 +27,7 @@
   <bean class="com.alexshabanov.booklib.web.controllers.GenreController">
     <constructor-arg ref="svc.bookService"/>
   </bean>
+
 
   <!-- Annotation driven support for MVC controllers -->
   <mvc:annotation-driven/>

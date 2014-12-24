@@ -10,6 +10,8 @@ import com.alexshabanov.booklib.service.BookService
 import com.alexshabanov.booklib.service.DEFAULT_LIMIT
 import javax.servlet.http.HttpServletResponse
 import com.alexshabanov.booklib.service.BookDownloadService
+import com.alexshabanov.booklib.model.UtcTime
+import com.alexshabanov.booklib.model.currentUtcTime
 
 //
 // Spring MVC controllers
@@ -26,6 +28,10 @@ class GenericController(val bookService: BookService): StandardHtmlController() 
   req(array("/index")) fun index() = ModelAndView("index", "randomBooks", bookService.getRandomBooks())
 
   req(array("/about")) fun about() = "about"
+
+  req(array("/login")) fun login(par("error", required = false) loginError: String?): ModelAndView {
+    return ModelAndView("login", mapOf(Pair("loginError", loginError), Pair("currentTime", currentUtcTime())))
+  }
 }
 
 /** Book-specific pages */

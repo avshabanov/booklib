@@ -31,3 +31,14 @@ table.book-info > tbody > tr > td {
 table.book-info > tbody > tr > td:first-child {
   font-weight: bold;
 }
+
+/* Sign in form */
+
+form.signin-form div {
+  min-height: 2em;
+}
+
+form.signin-form > div.button-holder {
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+}

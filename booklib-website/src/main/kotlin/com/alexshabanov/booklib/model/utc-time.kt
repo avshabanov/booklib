@@ -18,6 +18,8 @@ data class UtcTime(val time: Long) {
   }
 }
 
+fun currentUtcTime() = UtcTime(System.currentTimeMillis())
+
 fun asNullableUtcTime(rs: ResultSet, columnName: String): UtcTime? {
   val utcTimestamp = rs.getTimestamp(columnName, UTC_CALENDAR)
   if (utcTimestamp == null) {

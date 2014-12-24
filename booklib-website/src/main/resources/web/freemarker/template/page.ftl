@@ -2,11 +2,11 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
 
     <meta name="Author" content="Alex" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <title>BookLib &raquo; ${title?html}</title>
 
@@ -37,6 +37,8 @@
           <li><a href="/g/genres">Genres</a></li>
           <li class="nav-divider"></li>
           <li><a href="/g/about">About</a></li>
+          <li class="nav-divider"></li>
+          <li><a href="/g/logout">Logout</a></li>
         </ul>
       </div>
       <#-- /.navbar-collapse -->

@@ -13,18 +13,29 @@ import org.eclipse.jetty.server.handler.HandlerCollection
 import org.eclipse.jetty.server.Handler
 import org.eclipse.jetty.util.resource.Resource
 import com.alexshabanov.booklib.util.ArgParser
+import org.springframework.web.filter.DelegatingFilterProxy
+import org.eclipse.jetty.servlet.FilterHolder
 
 
 private fun initSpringContext(context: ServletContextHandler) {
-  context.setInitParameter("contextConfigLocation", "classpath:/spring/service-context.xml")
+  context.setInitParameter("contextConfigLocation", "classpath:/spring/service-context.xml,classpath:/spring/security-context.xml")
 
-  val cef = context.addFilter(javaClass<CharacterEncodingFilter>(), "/*", EnumSet.allOf(javaClass<DispatcherType>()))
-  cef.setInitParameter("encoding", "UTF-8")
-  cef.setInitParameter("forceEncoding", "true")
+  // Enforce UTF-8 encoding
+  val encFilterHolder = context.addFilter(javaClass<CharacterEncodingFilter>(), "/*", EnumSet.allOf(javaClass<DispatcherType>()))
+  encFilterHolder.setInitParameter("encoding", "UTF-8")
+  encFilterHolder.setInitParameter("forceEncoding", "true")
 
+  // Spring security
+  val delegatingFilterHolder = FilterHolder(javaClass<DelegatingFilterProxy>())
+  delegatingFilterHolder.setName("springSecurityFilterChain")
+  context.addFilter(delegatingFilterHolder, "/*", EnumSet.allOf(javaClass<DispatcherType>()))
+
+  // Spring loader context
   context.addEventListener(ContextLoaderListener())
 
-  val ds = context.addServlet(javaClass<DispatcherServlet>(), "/g/*,/rest/*")
+  // Main spring servlet
+  // NOTE: /j_spring_security_check is associated with dispatcher servlet, but it is actually handled by DelegatingFilterProxy!
+  val ds = context.addServlet(javaClass<DispatcherServlet>(), "/g/*,/rest/*,/j_spring_security_check")
   ds.setInitParameter("contextConfigLocation", "classpath:/spring/webmvc-context.xml")
 }
 
