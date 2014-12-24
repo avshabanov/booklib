@@ -9,7 +9,7 @@
 
 <ul>
   <#list authorList as author>
-      <li><a href="/g/author/${author.id}">${author.name}</a></li>
+      <li><a href="/g/author/${author.id?c}">${author.name}</a></li>
   </#list>
 </ul>
 

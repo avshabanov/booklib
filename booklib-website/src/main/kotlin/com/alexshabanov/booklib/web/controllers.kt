@@ -5,17 +5,8 @@ import org.springframework.web.bind.annotation.RequestMapping as req
 import org.springframework.web.bind.annotation.RequestParam as par
 import org.springframework.web.bind.annotation.PathVariable as pathVar
 import org.springframework.web.bind.annotation.ResponseBody as respBody
-import javax.servlet.http.HttpServletResponse
-import java.io.OutputStreamWriter
-import org.springframework.ui.Model
 import org.springframework.web.servlet.ModelAndView
-import java.util.Arrays
-import com.alexshabanov.booklib.service.BookDao
-import com.alexshabanov.booklib.model.BookMeta
-import com.alexshabanov.booklib.model.NamedValue
-import java.util.ArrayList
 import com.alexshabanov.booklib.service.BookService
-import com.alexshabanov.booklib.service.Book
 import com.alexshabanov.booklib.service.DEFAULT_LIMIT
 
 //
@@ -24,8 +15,10 @@ import com.alexshabanov.booklib.service.DEFAULT_LIMIT
 
 val MAX_NAME_HINT_LENGTH = 3
 
-/** Public HTML controller. */
-req(array("/g")) controller class PublicController(val bookService: BookService) {
+req(array("/g"), produces = "text/html; encoding=UTF-8") controller open class StandardHtmlController
+
+/** Generic pages controller. */
+class PublicController(val bookService: BookService): StandardHtmlController() {
 
   req(array("/index")) fun index() = ModelAndView("index", "randomBooks", bookService.getRandomBooks())
 

@@ -14,9 +14,9 @@
 <div>
   <nav>
     <ul class="pager">
-      <li><a href="/g/genre/${pageModel.namedValue.id}">&lArr; First Page</a></li>
+      <li><a href="/g/genre/${pageModel.namedValue.id?c}">&lArr; First Page</a></li>
       <#if pageModel.startBookId??>
-        <li><a href="/g/genre/${pageModel.namedValue.id}?startBookId=${pageModel.startBookId}">Next Page &rarr;</a></li>
+        <li><a href="/g/genre/${pageModel.namedValue.id?c}?startBookId=${pageModel.startBookId?c}">Next Page &rarr;</a></li>
       </#if>
     </ul>
   </nav>

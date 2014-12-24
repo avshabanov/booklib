@@ -12,6 +12,7 @@ import org.eclipse.jetty.server.handler.ResourceHandler
 import org.eclipse.jetty.server.handler.HandlerCollection
 import org.eclipse.jetty.server.Handler
 import org.eclipse.jetty.util.resource.Resource
+import com.alexshabanov.booklib.util.ArgParser
 
 
 private fun initSpringContext(context: ServletContextHandler) {
@@ -27,14 +28,10 @@ private fun initSpringContext(context: ServletContextHandler) {
   ds.setInitParameter("contextConfigLocation", "classpath:/spring/webmvc-context.xml")
 }
 
-/**
- * @author Alexander Shabanov
- */
-fun main(args: Array<String>) {
-  var configPath = "classpath:settings/default.properties"
+private fun startServer(port: Int, configPath: String) {
   System.setProperty("booklib.settings.path", configPath)
 
-  val server = Server(8080)
+  val server = Server(port)
 
   val resourceHandler = ResourceHandler()
   resourceHandler.setBaseResource(Resource.newClassPathResource("/web/static"))
@@ -49,5 +46,16 @@ fun main(args: Array<String>) {
 
   server.start()
   server.join()
+}
+
+/** Entry point. */
+fun main(args: Array<String>) {
+  val argParser = ArgParser(args)
+  val parseResult = argParser.parse()
+  if (parseResult != 0) {
+    System.exit(parseResult)
+  }
+
+  startServer(argParser.port, argParser.configPath)
 }
 

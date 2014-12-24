@@ -5,7 +5,7 @@
 
 <ul>
   <#list genreList as genre>
-    <li><a href="/g/genre/${genre.id}">${genre.name}</a></li>
+    <li><a href="/g/genre/${genre.id?c}">${genre.name}</a></li>
   </#list>
 </ul>
 
