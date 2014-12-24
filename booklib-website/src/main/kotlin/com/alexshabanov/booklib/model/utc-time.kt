@@ -4,11 +4,19 @@ import java.util.TimeZone
 import java.util.Calendar
 import java.sql.ResultSet
 import java.text.SimpleDateFormat
+import java.util.Date
 
-data class UtcTime(val time: Long)
 
 val UTC_TIMEZONE = TimeZone.getTimeZone("UTC")
 private val UTC_CALENDAR = Calendar.getInstance(UTC_TIMEZONE)
+
+data class UtcTime(val time: Long) {
+  override fun toString(): String {
+    val dateTime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+    dateTime.setCalendar(UTC_CALENDAR)
+    return dateTime.format(Date(time))
+  }
+}
 
 fun asNullableUtcTime(rs: ResultSet, columnName: String): UtcTime? {
   val utcTimestamp = rs.getTimestamp(columnName, UTC_CALENDAR)
@@ -32,8 +40,7 @@ fun asUtcTime(rs: ResultSet, columnName: String, defaultTime: UtcTime? = null): 
 }
 
 fun parseUtcDate(isoDate: String): UtcTime {
-  val cal = Calendar.getInstance(UTC_TIMEZONE)
   val dateTime = SimpleDateFormat("yyyy-MM-dd")
-  dateTime.setCalendar(cal)
+  dateTime.setCalendar(UTC_CALENDAR)
   return UtcTime(time = dateTime.parse(isoDate).getTime())
 }

@@ -23,6 +23,9 @@ class PublicController(val bookService: BookService): StandardHtmlController() {
   req(array("/index")) fun index() = ModelAndView("index", "randomBooks", bookService.getRandomBooks())
 
   req(array("/about")) fun about() = "about"
+
+  req(array("/book/{id}")) fun book(pathVar("id") bookId: Long) =
+      ModelAndView("book", "book", bookService.getBookById(bookId))
 }
 
 /** Genre-specific pages */

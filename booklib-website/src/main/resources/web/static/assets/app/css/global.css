@@ -18,3 +18,16 @@ ul.book-list li {
   border-top: 1px solid #eee;
   padding-bottom: 1em;
 }
+
+.named-value-elem {
+  padding: 0.5em;
+  display: inline-block;
+}
+
+table.book-info > tbody > tr > td {
+  padding: 0.5em;
+}
+
+table.book-info > tbody > tr > td:first-child {
+  font-weight: bold;
+}

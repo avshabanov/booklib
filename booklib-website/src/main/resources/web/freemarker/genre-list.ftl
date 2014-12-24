@@ -1,12 +1,9 @@
 <#import "template/page.ftl" as pt/>
+<#import "template/named-value.ftl" as namedValue/>
 <@pt.page title="Genres">
 
 <h2>Genres</h2>
 
-<ul>
-  <#list genreList as genre>
-    <li><a href="/g/genre/${genre.id?c}">${genre.name}</a></li>
-  </#list>
-</ul>
+<@namedValue.list valuePageUrlPrefix="/g/genre" listModel=genreList />
 
 </@pt.page>

@@ -7,10 +7,10 @@
 
 <h2>Authors</h2>
 
-<ul>
+<p>
   <#list prefixList as namePrefix>
-    <li><a href="/g/authors?namePrefix=${namePrefix?html}">${namePrefix}</a></li>
+    <span class="named-value-elem"><a href="/g/authors?namePrefix=${namePrefix?url}"><strong>${namePrefix}</strong>&nbsp;<small>&hellip;</small></a></span>
   </#list>
-</ul>
+</p>
 
 </@pt.page>

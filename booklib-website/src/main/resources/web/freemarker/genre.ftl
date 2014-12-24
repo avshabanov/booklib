@@ -6,7 +6,7 @@
 <h2>${pageModel.namedValue.name?html}</h2>
 <p>Bibliography:</p>
 
-<@pager.firstNextBook pageUrl="/g/genre/${pageModel.namedValue.id?c}" curBookId=curBookId!0 startBookId=pageModel.startBookId />
+<@pager.firstNextBook pageUrl="/g/genre/${pageModel.namedValue.id?c}" curBookId=curBookId!0 startBookId=pageModel.startBookId!0 />
 
 <ul class="book-list">
   <#list pageModel.books as bookModel>
@@ -14,6 +14,6 @@
   </#list>
 </ul>
 
-<@pager.firstNextBook pageUrl="/g/genre/${pageModel.namedValue.id?c}" curBookId=curBookId!0 startBookId=pageModel.startBookId />
+<@pager.firstNextBook pageUrl="/g/genre/${pageModel.namedValue.id?c}" curBookId=curBookId!0 startBookId=pageModel.startBookId!0 />
 
 </@pt.page>

@@ -1,4 +1,5 @@
 <#import "template/page.ftl" as pt/>
+<#import "template/named-value.ftl" as namedValue/>
 <@pt.page title="Authors">
 
 <#--
@@ -7,10 +8,6 @@
 
 <h2>Authors</h2>
 
-<ul>
-  <#list authorList as author>
-      <li><a href="/g/author/${author.id?c}">${author.name}</a></li>
-  </#list>
-</ul>
+<@namedValue.list valuePageUrlPrefix="/g/author" listModel=authorList />
 
 </@pt.page>

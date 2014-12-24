@@ -48,4 +48,6 @@ class BookService(val bookDao: BookDao, val namedValueDao: NamedValueDao) {
 
   fun getAuthorsByNamePrefix(namePrefix: String, startWithName: String? = null, limit: Int = DEFAULT_LIMIT) =
       namedValueDao.getAuthorsByNamePrefix(namePrefix, startWithName, limit)
+
+  fun getBookById(bookId: Long): Book = getBooksByMeta(listOf(bookDao.getBookById(bookId))).get(0)
 }
