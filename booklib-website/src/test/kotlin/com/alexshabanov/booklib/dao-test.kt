@@ -30,8 +30,8 @@ import com.alexshabanov.booklib.model.parseUtcDate
 RunWith(javaClass<SpringJUnit4ClassRunner>())
 ContextConfiguration(locations = array("/spring/DaoTest-context.xml"))
 class DaoTest {
-  Resource(name = "dao.bookDao") var bookDao: BookDao = mock(javaClass<BookDao>()) // HERE: mocks to silence compiler
-  Resource(name = "dao.namedValueDao") var namedValueDao: NamedValueDao = mock(javaClass<NamedValueDao>())
+  Resource(name = "dao.bookDao") var bookDao: BookDao = mock(javaClass()) // HERE: mocks to silence compiler
+  Resource(name = "dao.namedValueDao") var namedValueDao: NamedValueDao = mock(javaClass())
 
   Test fun shouldGetBookById() {
     assertEquals(BookMeta(id = 1, title = "Far Rainbow", fileSize = 255365, addDate = parseUtcDate("2007-10-23"),
