@@ -77,3 +77,15 @@ class AuthorController(val bookService: BookService): StandardHtmlController() {
     return ModelAndView("author-names", "prefixList", bookService.getAuthorNameHint(namePrefix))
   }
 }
+
+/* Language-specific pages */
+class LangController(val bookService: BookService): StandardHtmlController() {
+
+  req(array("/language/{id}")) fun language(pathVar("id") languageId: Long,
+                                            par("startBookId", required = false) startBookId: Long?) =
+      ModelAndView("language", mapOf(
+          Pair("curBookId", startBookId),
+          Pair("pageModel", bookService.getLanguagePageModel(languageId, startBookId))))
+
+  req(array("/languages")) fun languages() = ModelAndView("language-list", "langList", bookService.getLanguages())
+}

@@ -38,7 +38,7 @@ class DaoTest {
 
   Test fun shouldGetBookById() {
     assertEquals(BookMeta(id = 1, title = "Far Rainbow", fileSize = 255365, addDate = parseUtcTime("2007-10-23"),
-        lang = "ru", origin = "RussianBooks"), bookDao.getBookById(1))
+        lang = NamedValue(2, "ru"), origin = "RussianBooks"), bookDao.getBookById(1))
   }
 
   Test fun shouldGetBookByTitle() {
@@ -111,6 +111,29 @@ class DaoTest {
         namedValueDao.getAuthorsByNamePrefix("J", "Jack London"))
 
     assertEquals(listOf(NamedValue(8, "Jason Ciaramella")), namedValueDao.getAuthorsByNamePrefix("J", "Jack London", 1))
+  }
+
+  Test fun shouldGetLanguageById() {
+    assertEquals(NamedValue(1, "en"), namedValueDao.getLanguageById(1))
+  }
+
+  Test fun shouldGetLanguages() {
+    assertEquals(listOf(NamedValue(1, "en"), NamedValue(2, "ru")), namedValueDao.getLanguages())
+  }
+
+  Test fun shouldGetFirstRuBooksByLanguage() {
+    val books = bookDao.getBooksByLanguage(languageId = 2, limit = 2)
+    assertEquals(listOf(bookDao.getBookById(1), bookDao.getBookById(2)), books)
+  }
+
+  Test fun shouldGetFirstEnBooksByLanguage() {
+    val books = bookDao.getBooksByLanguage(languageId = 1, limit = 2)
+    assertEquals(listOf(bookDao.getBookById(3), bookDao.getBookById(5)), books)
+  }
+
+  Test fun shouldGetNextEnBooksByLanguage() {
+    val books = bookDao.getBooksByLanguage(languageId = 1, nextBookId = 5, limit = 2)
+    assertEquals(listOf(bookDao.getBookById(6), bookDao.getBookById(7)), books)
   }
 }
 

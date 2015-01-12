@@ -35,6 +35,8 @@ trait BookDao {
   fun getBooksOfAuthor(authorId: Long, nextBookId: Long? = null, limit: Int = DEFAULT_LIMIT): List<BookMeta>
 
   fun getBooksOfGenre(genreId: Long, nextBookId: Long? = null, limit: Int = DEFAULT_LIMIT): List<BookMeta>
+
+  fun getBooksByLanguage(languageId: Long, nextBookId: Long? = null, limit: Int = DEFAULT_LIMIT): List<BookMeta>
 }
 
 trait NamedValueDao {
@@ -52,6 +54,10 @@ trait NamedValueDao {
   fun getAuthorNameHint(namePrefix: String? = null): List<String>
 
   fun getAuthorsByNamePrefix(namePrefix: String, startWithName: String? = null, limit: Int = DEFAULT_LIMIT): List<NamedValue>
+
+  fun getLanguageById(id: Long): NamedValue
+
+  fun getLanguages(): List<NamedValue>
 }
 
 //
@@ -60,12 +66,13 @@ trait NamedValueDao {
 
 private val BOOK_META_ROW_MAPPER = RowMapper() {(rs: ResultSet, i: Int) ->
   BookMeta(id = rs.getLong("id"), title = rs.getString("title"), fileSize = rs.getInt("f_size"),
-      lang = rs.getString("lang_name"), origin = rs.getString("origin_name"),
+      lang = NamedValue(rs.getLong("lang_id"), rs.getString("lang_name")), origin = rs.getString("origin_name"),
       addDate = UtcTimeSqlUtil.getUtcTime(rs, "add_date"))
 }
 
 private val BOOK_QUERY_SQL_HEAD =
-    "SELECT bm.id, bm.title, bm.f_size, bm.add_date, bo.code AS origin_name, lc.code AS lang_name FROM book_meta AS bm\n" +
+    "SELECT bm.id, bm.title, bm.f_size, bm.add_date, bo.code AS origin_name, lc.id AS lang_id, lc.code AS lang_name\n" +
+    "FROM book_meta AS bm\n" +
     "INNER JOIN book_origin AS bo ON bm.origin_id=bo.id\n" +
     "INNER JOIN lang_code AS lc ON bm.lang_id=lc.id\n"
 
@@ -102,18 +109,26 @@ class BookDaoImpl(val db: JdbcOperations): BookDao {
       BOOK_QUERY_SQL_HEAD +
           "INNER JOIN book_author AS ba ON bm.id=ba.book_id\n" +
           "WHERE ba.author_id=? AND ((? IS NULL) OR (bm.id > ?))\n" +
-          "ORDER BY bm.id\n" +
-          "LIMIT ?",
+          "ORDER BY bm.id LIMIT ?",
       BOOK_META_ROW_MAPPER, authorId, nextBookId, nextBookId, limit)
 
   override fun getBooksOfGenre(genreId: Long, nextBookId: Long?, limit: Int) = db.query(
       BOOK_QUERY_SQL_HEAD +
           "INNER JOIN book_genre AS bg ON bm.id=bg.book_id\n" +
           "WHERE bg.genre_id=? AND ((? IS NULL) OR (bm.id > ?))\n" +
-          "ORDER BY bm.id\n" +
-          "LIMIT ?",
+          "ORDER BY bm.id LIMIT ?",
       BOOK_META_ROW_MAPPER, genreId, nextBookId, nextBookId, limit)
+
+  override fun getBooksByLanguage(languageId: Long, nextBookId: Long?, limit: Int) = db.query(
+      BOOK_QUERY_SQL_HEAD +
+          "WHERE lc.id=? AND ((? IS NULL) OR (bm.id > ?))\n" +
+          "ORDER BY bm.id LIMIT ?",
+      BOOK_META_ROW_MAPPER, languageId, nextBookId, nextBookId, limit)
 }
+
+//
+// NamedValue DAO
+//
 
 private val NAMED_VALUE_ROW_MAPPER = RowMapper() {(rs: ResultSet, i: Int) ->
   NamedValue(id = rs.getInt("id").toLong(), name = rs.getString("name"))
@@ -153,6 +168,11 @@ class NamedValueDaoImpl(val db: NamedParameterJdbcOperations): NamedValueDao {
           "WHERE f_name LIKE :name_prefix AND (:start_name IS NULL OR f_name > :start_name) LIMIT :limit",
       mapOf(Pair("name_prefix", namePrefix + "%"), Pair("start_name", startWithName), Pair("limit", limit)),
       NAMED_VALUE_ROW_MAPPER)
+
+  override fun getLanguageById(id: Long) = db.getJdbcOperations().queryForObject(
+      "SELECT id, code AS name FROM lang_code WHERE id=?", NAMED_VALUE_ROW_MAPPER, id)
+
+  override fun getLanguages() = db.query("SELECT id, code AS name FROM lang_code ORDER BY code", NAMED_VALUE_ROW_MAPPER)
 
   //
   // Private

@@ -37,12 +37,20 @@ class BookService(val bookDao: BookDao, val namedValueDao: NamedValueDao) {
   }
 
   fun getAuthorPageModel(authorId: Long, startBookId: Long?, limit: Int = DEFAULT_LIMIT) = asNamedValuePage(
-      namedValueDao.getAuthorById(authorId), getBooksByMeta(bookDao.getBooksOfAuthor(authorId, startBookId, limit)), limit)
+      namedValueDao.getAuthorById(authorId),
+      getBooksByMeta(bookDao.getBooksOfAuthor(authorId, startBookId, limit)), limit)
 
   fun getGenrePageModel(genreId: Long, startBookId: Long?, limit: Int = DEFAULT_LIMIT) = asNamedValuePage(
-      namedValueDao.getGenreById(genreId), getBooksByMeta(bookDao.getBooksOfGenre(genreId, startBookId, limit)), limit)
+      namedValueDao.getGenreById(genreId),
+      getBooksByMeta(bookDao.getBooksOfGenre(genreId, startBookId, limit)), limit)
+
+  fun getLanguagePageModel(languageId: Long, startBookId: Long?, limit: Int = DEFAULT_LIMIT) = asNamedValuePage(
+      namedValueDao.getLanguageById(languageId),
+      getBooksByMeta(bookDao.getBooksByLanguage(languageId, startBookId, limit)), limit)
 
   fun getGenres() = namedValueDao.getGenres()
+
+  fun getLanguages() = namedValueDao.getLanguages()
 
   fun getAuthorNameHint(namePrefix: String? = null) = namedValueDao.getAuthorNameHint(namePrefix)
 

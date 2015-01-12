@@ -38,7 +38,7 @@
     </tr>
     <tr>
       <td>Language:</td>
-      <td>${book.meta.lang?html}</td>
+      <td><a href="/g/language/${book.meta.lang.id?c}">${book.meta.lang.name?html}</a></td>
     </tr>
     <tr>
       <td>Origin:</td>

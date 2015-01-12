@@ -35,6 +35,7 @@
         <ul class="nav navbar-nav">
           <li><a href="/g/authors">Authors</a></li>
           <li><a href="/g/genres">Genres</a></li>
+          <li><a href="/g/languages">Languages</a></li>
           <li class="nav-divider"></li>
           <li><a href="/g/about">About</a></li>
           <li class="nav-divider"></li>

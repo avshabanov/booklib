@@ -28,6 +28,10 @@
     <constructor-arg ref="svc.bookService"/>
   </bean>
 
+  <bean class="com.alexshabanov.booklib.web.controllers.LangController">
+    <constructor-arg ref="svc.bookService"/>
+  </bean>
+
 
   <!-- Annotation driven support for MVC controllers -->
   <mvc:annotation-driven/>
