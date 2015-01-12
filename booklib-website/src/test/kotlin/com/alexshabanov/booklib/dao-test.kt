@@ -21,11 +21,14 @@ import com.alexshabanov.booklib.model.NamedValue
 import com.alexshabanov.booklib.service.BookService
 import com.alexshabanov.booklib.model.BookMeta
 import java.util.Calendar
-import com.alexshabanov.booklib.model.UTC_TIMEZONE
 import java.text.SimpleDateFormat
-import com.alexshabanov.booklib.model.UtcTime
-import com.alexshabanov.booklib.model.parseUtcDate
+import com.truward.time.UtcTime
 
+private fun parseUtcTime(str: String): UtcTime {
+  val format = SimpleDateFormat("yyyy-MM-dd");
+  format.setCalendar(UtcTime.newUtcCalendar())
+  return UtcTime.valueOf(format.parse(str).getTime())
+}
 
 RunWith(javaClass<SpringJUnit4ClassRunner>())
 ContextConfiguration(locations = array("/spring/DaoTest-context.xml"))
@@ -34,7 +37,7 @@ class DaoTest {
   Resource(name = "dao.namedValueDao") var namedValueDao: NamedValueDao = mock(javaClass())
 
   Test fun shouldGetBookById() {
-    assertEquals(BookMeta(id = 1, title = "Far Rainbow", fileSize = 255365, addDate = parseUtcDate("2007-10-23"),
+    assertEquals(BookMeta(id = 1, title = "Far Rainbow", fileSize = 255365, addDate = parseUtcTime("2007-10-23"),
         lang = "ru", origin = "RussianBooks"), bookDao.getBookById(1))
   }
 

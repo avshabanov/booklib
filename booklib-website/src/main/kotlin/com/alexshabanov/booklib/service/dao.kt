@@ -12,7 +12,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.core.JdbcTemplate
 import java.util.HashMap
 import java.util.ArrayList
-import com.alexshabanov.booklib.model.asUtcTime
+import com.truward.time.jdbc.UtcTimeSqlUtil
 
 //
 // Interface
@@ -60,7 +60,8 @@ trait NamedValueDao {
 
 private val BOOK_META_ROW_MAPPER = RowMapper() {(rs: ResultSet, i: Int) ->
   BookMeta(id = rs.getLong("id"), title = rs.getString("title"), fileSize = rs.getInt("f_size"),
-      lang = rs.getString("lang_name"), origin = rs.getString("origin_name"), addDate = asUtcTime(rs, "add_date"))
+      lang = rs.getString("lang_name"), origin = rs.getString("origin_name"),
+      addDate = UtcTimeSqlUtil.getUtcTime(rs, "add_date"))
 }
 
 private val BOOK_QUERY_SQL_HEAD =

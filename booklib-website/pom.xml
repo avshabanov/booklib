@@ -73,6 +73,16 @@
       <artifactId>spring-webmvc</artifactId>
     </dependency>
 
+    <!-- UTC time -->
+    <dependency>
+      <groupId>com.truward.time</groupId>
+      <artifactId>utc-time</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.truward.time</groupId>
+      <artifactId>utc-time-sql</artifactId>
+    </dependency>
+
     <!-- DB -->
     <dependency>
       <groupId>com.h2database</groupId>

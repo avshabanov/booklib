@@ -34,7 +34,7 @@
     </tr>
     <tr>
       <td>Add Date:</td>
-      <td>${book.meta.addDate?html}</td>
+      <td>${book.meta.addDate}</td>
     </tr>
     <tr>
       <td>Language:</td>

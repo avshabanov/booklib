@@ -1,6 +1,7 @@
 package com.alexshabanov.booklib.model
 
 import java.util.Date
+import com.truward.time.UtcTime
 
 trait DomainModel
 

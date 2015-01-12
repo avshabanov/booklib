@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <title>BookLib &raquo; ${title?html}</title>
+    <title>BookLib &raquo; ${title}</title>
 
     <#-- TODO: conditional inclusion: DEV, MINIFIED, LIVE -->
     <link rel="stylesheet" type="text/css" href="/assets/bootstrap-3.3.1/css/bootstrap.css" />

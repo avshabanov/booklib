@@ -29,6 +29,8 @@
 
     <jackson.version>2.4.2</jackson.version>
 
+    <utc-time.version>1.0.4</utc-time.version>
+
     <kotlin.version>0.10.4</kotlin.version>
 
     <!--  compiler settings -->
@@ -70,6 +72,18 @@
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.version}</version>
+      </dependency>
+
+      <!-- UTC time -->
+      <dependency>
+        <groupId>com.truward.time</groupId>
+        <artifactId>utc-time</artifactId>
+        <version>${utc-time.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.truward.time</groupId>
+        <artifactId>utc-time-sql</artifactId>
+        <version>${utc-time.version}</version>
       </dependency>
 
       <!-- AWS SDK -->
