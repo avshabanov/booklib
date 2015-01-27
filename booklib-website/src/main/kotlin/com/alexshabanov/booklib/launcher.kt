@@ -43,6 +43,7 @@ private fun startServer(port: Int, configPath: String) {
   System.setProperty("booklib.settings.path", configPath)
 
   val server = Server(port)
+  server.setSendServerVersion(false)
 
   val resourceHandler = ResourceHandler()
   resourceHandler.setBaseResource(Resource.newClassPathResource("/web/static"))
