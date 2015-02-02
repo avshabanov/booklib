@@ -1,4 +1,4 @@
-package com.alexshabanov.booklib
+package com.alexshabanov.booklib.bookdaotest
 
 import org.junit.Test
 import org.springframework.test.context.ContextConfiguration
@@ -32,9 +32,9 @@ private fun parseUtcTime(str: String): UtcTime {
 
 RunWith(javaClass<SpringJUnit4ClassRunner>())
 ContextConfiguration(locations = array("/spring/DaoTest-context.xml"))
-class DaoTest {
-  Resource(name = "dao.bookDao") var bookDao: BookDao = mock(javaClass()) // HERE: mocks to silence compiler
-  Resource(name = "dao.namedValueDao") var namedValueDao: NamedValueDao = mock(javaClass())
+class BookDaoTest {
+  Resource(name = "dao.book.bookDao") var bookDao: BookDao = mock(javaClass()) // HERE: mocks to silence compiler
+  Resource(name = "dao.book.namedValueDao") var namedValueDao: NamedValueDao = mock(javaClass())
 
   Test fun shouldGetBookById() {
     assertEquals(BookMeta(id = 1, title = "Far Rainbow", fileSize = 255365, addDate = parseUtcTime("2007-10-23"),

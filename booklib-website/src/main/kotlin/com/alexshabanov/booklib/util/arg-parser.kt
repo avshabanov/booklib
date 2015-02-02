@@ -20,7 +20,7 @@ class ArgParser(val args: Array<String>) {
 
   private fun argValue(valueName: String): String {
     val nextPos = pos + 1
-    if (nextPos < args.size()) {
+    if (nextPos < args.size) {
       pos = nextPos
       return args[pos]
     }
@@ -28,7 +28,7 @@ class ArgParser(val args: Array<String>) {
   }
 
   private fun doParse(): Int {
-    while (pos < args.size()) {
+    while (pos < args.size) {
       if ("--help".equals(args[pos]) or "-h".equals(args[pos])) {
         showHelp()
         return 0

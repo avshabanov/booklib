@@ -7,8 +7,6 @@ import java.sql.ResultSet
 import java.util.Random
 import com.alexshabanov.booklib.model.NamedValue
 import org.springframework.jdbc.core.PreparedStatementCreator
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.core.JdbcTemplate
 import java.util.HashMap
 import java.util.ArrayList
@@ -138,38 +136,41 @@ private val BOOK_ID_WITH_NAMED_VALUE_ROW_MAPPER = RowMapper() {(rs: ResultSet, i
   Pair(rs.getLong("book_id"), NamedValue(id = rs.getInt("id").toLong(), name = rs.getString("name")))
 }
 
-class NamedValueDaoImpl(val db: NamedParameterJdbcOperations): NamedValueDao {
+class NamedValueDaoImpl(val db: JdbcOperations): NamedValueDao {
   override fun getAuthorsOfBooks(bookIds: List<Long>) = getBookToNamedValuesMap(bookIds,
       "SELECT ba.book_id, a.id, a.f_name AS name FROM author AS a\n" +
-      "INNER JOIN book_author AS ba ON a.id=ba.author_id WHERE ba.book_id IN (:bookIds)")
+      "INNER JOIN book_author AS ba ON a.id=ba.author_id WHERE ba.book_id=?")
 
   override fun getGenresOfBooks(bookIds: List<Long>) = getBookToNamedValuesMap(bookIds,
       "SELECT bg.book_id, g.id, g.code AS name FROM genre AS g\n" +
-          "INNER JOIN book_genre AS bg ON g.id=bg.genre_id WHERE bg.book_id IN (:bookIds)")
+          "INNER JOIN book_genre AS bg ON g.id=bg.genre_id WHERE bg.book_id=?")
 
   override fun getAuthorById(id: Long) = db.queryForObject(
-      "SELECT id, f_name AS name FROM author WHERE id=:id", mapOf(Pair("id", id)), NAMED_VALUE_ROW_MAPPER)
+      "SELECT id, f_name AS name FROM author WHERE id=?", NAMED_VALUE_ROW_MAPPER, id)
 
   override fun getGenreById(id: Long) = db.queryForObject(
-      "SELECT id, code AS name FROM genre WHERE id=:id", mapOf(Pair("id", id)), NAMED_VALUE_ROW_MAPPER)
+      "SELECT id, code AS name FROM genre WHERE id=?", NAMED_VALUE_ROW_MAPPER, id)
 
   override fun getGenres() = db.query("SELECT id, code AS name FROM genre ORDER BY code", NAMED_VALUE_ROW_MAPPER)
 
-  override fun getAuthorNameHint(namePrefix: String?) = db.queryForList(
-      "SELECT DISTINCT SUBSTR(f_name, 0, :char_count) AS name_part FROM author\n" +
-          "WHERE (:name_prefix IS NULL OR f_name LIKE :name_prefix)\n" +
-          "ORDER BY name_part",
-      mapOf(Pair("name_prefix", if (namePrefix != null) namePrefix + "%" else null),
-          Pair("char_count", if (namePrefix != null) namePrefix.length() + 1 else 1)),
-      javaClass<String>())
+  override fun getAuthorNameHint(namePrefix: String?): List<String> {
+    val namePrefixParam = if (namePrefix != null) namePrefix + "%" else null
+    val charCount = if (namePrefix != null) namePrefix.length() + 1 else 1
 
-  override fun getAuthorsByNamePrefix(namePrefix: String, startWithName: String?, limit: Int) = db.query(
-      "SELECT id, f_name AS name FROM author\n" +
-          "WHERE f_name LIKE :name_prefix AND (:start_name IS NULL OR f_name > :start_name) LIMIT :limit",
-      mapOf(Pair("name_prefix", namePrefix + "%"), Pair("start_name", startWithName), Pair("limit", limit)),
-      NAMED_VALUE_ROW_MAPPER)
+    return db.queryForList(
+        "SELECT DISTINCT SUBSTR(f_name, 0, ?) AS name_part FROM author\n" +
+            "WHERE (? IS NULL OR f_name LIKE ?)\n" +
+            "ORDER BY name_part",
+        javaClass<String>(), charCount, namePrefixParam, namePrefixParam)
+  }
 
-  override fun getLanguageById(id: Long) = db.getJdbcOperations().queryForObject(
+  override fun getAuthorsByNamePrefix(namePrefix: String, startWithName: String?, limit: Int): List<NamedValue> {
+    return db.query("SELECT id, f_name AS name FROM author\n" +
+        "WHERE f_name LIKE ? AND (? IS NULL OR f_name > ?) LIMIT ?",
+        NAMED_VALUE_ROW_MAPPER, namePrefix + "%", startWithName, startWithName, limit)
+  }
+
+  override fun getLanguageById(id: Long) = db.queryForObject(
       "SELECT id, code AS name FROM lang_code WHERE id=?", NAMED_VALUE_ROW_MAPPER, id)
 
   override fun getLanguages() = db.query("SELECT id, code AS name FROM lang_code ORDER BY code", NAMED_VALUE_ROW_MAPPER)
@@ -179,8 +180,10 @@ class NamedValueDaoImpl(val db: NamedParameterJdbcOperations): NamedValueDao {
   //
 
   private fun getBookToNamedValuesMap(bookIds: List<Long>, sqlQuery: String): Map<Long, List<NamedValue>> {
-    val pairs = db.query(sqlQuery,
-        mapOf(Pair("bookIds", bookIds)), BOOK_ID_WITH_NAMED_VALUE_ROW_MAPPER)
+    val pairs = ArrayList<Pair<Long, NamedValue>>()
+    for (bookId in bookIds) {
+      pairs.addAll(db.query(sqlQuery, BOOK_ID_WITH_NAMED_VALUE_ROW_MAPPER, bookId))
+    }
 
     val result = HashMap<Long, MutableList<NamedValue>>(pairs.size())
 

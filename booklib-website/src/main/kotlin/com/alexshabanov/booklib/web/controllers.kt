@@ -67,7 +67,7 @@ class AuthorController(val bookService: BookService): StandardHtmlController() {
 
   req(array("/authors")) fun authors(par("namePrefix", required = false) namePrefix: String?,
                                      par("startName", required = false) startName: String?): ModelAndView {
-    if (namePrefix != null && namePrefix.length() >= MAX_NAME_HINT_LENGTH) {
+    if (namePrefix != null && namePrefix.length >= MAX_NAME_HINT_LENGTH) {
       // author full name list
       val limit = Integer.MAX_VALUE // TODO: support pagination for author list?
       return ModelAndView("author-list", "authorList", bookService.getAuthorsByNamePrefix(namePrefix, startName, limit))

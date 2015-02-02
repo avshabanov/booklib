@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:util="http://www.springframework.org/schema/util"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
   <context:annotation-config/>
-
-  <util:properties id="test.properties">
-    <prop key="booklib.dao.dataSource.url">jdbc:h2:mem:testDb;INIT=RUNSCRIPT FROM 'classpath:/sql/h2/schema.sql'\;RUNSCRIPT FROM 'classpath:/sql/h2/fixture.sql'</prop>
-    <prop key="booklib.dao.dataSource.username">SA</prop>
-    <prop key="booklib.dao.dataSource.password"/>
-  </util:properties>
-
-  <context:property-placeholder properties-ref="test.properties"/>
+  <context:property-placeholder location="classpath:/settings/default.properties"/>
 
   <import resource="classpath:/spring/dao-context.xml" />
 </beans>
