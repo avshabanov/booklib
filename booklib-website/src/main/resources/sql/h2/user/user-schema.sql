@@ -4,13 +4,14 @@
 --
 
 -- User Profile
+-- password 'test': $2a$10$W5YdtLrCN.3dH8hilF2queEvfJedIhzSEzszgcjJ8e/NrWBCURIUW
 CREATE TABLE user_profile (
   id            INTEGER PRIMARY KEY,
-  login         CHAR(32) NOT NULL,
+  nickname      CHAR(32) NOT NULL,
   email         CHAR(64) NOT NULL,
-  password_hash CHAR(128) NOT NULL
+  password_hash CHAR(128) NOT NULL,
   created       TIMESTAMP NOT NULL,
-  CONSTRAINT uq_user_profile_login UNIQUE (login),
+  CONSTRAINT uq_user_profile_nickname UNIQUE (nickname),
   CONSTRAINT uq_user_profile_email UNIQUE (email)
 );
 
@@ -19,7 +20,7 @@ CREATE SEQUENCE seq_user_profile      START WITH 1000;
 -- Roles
 CREATE TABLE role (
   id            INTEGER PRIMARY KEY,
-  role_name     CHAR(32) NOT NULL
+  role_name     CHAR(32) NOT NULL,
   CONSTRAINT uq_role_name UNIQUE (role_name)
 );
 

@@ -12,11 +12,11 @@ import java.sql.ResultSet
 import java.util.Date
 import org.junit.Ignore
 import org.mockito.Mockito.mock
-import com.alexshabanov.booklib.service.BookDao
+import com.alexshabanov.booklib.service.dao.BookDao
 import kotlin.test.assertFalse
 import kotlin.test.assertEquals
-import com.alexshabanov.booklib.service.DEFAULT_LIMIT
-import com.alexshabanov.booklib.service.NamedValueDao
+import com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT
+import com.alexshabanov.booklib.service.dao.NamedValueDao
 import com.alexshabanov.booklib.model.NamedValue
 import com.alexshabanov.booklib.service.BookService
 import com.alexshabanov.booklib.model.BookMeta
@@ -33,8 +33,8 @@ private fun parseUtcTime(str: String): UtcTime {
 RunWith(javaClass<SpringJUnit4ClassRunner>())
 ContextConfiguration(locations = array("/spring/DaoTest-context.xml"))
 class BookDaoTest {
-  Resource(name = "dao.book.bookDao") var bookDao: BookDao = mock(javaClass()) // HERE: mocks to silence compiler
-  Resource(name = "dao.book.namedValueDao") var namedValueDao: NamedValueDao = mock(javaClass())
+  Resource(name = "dao.book.bookDao") var bookDao: com.alexshabanov.booklib.service.dao.BookDao = mock(javaClass()) // HERE: mocks to silence compiler
+  Resource(name = "dao.book.namedValueDao") var namedValueDao: com.alexshabanov.booklib.service.dao.NamedValueDao = mock(javaClass())
 
   Test fun shouldGetBookById() {
     assertEquals(BookMeta(id = 1, title = "Far Rainbow", fileSize = 255365, addDate = parseUtcTime("2007-10-23"),
@@ -50,7 +50,7 @@ class BookDaoTest {
   }
 
   Test fun shouldGetRandomBooks() {
-    assertEquals(DEFAULT_LIMIT, bookDao.getRandomBooks().size(), "Should get more than one random books")
+    assertEquals(com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT, bookDao.getRandomBooks().size(), "Should get more than one random books")
   }
 
   Test fun shouldGetAuthors() {

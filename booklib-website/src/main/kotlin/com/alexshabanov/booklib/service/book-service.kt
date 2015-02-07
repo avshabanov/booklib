@@ -22,7 +22,7 @@ private fun asNamedValuePage(namedValue: NamedValue, books: List<Book>, limit: I
 // Service Implementation
 //
 
-class BookService(val bookDao: BookDao, val namedValueDao: NamedValueDao) {
+class BookService(val bookDao: com.alexshabanov.booklib.service.dao.BookDao, val namedValueDao: com.alexshabanov.booklib.service.dao.NamedValueDao) {
   fun getRandomBooks() = getBooksByMeta(bookDao.getRandomBooks())
 
   fun getBooksByMeta(bookMetaList: List<BookMeta>): List<Book> {
@@ -36,15 +36,15 @@ class BookService(val bookDao: BookDao, val namedValueDao: NamedValueDao) {
     }
   }
 
-  fun getAuthorPageModel(authorId: Long, startBookId: Long?, limit: Int = DEFAULT_LIMIT) = asNamedValuePage(
+  fun getAuthorPageModel(authorId: Long, startBookId: Long?, limit: Int = com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT) = asNamedValuePage(
       namedValueDao.getAuthorById(authorId),
       getBooksByMeta(bookDao.getBooksOfAuthor(authorId, startBookId, limit)), limit)
 
-  fun getGenrePageModel(genreId: Long, startBookId: Long?, limit: Int = DEFAULT_LIMIT) = asNamedValuePage(
+  fun getGenrePageModel(genreId: Long, startBookId: Long?, limit: Int = com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT) = asNamedValuePage(
       namedValueDao.getGenreById(genreId),
       getBooksByMeta(bookDao.getBooksOfGenre(genreId, startBookId, limit)), limit)
 
-  fun getLanguagePageModel(languageId: Long, startBookId: Long?, limit: Int = DEFAULT_LIMIT) = asNamedValuePage(
+  fun getLanguagePageModel(languageId: Long, startBookId: Long?, limit: Int = com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT) = asNamedValuePage(
       namedValueDao.getLanguageById(languageId),
       getBooksByMeta(bookDao.getBooksByLanguage(languageId, startBookId, limit)), limit)
 
@@ -54,7 +54,7 @@ class BookService(val bookDao: BookDao, val namedValueDao: NamedValueDao) {
 
   fun getAuthorNameHint(namePrefix: String? = null) = namedValueDao.getAuthorNameHint(namePrefix)
 
-  fun getAuthorsByNamePrefix(namePrefix: String, startWithName: String? = null, limit: Int = DEFAULT_LIMIT) =
+  fun getAuthorsByNamePrefix(namePrefix: String, startWithName: String? = null, limit: Int = com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT) =
       namedValueDao.getAuthorsByNamePrefix(namePrefix, startWithName, limit)
 
   fun getBookById(bookId: Long): Book = getBooksByMeta(listOf(bookDao.getBookById(bookId))).get(0)

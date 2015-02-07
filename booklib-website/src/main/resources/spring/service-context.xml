@@ -24,45 +24,15 @@
   </bean>
 
   <!-- DAO -->
-  <import resource="dao-context.xml" />
+  <import resource="dao/dao-context.xml" />
 
   <!-- Services -->
+  <import resource="service/book-service-context.xml"/>
+  <import resource="service/user-service-context.xml"/>
+  <import resource="service/download-service-context.xml"/>
 
-  <bean id="svc.bookService" class="com.alexshabanov.booklib.service.BookService">
-    <constructor-arg ref="dao.book.bookDao"/>
-    <constructor-arg ref="dao.book.namedValueDao"/>
-  </bean>
-
-  <bean id="svc.downloadServiceFactory" class="com.alexshabanov.booklib.service.BookDownloadServiceFactory">
-    <constructor-arg ref="dao.book.bookDao"/>
-
-    <property name="downloadMode" value="${booklib.download.mode}"/>
-
-    <property name="accessKey" value="${booklib.aws.accessKey}"/>
-    <property name="secretKey" value="${booklib.aws.secretKey}"/>
-
-    <property name="bucketName" value="${booklib.download.s3.bucket}"/>
-    <property name="bucketKeySuffix" value="${booklib.download.s3.bucketKeySuffix}"/>
-    <property name="bucketKeyPrefix" value="${booklib.download.s3.bucketKeyPrefix}"/>
-
-    <property name="urlExpirationMillis" value="${booklib.download.s3.urlExpirationTimeoutMillis}"/>
-  </bean>
-
-  <bean id="svc.downloadService" factory-bean="svc.downloadServiceFactory" factory-method="getDownloadService" />
-
-
-  <!-- Security Services -->
-
-  <bean id="svc.sec.saltSource"
-        class="org.springframework.security.authentication.dao.ReflectionSaltSource">
-    <property name="userPropertyToUse" value="username" />
-  </bean>
-
-  <bean id="svc.sec.passwordEncoder"
-        class="org.springframework.security.authentication.encoding.Md5PasswordEncoder"/>
-
-  <bean id="svc.sec.userDetailsService" class="com.alexshabanov.booklib.service.UserService">
-    <constructor-arg ref="dao.user.userAccountDao"/>
-    <constructor-arg ref="svc.sec.passwordEncoder"/>
+  <!-- User Initializer -->
+  <bean class="com.alexshabanov.booklib.service.DefaultUserInitializer">
+    <constructor-arg ref="svc.sec.userProfileService"/>
   </bean>
 </beans>

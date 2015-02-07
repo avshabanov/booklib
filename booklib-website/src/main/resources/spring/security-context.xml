@@ -26,11 +26,10 @@
   <beans:bean id="svc.sec.daoAuthenticationProvider"
               class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
     <beans:property name="passwordEncoder" ref="svc.sec.passwordEncoder" />
-    <beans:property name="saltSource" ref="svc.sec.saltSource" />
-    <beans:property name="userDetailsService" ref="svc.sec.userDetailsService" />
+    <beans:property name="userDetailsService" ref="svc.sec.userProfileService" />
   </beans:bean>
 
   <authentication-manager>
-    <authentication-provider ref="svc.sec.userDetailsService"/>
+    <authentication-provider ref="svc.sec.daoAuthenticationProvider"/>
   </authentication-manager>
 </beans:beans>

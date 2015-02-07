@@ -1,16 +1,9 @@
-package com.alexshabanov.booklib.service
+package com.alexshabanov.booklib.service.dao
 
-import org.springframework.jdbc.core.JdbcOperations
 import com.alexshabanov.booklib.model.BookMeta
-import org.springframework.jdbc.core.RowMapper
-import java.sql.ResultSet
-import java.util.Random
 import com.alexshabanov.booklib.model.NamedValue
-import org.springframework.jdbc.core.PreparedStatementCreator
-import org.springframework.jdbc.core.JdbcTemplate
-import java.util.HashMap
-import java.util.ArrayList
-import com.truward.time.jdbc.UtcTimeSqlUtil
+import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.JdbcOperations
 
 //
 // Interface
@@ -62,10 +55,10 @@ trait NamedValueDao {
 // Impl
 //
 
-private val BOOK_META_ROW_MAPPER = RowMapper() {(rs: ResultSet, i: Int) ->
+private val BOOK_META_ROW_MAPPER = RowMapper() {(rs: java.sql.ResultSet, i: Int) ->
   BookMeta(id = rs.getLong("id"), title = rs.getString("title"), fileSize = rs.getInt("f_size"),
       lang = NamedValue(rs.getLong("lang_id"), rs.getString("lang_name")), origin = rs.getString("origin_name"),
-      addDate = UtcTimeSqlUtil.getUtcTime(rs, "add_date"))
+      addDate = com.truward.time.jdbc.UtcTimeSqlUtil.getUtcTime(rs, "add_date"))
 }
 
 private val BOOK_QUERY_SQL_HEAD =
@@ -128,11 +121,11 @@ class BookDaoImpl(val db: JdbcOperations): BookDao {
 // NamedValue DAO
 //
 
-private val NAMED_VALUE_ROW_MAPPER = RowMapper() {(rs: ResultSet, i: Int) ->
+private val NAMED_VALUE_ROW_MAPPER = RowMapper() {(rs: java.sql.ResultSet, i: Int) ->
   NamedValue(id = rs.getInt("id").toLong(), name = rs.getString("name"))
 }
 
-private val BOOK_ID_WITH_NAMED_VALUE_ROW_MAPPER = RowMapper() {(rs: ResultSet, i: Int) ->
+private val BOOK_ID_WITH_NAMED_VALUE_ROW_MAPPER = RowMapper() {(rs: java.sql.ResultSet, i: Int) ->
   Pair(rs.getLong("book_id"), NamedValue(id = rs.getInt("id").toLong(), name = rs.getString("name")))
 }
 
@@ -180,17 +173,17 @@ class NamedValueDaoImpl(val db: JdbcOperations): NamedValueDao {
   //
 
   private fun getBookToNamedValuesMap(bookIds: List<Long>, sqlQuery: String): Map<Long, List<NamedValue>> {
-    val pairs = ArrayList<Pair<Long, NamedValue>>()
+    val pairs = java.util.ArrayList<Pair<Long, NamedValue>>()
     for (bookId in bookIds) {
       pairs.addAll(db.query(sqlQuery, BOOK_ID_WITH_NAMED_VALUE_ROW_MAPPER, bookId))
     }
 
-    val result = HashMap<Long, MutableList<NamedValue>>(pairs.size())
+    val result = java.util.HashMap<Long, MutableList<NamedValue>>(pairs.size())
 
     for (pair in pairs) {
       var list = result.get(pair.first)
       if (list == null) {
-        list = ArrayList<NamedValue>()
+        list = java.util.ArrayList<NamedValue>()
         result.put(pair.first, list)
       }
 

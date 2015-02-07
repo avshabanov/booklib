@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="svc.sec.passwordEncoder"
+        class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+
+  <bean id="svc.sec.userProfileService" class="com.alexshabanov.booklib.service.UserProfileServiceImpl">
+    <constructor-arg ref="dao.user.userAccountDao"/>
+    <constructor-arg ref="svc.sec.passwordEncoder"/>
+  </bean>
+</beans>

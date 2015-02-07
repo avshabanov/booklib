@@ -8,5 +8,5 @@
   <context:annotation-config/>
   <context:property-placeholder location="classpath:/settings/default.properties"/>
 
-  <import resource="classpath:/spring/dao-context.xml" />
+  <import resource="classpath:/spring/dao/dao-context.xml" />
 </beans>

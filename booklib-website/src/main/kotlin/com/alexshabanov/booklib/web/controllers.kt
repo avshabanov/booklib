@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable as pathVar
 import org.springframework.web.bind.annotation.ResponseBody as respBody
 import org.springframework.web.servlet.ModelAndView
 import com.alexshabanov.booklib.service.BookService
-import com.alexshabanov.booklib.service.DEFAULT_LIMIT
+import com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT
 import javax.servlet.http.HttpServletResponse
 import com.alexshabanov.booklib.service.BookDownloadService
 import com.truward.time.UtcTime

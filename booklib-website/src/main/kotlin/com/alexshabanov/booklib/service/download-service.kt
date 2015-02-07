@@ -26,7 +26,7 @@ class DemoBookDownloadService: BookDownloadService {
 }
 
 /** S3-based download service */
-class S3BookDownloadService(val bookDao: BookDao,
+class S3BookDownloadService(val bookDao: com.alexshabanov.booklib.service.dao.BookDao,
                             val s3Client: AmazonS3,
                             val bucketName: String,
                             val bucketKeyPrefix: String,
@@ -55,7 +55,7 @@ class S3BookDownloadService(val bookDao: BookDao,
 }
 
 /** Download service initializer. */
-class BookDownloadServiceFactory(val bookDao: BookDao) {
+class BookDownloadServiceFactory(val bookDao: com.alexshabanov.booklib.service.dao.BookDao) {
 
   var downloadMode = ""
   var accessKey = ""
