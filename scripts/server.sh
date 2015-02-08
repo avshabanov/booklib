@@ -1,4 +1,7 @@
 #!/bin/sh
+#
+# Server script for applications with embedded servlet container.
+# 2014-2015 Alexander Shabanov
 ################################################################
 
 # Exit on error
@@ -9,7 +12,7 @@ set -e
 #
 
 SERVICE_NAME=booklib
-BASE_DIR=/usr/local/booklib
+BASE_DIR=/usr/local/$SERVICE_NAME
 
 
 JAR_PATH=$BASE_DIR/app.jar
@@ -32,7 +35,6 @@ JVM_DEBUG_PORT=7301
 GC_PERM_SIZE=64m
 GC_MAX_HEAP_SIZE=256m
 GC_START_HEAP_SIZE=64m
-
 
 
 #

@@ -46,4 +46,42 @@
     <property name="maxStatementsPerConnection" value="20" /> <!-- should be estimated based on application usage, usually 4-8 higher than N of frequent queries -->
     <!-- <property name="numHelperThreads" value="8" /> --> <!-- how much helper threads serves this pool, should be determined experimentally. -->
   </bean>
+
+  <!-- Book DB initializer -->
+
+  <bean id="dao.book.initScripts" class="java.lang.String">
+    <constructor-arg value="${booklib.dao.book.initScripts}" />
+  </bean>
+
+  <bean class="org.springframework.jdbc.datasource.init.DataSourceInitializer">
+    <property name="dataSource" ref="dao.book.dataSource" />
+    <property name="databasePopulator">
+      <bean class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
+        <property name="scripts">
+          <bean factory-bean="dao.book.initScripts" factory-method="split">
+            <constructor-arg value=","/>
+          </bean>
+        </property>
+      </bean>
+    </property>
+  </bean>
+
+  <!-- User DB initializer -->
+
+  <bean id="dao.user.initScripts" class="java.lang.String">
+    <constructor-arg value="${booklib.dao.user.initScripts}" />
+  </bean>
+
+  <bean class="org.springframework.jdbc.datasource.init.DataSourceInitializer">
+    <property name="dataSource" ref="dao.user.dataSource" />
+    <property name="databasePopulator">
+      <bean class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
+        <property name="scripts">
+          <bean factory-bean="dao.user.initScripts" factory-method="split">
+            <constructor-arg value=","/>
+          </bean>
+        </property>
+      </bean>
+    </property>
+  </bean>
 </beans>

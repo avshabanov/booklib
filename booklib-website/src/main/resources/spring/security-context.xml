@@ -10,7 +10,7 @@
   <http security="none" pattern="/assets/*"/>
   <http security="none" pattern="/g/login"/>
 
-  <http access-denied-page="/assets/app/html/403.html" use-expressions="true" auto-config="true">
+  <http access-denied-page="/assets/app/html/403.html" use-expressions="true" auto-config="true" disable-url-rewriting="true">
     <intercept-url pattern="/g/**" access="hasRole('ROLE_USER')" />
 
     <form-login login-page="/g/login"

@@ -24,6 +24,7 @@
   </bean>
 
   <!-- DAO -->
+  <import resource="dao/data-source-context.xml" />
   <import resource="dao/dao-context.xml" />
 
   <!-- Services -->

@@ -4,7 +4,7 @@
     Properties
   -->
 
-  <property name="logBaseName" value="${app.logback.logBaseName:-/tmp/appdevmode}"/>
+  <property name="logBaseName" value="${app.logback.logBaseName:-${java.io.tmpdir}/appdevmode}"/>
   <property name="rootLogId" value="${app.logback.rootLogId:-STDOUT}"/>
   <property name="logPattern"
             value="%d{ISO8601, UTC} [%thread] %-5level %X - %logger{36} - %msg%n"/>
