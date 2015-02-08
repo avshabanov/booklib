@@ -68,6 +68,7 @@ class UserProfileServiceImpl(val userDao: UserAccountDao, val passwordEncoder: P
       if (reg.invitationCode.isEmpty()) {
         throw InvalidInvitationTokenException()
       }
+
       // TODO: more invitation token checks...
     }
 

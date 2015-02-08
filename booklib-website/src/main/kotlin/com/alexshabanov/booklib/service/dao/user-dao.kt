@@ -14,6 +14,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 trait UserAccountDao {
 
+  fun getIntConstantByName(constantName: String): Int
+
   /**
    * Method, that fetches profile information, needed for Spring Security
    *
@@ -32,17 +34,36 @@ trait UserAccountDao {
   fun deleteProfile(id: Long)
 
   fun hasAccounts(): Boolean
+
+//  //
+//  // Invitation Token API
+//  //
+//
+//  fun redeemToken(code: String): Int
+//
+//  fun createToken(code: String)
+//
+//  //
+//  // Favorites
+//  //
+//
+//  fun isFavorite(kind: Int, entityId: Long): Boolean
 }
 
 //
 // User Account Dao Impl
 //
 
-val ROLE_NAME_SQL = "SELECT r.role_name FROM role AS r INNER JOIN user_role AS ur ON r.id=ur.role_id WHERE ur.user_id=?"
+val AUTHOR_ENTITY_KIND_CONST_NAME = "c_entity_kind_author"
+val BOOK_ENTITY_KIND_CONST_NAME = "c_entity_kind_book"
+
+private val ROLE_NAME_SQL = "SELECT r.role_name FROM role AS r INNER JOIN user_role AS ur ON r.id=ur.role_id WHERE ur.user_id=?"
 
 Transactional(value = "userTxManager", propagation = Propagation.MANDATORY)
 class UserAccountDaoImpl(val db: JdbcOperations):
     UserAccountDao {
+
+  override fun getIntConstantByName(constantName: String) = queryForInt(db, "SELECT " + constantName)
 
   override fun getUserAccountByName(name: String): UserAccount {
     // fetch profile

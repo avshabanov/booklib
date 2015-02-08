@@ -44,6 +44,7 @@ CREATE TABLE invitation_token (
   id            INTEGER PRIMARY KEY,
   code          CHAR(64) NOT NULL,
   note          VARCHAR(256) NOT NULL,
+  redeem_count  INTEGER NOT NULL,
   CONSTRAINT uq_invitation_token_code UNIQUE (code)
 );
 
