@@ -251,6 +251,7 @@ INSERT INTO book_author (book_id, author_id) VALUES (37, 5);
 INSERT INTO book_author (book_id, author_id) VALUES (37, 6);
 INSERT INTO book_genre (book_id, genre_id) VALUES (37, 4);
 
+COMMIT;
 
 --
 -- EOF

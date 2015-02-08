@@ -1,2 +1,3 @@
 -- User Data Fixture
 
+COMMIT;

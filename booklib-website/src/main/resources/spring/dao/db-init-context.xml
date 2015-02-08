@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <!-- User DB populator -->
+
+  <bean id="dao.book.initScripts" class="java.lang.String">
+    <constructor-arg value="${booklib.dao.book.initScripts}" />
+  </bean>
+
+  <bean id="dao.book.databasePopulator" class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
+    <property name="scripts">
+      <bean factory-bean="dao.book.initScripts" factory-method="split">
+        <constructor-arg value=","/>
+      </bean>
+    </property>
+  </bean>
+
+  <!-- User DB populator -->
+
+  <bean id="dao.user.initScripts" class="java.lang.String">
+    <constructor-arg value="${booklib.dao.user.initScripts}" />
+  </bean>
+
+  <bean id="dao.user.databasePopulator" class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
+    <property name="scripts">
+      <bean factory-bean="dao.user.initScripts" factory-method="split">
+        <constructor-arg value=","/>
+      </bean>
+    </property>
+  </bean>
+</beans>
