@@ -39,4 +39,4 @@ data class InvitationToken(val code: String, val note: String)
 
 /** Personalized information. */
 
-data class FavoriteEntry(val kind: Int, val entityId: Int)
+data class FavoriteEntry(val kind: Int, val entityId: Long)

@@ -11,6 +11,8 @@ import com.alexshabanov.booklib.service.dao.UserAccountDao
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.annotation.Isolation
+import com.alexshabanov.booklib.model.FavoriteEntry
+import com.alexshabanov.booklib.model.InvitationToken
 
 //
 // Exceptions
@@ -18,7 +20,7 @@ import org.springframework.transaction.annotation.Isolation
 
 class UserAlreadyExistsException: RuntimeException() {}
 
-class InvalidInvitationTokenException: RuntimeException() {}
+class InvalidInvitationTokenException(msg: String): RuntimeException(msg) {}
 
 //
 // Interface
@@ -39,6 +41,28 @@ trait UserProfileService : UserDetailsService {
   fun registerUser(reg: RegistrationData): Long
 
   fun hasAccounts(): Boolean
+
+  //
+  // Invitation Token API
+  //
+
+  fun createToken(code: String, note: String)
+
+  fun getTokens(): List<InvitationToken>
+
+  fun deleteToken(code: String)
+
+  //
+  // Favorites
+  //
+
+  fun isFavorite(userId: Long, kind: Int, entityId: Long): Boolean
+
+  fun setFavorite(userId: Long, kind: Int, entityId: Long)
+
+  fun resetFavorite(userId: Long, kind: Int, entityId: Long)
+
+  fun getFavorites(userId: Long): List<FavoriteEntry>
 }
 
 //
@@ -62,21 +86,44 @@ class UserProfileServiceImpl(val userDao: UserAccountDao, val passwordEncoder: P
       throw UserAlreadyExistsException()
     }
 
-    // ok, so the user doesn't exist, add it
-    val passwordHash = passwordEncoder.encode(reg.password)
     if (reg.invitationCode != null) {
       if (reg.invitationCode.isEmpty()) {
-        throw InvalidInvitationTokenException()
+        throw InvalidInvitationTokenException("Invitation token is empty")
       }
 
       // TODO: more invitation token checks...
+      try {
+        val redeemCount = userDao.redeemToken(reg.invitationCode)
+        if (redeemCount == 0) {
+          throw InvalidInvitationTokenException("Token already redeemed")
+        }
+      } catch (ignored: EmptyResultDataAccessException) {
+        throw InvalidInvitationTokenException("No such token has been registered")
+      }
     }
+
+    // ok, so the user doesn't exist, add it
+    val passwordHash = passwordEncoder.encode(reg.password)
 
     return userDao.saveProfile(UserProfileData(nickname = reg.nickname, email = reg.email, passwordHash = passwordHash,
         authorityList = reg.desiredRoles, created = UtcTime.now()))
   }
 
   override fun hasAccounts() = userDao.hasAccounts()
+
+  override fun createToken(code: String, note: String) = userDao.createToken(code, note)
+
+  override fun getTokens() = userDao.getTokens()
+
+  override fun deleteToken(code: String) = userDao.deleteToken(code)
+
+  override fun isFavorite(userId: Long, kind: Int, entityId: Long) = userDao.isFavorite(userId, kind, entityId)
+
+  override fun setFavorite(userId: Long, kind: Int, entityId: Long) = userDao.setFavorite(userId, kind, entityId)
+
+  override fun resetFavorite(userId: Long, kind: Int, entityId: Long) = userDao.resetFavorite(userId, kind, entityId)
+
+  override fun getFavorites(userId: Long) = userDao.getFavorites(userId)
 }
 
 class DefaultUserInitializer(val userService: UserProfileService) {

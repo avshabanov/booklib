@@ -47,17 +47,19 @@ trait UserAccountDao {
 
   fun getTokens(): List<InvitationToken>
 
+  fun deleteToken(code: String)
+
   //
   // Favorites
   //
 
-  fun isFavorite(userId: Int, kind: Int, entityId: Long): Boolean
+  fun isFavorite(userId: Long, kind: Int, entityId: Long): Boolean
 
-  fun setFavorite(userId: Int, kind: Int, entityId: Long)
+  fun setFavorite(userId: Long, kind: Int, entityId: Long)
 
-  fun resetFavorite(userId: Int, kind: Int, entityId: Long)
+  fun resetFavorite(userId: Long, kind: Int, entityId: Long)
 
-  fun getFavorites(userId: Int): List<FavoriteEntry>
+  fun getFavorites(userId: Long): List<FavoriteEntry>
 }
 
 //
@@ -74,7 +76,7 @@ private val INVITATION_TOKEN_ROW_MAPPER = RowMapper() {(rs: java.sql.ResultSet, 
 }
 
 private val FAVORITE_ENTRY_ROW_MAPPER = RowMapper() {(rs: java.sql.ResultSet, i: Int) ->
-  FavoriteEntry(kind = rs.getInt("kind"), entityId = rs.getInt("entity_id"))
+  FavoriteEntry(kind = rs.getInt("entity_kind"), entityId = rs.getLong("entity_id"))
 }
 
 Transactional(value = "userTxManager", propagation = Propagation.MANDATORY)
@@ -87,7 +89,7 @@ class UserAccountDaoImpl(val db: JdbcOperations):
     // fetch profile
     val account = db.queryForObject(
         "SELECT id, nickname, password_hash FROM user_profile WHERE nickname=? OR email=?",
-        org.springframework.jdbc.core.RowMapper {(rs: java.sql.ResultSet, i: Int) ->
+        RowMapper {(rs: java.sql.ResultSet, i: Int) ->
           UserAccount(id = rs.getLong("id"), nickname = rs.getString("nickname"),
               passwordHash = rs.getString("password_hash"))
         }, name, name)
@@ -95,7 +97,7 @@ class UserAccountDaoImpl(val db: JdbcOperations):
     // fetch roles
     account.authorityList = db.query(
         ROLE_NAME_SQL,
-        org.springframework.jdbc.core.RowMapper {(rs: java.sql.ResultSet, i: Int) ->
+        RowMapper {(rs: java.sql.ResultSet, i: Int) ->
           SimpleGrantedAuthority(rs.getString("role_name"))
         }, account.id)
 
@@ -151,9 +153,9 @@ class UserAccountDaoImpl(val db: JdbcOperations):
   }
 
   override fun redeemToken(code: String): Int {
-    val redeemCount = db.update("SELECT redeem_count FROM invitation_token WHERE code=? FOR UPDATE", code)
+    val redeemCount = queryForInt(db, "SELECT redeem_count FROM invitation_token WHERE code=? FOR UPDATE", code)
     if (redeemCount > 0) {
-      db.update("UPDATE invitation_token WHERE code=? SET redeem_count=?", code, redeemCount - 1)
+      db.update("UPDATE invitation_token SET redeem_count=? WHERE code=?", redeemCount - 1, code)
     }
     return redeemCount
   }
@@ -164,17 +166,21 @@ class UserAccountDaoImpl(val db: JdbcOperations):
 
   override fun getTokens() = db.query("SELECT code, note FROM invitation_token", INVITATION_TOKEN_ROW_MAPPER)
 
-  override fun isFavorite(userId: Int, kind: Int, entityId: Long) = queryForInt(db,
-      "SELECT COUNT(0) FROM favorite WHERE user_id=? AND kind=? AND entityId=?", userId, kind, entityId) > 0
-
-  override fun setFavorite(userId: Int, kind: Int, entityId: Long) {
-    db.update("INSERT INTO favorite (user_id, kind, entity_id)", userId, kind, entityId)
+  override fun deleteToken(code: String) {
+    db.update("DELETE FROM invitation_token WHERE code=?", code)
   }
 
-  override fun resetFavorite(userId: Int, kind: Int, entityId: Long) {
-    db.update("DELETE FROM favorite WHERE user_id=? AND kind=? AND entityId=?", userId, kind, entityId)
+  override fun isFavorite(userId: Long, kind: Int, entityId: Long) = queryForInt(db,
+      "SELECT COUNT(0) FROM favorite WHERE user_id=? AND entity_kind=? AND entityId=?", userId, kind, entityId) > 0
+
+  override fun setFavorite(userId: Long, kind: Int, entityId: Long) {
+    db.update("INSERT INTO favorite (user_id, entity_kind, entity_id) VALUES (?, ?, ?)", userId, kind, entityId)
   }
 
-  override fun getFavorites(userId: Int) = db.query("SELECT entity_id, kind FROM favorite WHERE user_id=?",
+  override fun resetFavorite(userId: Long, kind: Int, entityId: Long) {
+    db.update("DELETE FROM favorite WHERE user_id=? AND entity_kind=? AND entity_id=?", userId, kind, entityId)
+  }
+
+  override fun getFavorites(userId: Long) = db.query("SELECT entity_id, entity_kind FROM favorite WHERE user_id=?",
       FAVORITE_ENTRY_ROW_MAPPER, userId)
 }
