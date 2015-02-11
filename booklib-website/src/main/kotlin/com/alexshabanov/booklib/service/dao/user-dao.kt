@@ -7,9 +7,11 @@ import com.truward.time.jdbc.UtcTimeSqlUtil
 import com.alexshabanov.booklib.model.UserAccount
 import org.springframework.jdbc.core.RowMapper
 import com.alexshabanov.booklib.util.queryForInt
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import com.alexshabanov.booklib.model.FavoriteEntry
+import com.alexshabanov.booklib.model.InvitationToken
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.annotation.Propagation
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 
 trait UserAccountDao {
@@ -35,19 +37,27 @@ trait UserAccountDao {
 
   fun hasAccounts(): Boolean
 
-//  //
-//  // Invitation Token API
-//  //
-//
-//  fun redeemToken(code: String): Int
-//
-//  fun createToken(code: String)
-//
-//  //
-//  // Favorites
-//  //
-//
-//  fun isFavorite(kind: Int, entityId: Long): Boolean
+  //
+  // Invitation Token API
+  //
+
+  fun redeemToken(code: String): Int
+
+  fun createToken(code: String, note: String)
+
+  fun getTokens(): List<InvitationToken>
+
+  //
+  // Favorites
+  //
+
+  fun isFavorite(userId: Int, kind: Int, entityId: Long): Boolean
+
+  fun setFavorite(userId: Int, kind: Int, entityId: Long)
+
+  fun resetFavorite(userId: Int, kind: Int, entityId: Long)
+
+  fun getFavorites(userId: Int): List<FavoriteEntry>
 }
 
 //
@@ -58,6 +68,14 @@ val AUTHOR_ENTITY_KIND_CONST_NAME = "c_entity_kind_author"
 val BOOK_ENTITY_KIND_CONST_NAME = "c_entity_kind_book"
 
 private val ROLE_NAME_SQL = "SELECT r.role_name FROM role AS r INNER JOIN user_role AS ur ON r.id=ur.role_id WHERE ur.user_id=?"
+
+private val INVITATION_TOKEN_ROW_MAPPER = RowMapper() {(rs: java.sql.ResultSet, i: Int) ->
+  InvitationToken(code = rs.getString("code"), note = rs.getString("note"))
+}
+
+private val FAVORITE_ENTRY_ROW_MAPPER = RowMapper() {(rs: java.sql.ResultSet, i: Int) ->
+  FavoriteEntry(kind = rs.getInt("kind"), entityId = rs.getInt("entity_id"))
+}
 
 Transactional(value = "userTxManager", propagation = Propagation.MANDATORY)
 class UserAccountDaoImpl(val db: JdbcOperations):
@@ -131,4 +149,32 @@ class UserAccountDaoImpl(val db: JdbcOperations):
   override fun hasAccounts(): Boolean {
     return queryForInt(db, "SELECT count(0) FROM user_profile") > 0
   }
+
+  override fun redeemToken(code: String): Int {
+    val redeemCount = db.update("SELECT redeem_count FROM invitation_token WHERE code=? FOR UPDATE", code)
+    if (redeemCount > 0) {
+      db.update("UPDATE invitation_token WHERE code=? SET redeem_count=?", code, redeemCount - 1)
+    }
+    return redeemCount
+  }
+
+  override fun createToken(code: String, note: String) {
+    db.update("INSERT INTO invitation_token (code, note, redeem_count) VALUES (?, ?, 1)", code, note)
+  }
+
+  override fun getTokens() = db.query("SELECT code, note FROM invitation_token", INVITATION_TOKEN_ROW_MAPPER)
+
+  override fun isFavorite(userId: Int, kind: Int, entityId: Long) = queryForInt(db,
+      "SELECT COUNT(0) FROM favorite WHERE user_id=? AND kind=? AND entityId=?", userId, kind, entityId) > 0
+
+  override fun setFavorite(userId: Int, kind: Int, entityId: Long) {
+    db.update("INSERT INTO favorite (user_id, kind, entity_id)", userId, kind, entityId)
+  }
+
+  override fun resetFavorite(userId: Int, kind: Int, entityId: Long) {
+    db.update("DELETE FROM favorite WHERE user_id=? AND kind=? AND entityId=?", userId, kind, entityId)
+  }
+
+  override fun getFavorites(userId: Int) = db.query("SELECT entity_id, kind FROM favorite WHERE user_id=?",
+      FAVORITE_ENTRY_ROW_MAPPER, userId)
 }

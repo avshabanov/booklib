@@ -41,11 +41,10 @@ CREATE TABLE user_role (
 --
 
 CREATE TABLE invitation_token (
-  id            INTEGER PRIMARY KEY,
   code          CHAR(64) NOT NULL,
   note          VARCHAR(256) NOT NULL,
   redeem_count  INTEGER NOT NULL,
-  CONSTRAINT uq_invitation_token_code UNIQUE (code)
+  CONSTRAINT pk_invitation_token PRIMARY KEY (code)
 );
 
 --
@@ -56,9 +55,9 @@ CREATE CONSTANT c_entity_kind_author            VALUE 200;
 CREATE CONSTANT c_entity_kind_book              VALUE 201;
 
 CREATE TABLE favorite (
-  id            INTEGER PRIMARY KEY,
   user_id       INTEGER NOT NULL,
   entity_id     INTEGER NOT NULL, -- denormalized value - refers to either author(id) or book_meta(id)
   entity_kind   INTEGER NOT NULL,
+  CONSTRAINT pk_favorite PRIMARY KEY (user_id, entity_id, entity_kind),
   CONSTRAINT fk_favorite_user_id FOREIGN KEY (user_id) REFERENCES user_profile(id)
 );

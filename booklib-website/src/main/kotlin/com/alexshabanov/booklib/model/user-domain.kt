@@ -34,3 +34,9 @@ data class UserProfileData(val id: Long? = null,
                            val passwordHash: String,
                            val authorityList: List<String> = listOf("ROLE_USER"),
                            val created: UtcTime = UtcTime.now())
+
+data class InvitationToken(val code: String, val note: String)
+
+/** Personalized information. */
+
+data class FavoriteEntry(val kind: Int, val entityId: Int)
