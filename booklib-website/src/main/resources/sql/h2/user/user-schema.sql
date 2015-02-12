@@ -51,9 +51,6 @@ CREATE TABLE invitation_token (
 -- Personalization Stuff
 --
 
-CREATE CONSTANT c_entity_kind_author            VALUE 200;
-CREATE CONSTANT c_entity_kind_book              VALUE 201;
-
 CREATE TABLE favorite (
   user_id       INTEGER NOT NULL,
   entity_id     INTEGER NOT NULL, -- denormalized value - refers to either author(id) or book_meta(id)

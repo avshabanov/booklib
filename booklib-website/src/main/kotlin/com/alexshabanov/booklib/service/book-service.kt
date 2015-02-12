@@ -4,49 +4,58 @@ import com.alexshabanov.booklib.model.BookMeta
 import java.util.ArrayList
 import java.util.LinkedHashSet
 import com.alexshabanov.booklib.model.NamedValue
+import com.alexshabanov.booklib.service.dao.BookDao
+import com.alexshabanov.booklib.service.dao.NamedValueDao
+import com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT
+import com.alexshabanov.booklib.model.FavoriteKind
 
 //
 // Presentational model
 //
 
-data class Book(val meta: BookMeta, val authors: List<NamedValue>, val genres: List<NamedValue>)
+data class Book(val meta: BookMeta, val favorite: Boolean,
+                val authors: List<NamedValue>, val genres: List<NamedValue>)
 
-data class NamedValuePage(val namedValue: NamedValue, val books: List<Book>, val startBookId: Long?)
+data class NamedValuePage(val namedValue: NamedValue, val books: List<Book>, val favorite: Boolean, val startBookId: Long?)
 
-private fun asNamedValuePage(namedValue: NamedValue, books: List<Book>, limit: Int) = NamedValuePage(
+private fun asNamedValuePage(namedValue: NamedValue, books: List<Book>, limit: Int, favorite: Boolean = false) = NamedValuePage(
     namedValue = namedValue,
     books = books,
+    favorite = favorite,
     startBookId = (if (books.size() < limit) null else books.last().meta.id))
 
 //
 // Service Implementation
 //
 
-class BookService(val bookDao: com.alexshabanov.booklib.service.dao.BookDao, val namedValueDao: com.alexshabanov.booklib.service.dao.NamedValueDao) {
-  fun getRandomBooks() = getBooksByMeta(bookDao.getRandomBooks())
+class BookService(val bookDao: BookDao, val namedValueDao: NamedValueDao, val userService: UserProfileService) {
+  fun getRandomBooks(userId: Long) = getBooksByMeta(userId, bookDao.getRandomBooks())
 
-  fun getBooksByMeta(bookMetaList: List<BookMeta>): List<Book> {
+  fun getBooksByMeta(userId: Long, bookMetaList: List<BookMeta>): List<Book> {
     val bookIds: List<Long> = bookMetaList.map { it.id ?: -1 }
     val bookAuthorsMap = namedValueDao.getAuthorsOfBooks(bookIds)
     val bookGenresMap = namedValueDao.getGenresOfBooks(bookIds)
 
     return bookMetaList.map { Book(meta = it,
+        favorite = userService.isFavorite(userId, FavoriteKind.BOOK, it.id ?: -1),
         authors = bookAuthorsMap.get(it.id) ?: listOf(),
         genres = bookGenresMap.get(it.id) ?: listOf())
     }
   }
 
-  fun getAuthorPageModel(authorId: Long, startBookId: Long?, limit: Int = com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT) = asNamedValuePage(
-      namedValueDao.getAuthorById(authorId),
-      getBooksByMeta(bookDao.getBooksOfAuthor(authorId, startBookId, limit)), limit)
+  fun getAuthorPageModel(userId: Long, authorId: Long, startBookId: Long?, limit: Int = DEFAULT_LIMIT) = asNamedValuePage(
+      namedValue = namedValueDao.getAuthorById(authorId),
+      favorite = userService.isFavorite(userId, FavoriteKind.AUTHOR, authorId),
+      books = getBooksByMeta(userId, bookDao.getBooksOfAuthor(authorId, startBookId, limit)),
+      limit = limit)
 
-  fun getGenrePageModel(genreId: Long, startBookId: Long?, limit: Int = com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT) = asNamedValuePage(
+  fun getGenrePageModel(userId: Long, genreId: Long, startBookId: Long?, limit: Int = DEFAULT_LIMIT) = asNamedValuePage(
       namedValueDao.getGenreById(genreId),
-      getBooksByMeta(bookDao.getBooksOfGenre(genreId, startBookId, limit)), limit)
+      getBooksByMeta(userId, bookDao.getBooksOfGenre(genreId, startBookId, limit)), limit)
 
-  fun getLanguagePageModel(languageId: Long, startBookId: Long?, limit: Int = com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT) = asNamedValuePage(
+  fun getLanguagePageModel(userId: Long, languageId: Long, startBookId: Long?, limit: Int = DEFAULT_LIMIT) = asNamedValuePage(
       namedValueDao.getLanguageById(languageId),
-      getBooksByMeta(bookDao.getBooksByLanguage(languageId, startBookId, limit)), limit)
+      getBooksByMeta(userId, bookDao.getBooksByLanguage(languageId, startBookId, limit)), limit)
 
   fun getGenres() = namedValueDao.getGenres()
 
@@ -54,8 +63,8 @@ class BookService(val bookDao: com.alexshabanov.booklib.service.dao.BookDao, val
 
   fun getAuthorNameHint(namePrefix: String? = null) = namedValueDao.getAuthorNameHint(namePrefix)
 
-  fun getAuthorsByNamePrefix(namePrefix: String, startWithName: String? = null, limit: Int = com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT) =
+  fun getAuthorsByNamePrefix(namePrefix: String, startWithName: String? = null, limit: Int = DEFAULT_LIMIT) =
       namedValueDao.getAuthorsByNamePrefix(namePrefix, startWithName, limit)
 
-  fun getBookById(bookId: Long): Book = getBooksByMeta(listOf(bookDao.getBookById(bookId))).get(0)
+  fun getBookById(userId: Long, bookId: Long): Book = getBooksByMeta(userId, listOf(bookDao.getBookById(bookId))).get(0)
 }

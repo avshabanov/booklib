@@ -16,7 +16,7 @@ import kotlin.test.assertFalse
 RunWith(javaClass<SpringJUnit4ClassRunner>())
 ContextConfiguration(locations = array("/spring/DaoTest-context.xml"))
 Transactional(value = "userTxManager") class UserDaoTest {
-  Resource(name = "dao.user.userAccountDao") var userDao: UserAccountDao = mock(javaClass()) // HERE: mocks to silence compiler
+  Resource(name = "dao.user.userAccountDao") var userDao: UserAccountDao = mock(javaClass())
 
   Test fun shouldRegisterUser() {
     // Given:

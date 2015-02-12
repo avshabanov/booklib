@@ -16,6 +16,7 @@ import com.alexshabanov.booklib.service.RegistrationData
 import kotlin.test.fail
 import com.alexshabanov.booklib.model.InvitationToken
 import com.alexshabanov.booklib.model.FavoriteEntry
+import com.alexshabanov.booklib.model.FavoriteKind
 
 RunWith(javaClass<SpringJUnit4ClassRunner>())
 ContextConfiguration(locations = array("/spring/UserServiceTest-context.xml"))
@@ -94,10 +95,11 @@ Transactional(value = "userTxManager") class UserServiceTest {
 
     assertTrue(userService.getFavorites(userId).isEmpty(), "favs should be empty")
 
-    userService.setFavorite(userId, 1, 1000L)
-    assertEquals(listOf(FavoriteEntry(1, 1000L)), userService.getFavorites(userId))
+    val kind = FavoriteKind.AUTHOR
+    userService.setFavorite(userId, kind, 1000L)
+    assertEquals(listOf(FavoriteEntry(kind, 1000L)), userService.getFavorites(userId))
 
-    userService.resetFavorite(userId, 1, 1000L)
+    userService.resetFavorite(userId, kind, 1000L)
     assertTrue(userService.getFavorites(userId).isEmpty(), "favs should be empty after resetting fav")
   }
 }

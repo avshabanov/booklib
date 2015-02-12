@@ -12,17 +12,18 @@ import java.sql.ResultSet
 import java.util.Date
 import org.junit.Ignore
 import org.mockito.Mockito.mock
-import com.alexshabanov.booklib.service.dao.BookDao
 import kotlin.test.assertFalse
 import kotlin.test.assertEquals
-import com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT
-import com.alexshabanov.booklib.service.dao.NamedValueDao
 import com.alexshabanov.booklib.model.NamedValue
 import com.alexshabanov.booklib.service.BookService
 import com.alexshabanov.booklib.model.BookMeta
 import java.util.Calendar
 import java.text.SimpleDateFormat
 import com.truward.time.UtcTime
+import com.alexshabanov.booklib.service.dao.NamedValueDao
+import com.alexshabanov.booklib.service.dao.BookDao
+import com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT
+import com.alexshabanov.booklib.service.UserProfileService
 
 private fun parseUtcTime(str: String): UtcTime {
   val format = SimpleDateFormat("yyyy-MM-dd");
@@ -33,8 +34,8 @@ private fun parseUtcTime(str: String): UtcTime {
 RunWith(javaClass<SpringJUnit4ClassRunner>())
 ContextConfiguration(locations = array("/spring/DaoTest-context.xml"))
 class BookDaoTest {
-  Resource(name = "dao.book.bookDao") var bookDao: com.alexshabanov.booklib.service.dao.BookDao = mock(javaClass()) // HERE: mocks to silence compiler
-  Resource(name = "dao.book.namedValueDao") var namedValueDao: com.alexshabanov.booklib.service.dao.NamedValueDao = mock(javaClass())
+  Resource(name = "dao.book.bookDao") var bookDao: BookDao = mock(javaClass()) // HERE: mocks to silence compiler
+  Resource(name = "dao.book.namedValueDao") var namedValueDao: NamedValueDao = mock(javaClass())
 
   Test fun shouldGetBookById() {
     assertEquals(BookMeta(id = 1, title = "Far Rainbow", fileSize = 255365, addDate = parseUtcTime("2007-10-23"),
@@ -50,7 +51,7 @@ class BookDaoTest {
   }
 
   Test fun shouldGetRandomBooks() {
-    assertEquals(com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT, bookDao.getRandomBooks().size(), "Should get more than one random books")
+    assertEquals(DEFAULT_LIMIT, bookDao.getRandomBooks().size(), "Should get more than one random books")
   }
 
   Test fun shouldGetAuthors() {
@@ -85,8 +86,9 @@ class BookDaoTest {
   }
 
   Test fun shouldGetAuthorsWithBooks() {
-    val bookService = BookService(bookDao = bookDao, namedValueDao = namedValueDao)
-    val books = bookService.getBooksByMeta(bookDao.getBooksByTitleTerm(titleSqlMask = "Far Rainbow", limit = 5))
+    var userService: UserProfileService = mock(javaClass())
+    val bookService = BookService(bookDao = bookDao, namedValueDao = namedValueDao, userService = userService)
+    val books = bookService.getBooksByMeta(1L, bookDao.getBooksByTitleTerm(titleSqlMask = "Far Rainbow", limit = 5))
 
     assertEquals(1, books.size())
     val book = books.get(0)

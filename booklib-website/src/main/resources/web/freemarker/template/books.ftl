@@ -1,9 +1,13 @@
 <#macro book model>
+<#import "fav-star.ftl" as fs/>
 <li>
   <div class="container">
     <!-- Title -->
     <div class="row">
-      <div class="col-md-12">
+      <div class="col-md-1">
+        <@fs.favStar isFavorite=model.favorite/>
+      </div>
+      <div class="col-md-11">
         <a href="/g/book/${model.meta.id?c}" title="${model.meta.title?html}"><h3><small>${model.meta.id?c}</small>&nbsp;${model.meta.title?html}</h3></a>
       </div>
     </div>

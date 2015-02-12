@@ -11,6 +11,10 @@ import com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT
 import javax.servlet.http.HttpServletResponse
 import com.alexshabanov.booklib.service.BookDownloadService
 import com.truward.time.UtcTime
+import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.authentication.InternalAuthenticationServiceException
+import com.alexshabanov.booklib.model.UserAccount
 
 //
 // Spring MVC controllers
@@ -19,12 +23,34 @@ import com.truward.time.UtcTime
 val MAX_NAME_HINT_LENGTH = 3
 
 /** Base HTML controller. */
-req(array("/g")) controller open class StandardHtmlController
+req(array("/g")) controller open class StandardHtmlController {
+  ModelAttribute("userAccount") fun getUserAccount(): UserAccount? {
+    val auth = SecurityContextHolder.getContext().getAuthentication()
+    if (auth != null) {
+      val details = auth.getPrincipal()
+      if (details is UserAccount) {
+        return details
+      } else {
+        throw InternalAuthenticationServiceException("Unexpected principal type: ${details}")
+      }
+    }
+
+    return null
+  }
+
+  fun getUserId(): Long {
+    val account = getUserAccount()
+    if (account != null) {
+      return account.id
+    }
+    throw InternalAuthenticationServiceException("UserAccount has not been found")
+  }
+}
 
 /** Generic pages controller. */
 class GenericController(val bookService: BookService): StandardHtmlController() {
 
-  req(array("/index")) fun index() = ModelAndView("index", "randomBooks", bookService.getRandomBooks())
+  req(array("/index")) fun index() = ModelAndView("index", "randomBooks", bookService.getRandomBooks(getUserId()))
 
   req(array("/about")) fun about() = "about"
 
@@ -37,7 +63,7 @@ class GenericController(val bookService: BookService): StandardHtmlController() 
 class BookController(val bookService: BookService, val downloadService: BookDownloadService): StandardHtmlController() {
 
   req(array("/book/{id}")) fun book(pathVar("id") bookId: Long) =
-      ModelAndView("book", "book", bookService.getBookById(bookId))
+      ModelAndView("book", "book", bookService.getBookById(getUserId(), bookId))
 
   req(array("/book/{id}/download")) fun downloadBook(pathVar("id") bookId: Long, response: HttpServletResponse) {
     downloadService.download(bookId, response)
@@ -51,7 +77,7 @@ class GenreController(val bookService: BookService): StandardHtmlController() {
                                       par("startBookId", required = false) startBookId: Long?) =
       ModelAndView("genre", mapOf(
           Pair("curBookId", startBookId),
-          Pair("pageModel", bookService.getGenrePageModel(genreId, startBookId))))
+          Pair("pageModel", bookService.getGenrePageModel(getUserId(), genreId, startBookId))))
 
   req(array("/genres")) fun genres() = ModelAndView("genre-list", "genreList", bookService.getGenres())
 }
@@ -63,11 +89,11 @@ class AuthorController(val bookService: BookService): StandardHtmlController() {
                                         par("startBookId", required = false) startBookId: Long?) =
       ModelAndView("author", mapOf(
           Pair("curBookId", startBookId),
-          Pair("pageModel", bookService.getAuthorPageModel(authorId, startBookId))))
+          Pair("pageModel", bookService.getAuthorPageModel(getUserId(), authorId, startBookId))))
 
   req(array("/authors")) fun authors(par("namePrefix", required = false) namePrefix: String?,
                                      par("startName", required = false) startName: String?): ModelAndView {
-    if (namePrefix != null && namePrefix.length >= MAX_NAME_HINT_LENGTH) {
+    if (namePrefix != null && namePrefix.length() >= MAX_NAME_HINT_LENGTH) {
       // author full name list
       val limit = Integer.MAX_VALUE // TODO: support pagination for author list?
       return ModelAndView("author-list", "authorList", bookService.getAuthorsByNamePrefix(namePrefix, startName, limit))
@@ -85,7 +111,7 @@ class LangController(val bookService: BookService): StandardHtmlController() {
                                             par("startBookId", required = false) startBookId: Long?) =
       ModelAndView("language", mapOf(
           Pair("curBookId", startBookId),
-          Pair("pageModel", bookService.getLanguagePageModel(languageId, startBookId))))
+          Pair("pageModel", bookService.getLanguagePageModel(getUserId(), languageId, startBookId))))
 
   req(array("/languages")) fun languages() = ModelAndView("language-list", "langList", bookService.getLanguages())
 }

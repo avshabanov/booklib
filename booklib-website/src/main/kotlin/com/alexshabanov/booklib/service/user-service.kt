@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.annotation.Isolation
 import com.alexshabanov.booklib.model.FavoriteEntry
 import com.alexshabanov.booklib.model.InvitationToken
+import com.alexshabanov.booklib.model.FavoriteKind
 
 //
 // Exceptions
@@ -56,11 +57,11 @@ trait UserProfileService : UserDetailsService {
   // Favorites
   //
 
-  fun isFavorite(userId: Long, kind: Int, entityId: Long): Boolean
+  fun isFavorite(userId: Long, kind: FavoriteKind, entityId: Long): Boolean
 
-  fun setFavorite(userId: Long, kind: Int, entityId: Long)
+  fun setFavorite(userId: Long, kind: FavoriteKind, entityId: Long)
 
-  fun resetFavorite(userId: Long, kind: Int, entityId: Long)
+  fun resetFavorite(userId: Long, kind: FavoriteKind, entityId: Long)
 
   fun getFavorites(userId: Long): List<FavoriteEntry>
 }
@@ -117,11 +118,14 @@ class UserProfileServiceImpl(val userDao: UserAccountDao, val passwordEncoder: P
 
   override fun deleteToken(code: String) = userDao.deleteToken(code)
 
-  override fun isFavorite(userId: Long, kind: Int, entityId: Long) = userDao.isFavorite(userId, kind, entityId)
+  override fun isFavorite(userId: Long, kind: FavoriteKind, entityId: Long) =
+      userDao.isFavorite(userId, kind, entityId)
 
-  override fun setFavorite(userId: Long, kind: Int, entityId: Long) = userDao.setFavorite(userId, kind, entityId)
+  override fun setFavorite(userId: Long, kind: FavoriteKind, entityId: Long) =
+      userDao.setFavorite(userId, kind, entityId)
 
-  override fun resetFavorite(userId: Long, kind: Int, entityId: Long) = userDao.resetFavorite(userId, kind, entityId)
+  override fun resetFavorite(userId: Long, kind: FavoriteKind, entityId: Long) =
+      userDao.resetFavorite(userId, kind, entityId)
 
   override fun getFavorites(userId: Long) = userDao.getFavorites(userId)
 }

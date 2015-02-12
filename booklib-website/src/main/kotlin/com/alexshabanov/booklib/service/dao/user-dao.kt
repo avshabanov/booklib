@@ -12,11 +12,10 @@ import com.alexshabanov.booklib.model.FavoriteEntry
 import com.alexshabanov.booklib.model.InvitationToken
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.annotation.Propagation
+import com.alexshabanov.booklib.model.FavoriteKind
 
 
 trait UserAccountDao {
-
-  fun getIntConstantByName(constantName: String): Int
 
   /**
    * Method, that fetches profile information, needed for Spring Security
@@ -53,11 +52,11 @@ trait UserAccountDao {
   // Favorites
   //
 
-  fun isFavorite(userId: Long, kind: Int, entityId: Long): Boolean
+  fun isFavorite(userId: Long, kind: FavoriteKind, entityId: Long): Boolean
 
-  fun setFavorite(userId: Long, kind: Int, entityId: Long)
+  fun setFavorite(userId: Long, kind: FavoriteKind, entityId: Long)
 
-  fun resetFavorite(userId: Long, kind: Int, entityId: Long)
+  fun resetFavorite(userId: Long, kind: FavoriteKind, entityId: Long)
 
   fun getFavorites(userId: Long): List<FavoriteEntry>
 }
@@ -66,8 +65,20 @@ trait UserAccountDao {
 // User Account Dao Impl
 //
 
-val AUTHOR_ENTITY_KIND_CONST_NAME = "c_entity_kind_author"
-val BOOK_ENTITY_KIND_CONST_NAME = "c_entity_kind_book"
+private val FAV_KIND_AUTHOR_CODE = 200
+private val FAV_KIND_BOOK_CODE = 201
+
+private fun toFavoriteKind(v: Int) = when (v) {
+  FAV_KIND_AUTHOR_CODE -> FavoriteKind.AUTHOR
+  FAV_KIND_BOOK_CODE -> FavoriteKind.BOOK
+  else -> throw IllegalStateException("Unknown favorite kind code=${v}")
+}
+
+private fun toInt(v: FavoriteKind) = when (v) {
+  FavoriteKind.AUTHOR -> FAV_KIND_AUTHOR_CODE
+  FavoriteKind.BOOK -> FAV_KIND_BOOK_CODE
+  else -> throw IllegalStateException("Unknown favorite kind value=${v}")
+}
 
 private val ROLE_NAME_SQL = "SELECT r.role_name FROM role AS r INNER JOIN user_role AS ur ON r.id=ur.role_id WHERE ur.user_id=?"
 
@@ -76,14 +87,12 @@ private val INVITATION_TOKEN_ROW_MAPPER = RowMapper() {(rs: java.sql.ResultSet, 
 }
 
 private val FAVORITE_ENTRY_ROW_MAPPER = RowMapper() {(rs: java.sql.ResultSet, i: Int) ->
-  FavoriteEntry(kind = rs.getInt("entity_kind"), entityId = rs.getLong("entity_id"))
+  FavoriteEntry(kind = toFavoriteKind(rs.getInt("entity_kind")), entityId = rs.getLong("entity_id"))
 }
 
 Transactional(value = "userTxManager", propagation = Propagation.MANDATORY)
 class UserAccountDaoImpl(val db: JdbcOperations):
     UserAccountDao {
-
-  override fun getIntConstantByName(constantName: String) = queryForInt(db, "SELECT " + constantName)
 
   override fun getUserAccountByName(name: String): UserAccount {
     // fetch profile
@@ -170,15 +179,16 @@ class UserAccountDaoImpl(val db: JdbcOperations):
     db.update("DELETE FROM invitation_token WHERE code=?", code)
   }
 
-  override fun isFavorite(userId: Long, kind: Int, entityId: Long) = queryForInt(db,
-      "SELECT COUNT(0) FROM favorite WHERE user_id=? AND entity_kind=? AND entityId=?", userId, kind, entityId) > 0
+  override fun isFavorite(userId: Long, kind: FavoriteKind, entityId: Long) = queryForInt(db,
+      "SELECT COUNT(0) FROM favorite WHERE user_id=? AND entity_kind=? AND entity_id=?",
+      userId, toInt(kind), entityId) > 0
 
-  override fun setFavorite(userId: Long, kind: Int, entityId: Long) {
-    db.update("INSERT INTO favorite (user_id, entity_kind, entity_id) VALUES (?, ?, ?)", userId, kind, entityId)
+  override fun setFavorite(userId: Long, kind: FavoriteKind, entityId: Long) {
+    db.update("INSERT INTO favorite (user_id, entity_kind, entity_id) VALUES (?, ?, ?)", userId, toInt(kind), entityId)
   }
 
-  override fun resetFavorite(userId: Long, kind: Int, entityId: Long) {
-    db.update("DELETE FROM favorite WHERE user_id=? AND entity_kind=? AND entity_id=?", userId, kind, entityId)
+  override fun resetFavorite(userId: Long, kind: FavoriteKind, entityId: Long) {
+    db.update("DELETE FROM favorite WHERE user_id=? AND entity_kind=? AND entity_id=?", userId, toInt(kind), entityId)
   }
 
   override fun getFavorites(userId: Long) = db.query("SELECT entity_id, entity_kind FROM favorite WHERE user_id=?",

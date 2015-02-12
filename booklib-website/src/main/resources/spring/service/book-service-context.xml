@@ -7,5 +7,6 @@
   <bean id="svc.bookService" class="com.alexshabanov.booklib.service.BookService">
     <constructor-arg ref="dao.book.bookDao"/>
     <constructor-arg ref="dao.book.namedValueDao"/>
+    <constructor-arg ref="svc.sec.userProfileService"/>
   </bean>
 </beans>
