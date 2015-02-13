@@ -33,7 +33,5 @@
   <import resource="service/download-service-context.xml"/>
 
   <!-- User Initializer -->
-  <bean class="com.alexshabanov.booklib.service.DefaultUserInitializer">
-    <constructor-arg ref="svc.sec.userProfileService"/>
-  </bean>
+  <bean class="com.alexshabanov.booklib.service.DefaultUserInitializer" autowire="constructor"/>
 </beans>

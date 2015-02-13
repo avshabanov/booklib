@@ -10,27 +10,11 @@
   <context:annotation-config/>
 
   <!-- Controllers -->
-
-  <bean class="com.alexshabanov.booklib.web.controllers.GenericController">
-    <constructor-arg ref="svc.bookService"/>
-  </bean>
-
-  <bean class="com.alexshabanov.booklib.web.controllers.BookController">
-    <constructor-arg ref="svc.bookService"/>
-    <constructor-arg ref="svc.downloadService"/>
-  </bean>
-
-  <bean class="com.alexshabanov.booklib.web.controllers.AuthorController">
-    <constructor-arg ref="svc.bookService"/>
-  </bean>
-
-  <bean class="com.alexshabanov.booklib.web.controllers.GenreController">
-    <constructor-arg ref="svc.bookService"/>
-  </bean>
-
-  <bean class="com.alexshabanov.booklib.web.controllers.LangController">
-    <constructor-arg ref="svc.bookService"/>
-  </bean>
+  <bean class="com.alexshabanov.booklib.web.controllers.GenericController" autowire="constructor"/>
+  <bean class="com.alexshabanov.booklib.web.controllers.BookController" autowire="constructor"/>
+  <bean class="com.alexshabanov.booklib.web.controllers.AuthorController" autowire="constructor"/>
+  <bean class="com.alexshabanov.booklib.web.controllers.GenreController" autowire="constructor"/>
+  <bean class="com.alexshabanov.booklib.web.controllers.LangController" autowire="constructor"/>
 
 
   <!-- Annotation driven support for MVC controllers -->

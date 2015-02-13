@@ -1,13 +1,13 @@
 package com.alexshabanov.booklib.service
 
 import com.alexshabanov.booklib.model.BookMeta
-import java.util.ArrayList
-import java.util.LinkedHashSet
 import com.alexshabanov.booklib.model.NamedValue
 import com.alexshabanov.booklib.service.dao.BookDao
 import com.alexshabanov.booklib.service.dao.NamedValueDao
 import com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT
 import com.alexshabanov.booklib.model.FavoriteKind
+import com.alexshabanov.booklib.model.FavoriteStatus
+import com.alexshabanov.booklib.model.toFavoriteStatus
 
 //
 // Presentational model
@@ -16,12 +16,20 @@ import com.alexshabanov.booklib.model.FavoriteKind
 data class Book(val meta: BookMeta, val favorite: Boolean,
                 val authors: List<NamedValue>, val genres: List<NamedValue>)
 
-data class NamedValuePage(val namedValue: NamedValue, val books: List<Book>, val favorite: Boolean, val startBookId: Long?)
+data class NamedValuePage(val namedValue: NamedValue,
+                          val books: List<Book>,
+                          val startBookId: Long?,
+                          private val favStatus: FavoriteStatus) {
+  var favorite: Boolean
+  get() = favStatus == FavoriteStatus.FAVORITE
+  private set(b: Boolean) = throw IllegalStateException()
+}
 
-private fun asNamedValuePage(namedValue: NamedValue, books: List<Book>, limit: Int, favorite: Boolean = false) = NamedValuePage(
+private fun asNamedValuePage(namedValue: NamedValue, books: List<Book>, limit: Int,
+                             favStatus: FavoriteStatus = FavoriteStatus.UNDECIDED) = NamedValuePage(
     namedValue = namedValue,
     books = books,
-    favorite = favorite,
+    favStatus = favStatus,
     startBookId = (if (books.size() < limit) null else books.last().meta.id))
 
 //
@@ -45,7 +53,7 @@ class BookService(val bookDao: BookDao, val namedValueDao: NamedValueDao, val us
 
   fun getAuthorPageModel(userId: Long, authorId: Long, startBookId: Long?, limit: Int = DEFAULT_LIMIT) = asNamedValuePage(
       namedValue = namedValueDao.getAuthorById(authorId),
-      favorite = userService.isFavorite(userId, FavoriteKind.AUTHOR, authorId),
+      favStatus = toFavoriteStatus(userService.isFavorite(userId, FavoriteKind.AUTHOR, authorId)),
       books = getBooksByMeta(userId, bookDao.getBooksOfAuthor(authorId, startBookId, limit)),
       limit = limit)
 

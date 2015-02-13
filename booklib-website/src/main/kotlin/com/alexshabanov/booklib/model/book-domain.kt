@@ -8,3 +8,11 @@ data class BookMeta(val id: Long?, val title: String, val fileSize: Int, val add
                     val lang: NamedValue, val origin: String)
 
 data class NamedValue(val id: Long?, val name: String)
+
+enum class FavoriteStatus {
+  NONE
+  FAVORITE
+  UNDECIDED
+}
+
+fun toFavoriteStatus(isFavorite: Boolean) = if (isFavorite) FavoriteStatus.FAVORITE else FavoriteStatus.NONE
