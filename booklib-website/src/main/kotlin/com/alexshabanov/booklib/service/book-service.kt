@@ -21,8 +21,12 @@ data class NamedValuePage(val namedValue: NamedValue,
                           val startBookId: Long?,
                           private val favStatus: FavoriteStatus) {
   var favorite: Boolean
-  get() = favStatus == FavoriteStatus.FAVORITE
-  private set(b: Boolean) = throw IllegalStateException()
+    get() = favStatus == FavoriteStatus.FAVORITE
+    private set(b: Boolean) = throw IllegalStateException()
+
+  var hasFavorite: Boolean
+    get() = favStatus != FavoriteStatus.UNDECIDED
+    private set(b: Boolean) = throw IllegalStateException()
 }
 
 private fun asNamedValuePage(namedValue: NamedValue, books: List<Book>, limit: Int,
