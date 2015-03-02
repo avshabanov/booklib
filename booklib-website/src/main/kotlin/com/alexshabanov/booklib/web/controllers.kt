@@ -102,6 +102,11 @@ class AuthorController(val bookService: BookService): StandardHtmlController() {
     // name hint
     return ModelAndView("author-names", "prefixList", bookService.getAuthorNameHint(namePrefix))
   }
+
+  // TODO: makeFavorite... (or changeFavStatus)
+  // TODO: unmakeFavorite...
+  // TODO: call from js..
+  // TODO: voila! remove these TODOs
 }
 
 /* Language-specific pages */
