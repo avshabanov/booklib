@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable as pathVar
 import org.springframework.web.bind.annotation.ResponseBody as respBody
 import org.springframework.web.servlet.ModelAndView
 import com.alexshabanov.booklib.service.BookService
-import com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT
 import javax.servlet.http.HttpServletResponse
 import com.alexshabanov.booklib.service.BookDownloadService
 import com.truward.time.UtcTime
@@ -15,6 +14,9 @@ import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.authentication.InternalAuthenticationServiceException
 import com.alexshabanov.booklib.model.UserAccount
+import com.alexshabanov.booklib.model.FavoriteKind
+import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.ResponseBody
 
 //
 // Spring MVC controllers
@@ -103,10 +105,19 @@ class AuthorController(val bookService: BookService): StandardHtmlController() {
     return ModelAndView("author-names", "prefixList", bookService.getAuthorNameHint(namePrefix))
   }
 
-  // TODO: makeFavorite... (or changeFavStatus)
-  // TODO: unmakeFavorite...
-  // TODO: call from js..
-  // TODO: voila! remove these TODOs
+  req(value = array("/author/rest/favorite/toggle"), method = array(RequestMethod.POST))
+  ResponseBody
+  fun changeFavStatus(
+      par("kind") kind: FavoriteKind, par("entityId") entityId: Long): Boolean {
+    val userId = getUserId()
+    if (bookService.userService.isFavorite(userId, kind, entityId)) {
+      bookService.userService.resetFavorite(userId, kind, entityId)
+      return false
+    } else {
+      bookService.userService.setFavorite(userId, kind, entityId)
+      return true
+    }
+  }
 }
 
 /* Language-specific pages */

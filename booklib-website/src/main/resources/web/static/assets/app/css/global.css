@@ -42,3 +42,19 @@ form.signin-form > div.button-holder {
   padding-top: 0.2em;
   padding-bottom: 0.2em;
 }
+
+.j-fav-link .star {
+  display: inline;
+}
+
+.j-fav-link .unstar {
+  display: none;
+}
+
+.j-fav-link.fav .star {
+  display: none;
+}
+
+.j-fav-link.fav .unstar {
+  display: inline;
+}
