@@ -3,7 +3,9 @@ $(document).ready(function () {
   console.log("ready");
 });
 
-$(".j-fav-link").click(function () {
+$(".j-fav-link").click(function (event) {
+  event.preventDefault(); // do not actually navigate
+
   var self = $(this);
   var id = self.attr("item-id");
   var type = self.attr("item-type");

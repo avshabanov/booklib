@@ -44,17 +44,17 @@ form.signin-form > div.button-holder {
 }
 
 .j-fav-link .star {
-  display: inline;
+  display: none;
 }
 
 .j-fav-link .unstar {
-  display: none;
+  display: inline;
 }
 
 .j-fav-link.fav .star {
-  display: none;
+  display: inline;
 }
 
 .j-fav-link.fav .unstar {
-  display: inline;
+  display: none;
 }

@@ -52,7 +52,24 @@ req(array("/g")) controller open class StandardHtmlController {
 /** Generic pages controller. */
 class GenericController(val bookService: BookService): StandardHtmlController() {
 
-  req(array("/index")) fun index() = ModelAndView("index", "randomBooks", bookService.getRandomBooks(getUserId()))
+  req(array("/index")) fun index(): ModelAndView {
+    val userId = getUserId()
+    val favs = bookService.userService.getFavorites(userId)
+
+    // filter entry ids
+    val favBookIds = favs.filter { it -> it.kind == FavoriteKind.BOOK }
+    val favAuthorIds = favs.filter { it -> it.kind == FavoriteKind.AUTHOR }
+
+    // fetch favorite books and authors
+    val favBooks = favBookIds.forEach { it -> bookService.getBookById(userId, it.entityId) }
+    val favAuthors = favAuthorIds.forEach { it -> bookService.getAuthorById(it.entityId) }
+
+    return ModelAndView("index", mapOf(
+        Pair("favBooks", favBooks),
+        Pair("favAuthors", favAuthors),
+        // TODO: remove
+        Pair("randomBooks", bookService.getRandomBooks(getUserId()))))
+  }
 
   req(array("/about")) fun about() = "about"
 
