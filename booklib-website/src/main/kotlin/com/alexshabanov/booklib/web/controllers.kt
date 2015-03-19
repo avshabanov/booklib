@@ -61,14 +61,12 @@ class GenericController(val bookService: BookService): StandardHtmlController() 
     val favAuthorIds = favs.filter { it -> it.kind == FavoriteKind.AUTHOR }
 
     // fetch favorite books and authors
-    val favBooks = favBookIds.forEach { it -> bookService.getBookById(userId, it.entityId) }
-    val favAuthors = favAuthorIds.forEach { it -> bookService.getAuthorById(it.entityId) }
+    val favBooks = favBookIds.map { it -> bookService.getBookById(userId, it.entityId) }
+    val favAuthors = favAuthorIds.map { it -> bookService.getAuthorById(it.entityId) }
 
     return ModelAndView("index", mapOf(
         Pair("favBooks", favBooks),
-        Pair("favAuthors", favAuthors),
-        // TODO: remove
-        Pair("randomBooks", bookService.getRandomBooks(getUserId()))))
+        Pair("favAuthors", favAuthors)))
   }
 
   req(array("/about")) fun about() = "about"
