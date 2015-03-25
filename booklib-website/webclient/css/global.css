@@ -1,0 +1,66 @@
+/* Custom app style */
+
+body {
+    padding-top: 70px;
+    /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+}
+
+.inlet {
+  padding: 24px;
+}
+
+ul.book-list {
+  list-style: none outside none;
+  padding: 0;
+}
+
+ul.book-list li {
+  border-top: 1px solid #eee;
+  padding-bottom: 1em;
+}
+
+.named-value-elem {
+  padding: 0.5em;
+  display: inline-block;
+}
+
+table.book-info > tbody > tr > td {
+  padding: 0.5em;
+}
+
+table.book-info > tbody > tr > td:first-child {
+  font-weight: bold;
+}
+
+/* Sign in form */
+
+form.signin-form div {
+  min-height: 2em;
+}
+
+form.signin-form > div.button-holder {
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+}
+
+.j-fav-link .star {
+  display: none;
+}
+
+.j-fav-link .unstar {
+  display: inline;
+}
+
+.j-fav-link.fav .star {
+  display: inline;
+}
+
+.j-fav-link.fav .unstar {
+  display: none;
+}
+
+/* Dividers */
+
+.item-sep:first-child .prepended-divider {
+  display: none;
+}

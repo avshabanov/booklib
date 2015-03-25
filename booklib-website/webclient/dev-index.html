@@ -1,0 +1,69 @@
+<!--
+Development version of the website.
+
+Run python -mSimpleHTTPServer then open http://127.0.0.1:8000/dev-index.html in your browser.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='Content-type' content='text/html; charset=utf-8'>
+  <title>Booklib</title>
+
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.1/css/bootstrap.css" />
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.1/css/bootstrap-theme.css" />
+  <link rel="stylesheet" type="text/css" href="../css/global.css" />
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#g-app-navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/g/index">BookLib</a>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="g-app-navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li><a href="#/g/authors">Authors</a></li>
+        <li><a href="#/g/genres">Genres</a></li>
+        <li><a href="#/g/languages">Languages</a></li>
+        <li class="nav-divider"></li>
+        <li><a href="#/g/about">About</a></li>
+        <li class="nav-divider"></li>
+        <li><a href="#/g/logout">Logout</a></li>
+      </ul>
+    </div> <!-- /.navbar-collapse -->
+  </div> <!-- /.container -->
+</nav>
+
+<div id="main-content" class="container">
+</div>
+
+<div id="footer">
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.1/js/bootstrap.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.1/react.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.1/JSXTransformer.js"></script>
+
+<script src="js/service/book-service.js"></script>
+
+<script type="text/jsx" src="js/react/widget/fav-star.jsx"></script>
+<script type="text/jsx" src="js/react/widget/book-item.jsx"></script>
+<script type="text/jsx" src="js/react/widget/book-list.jsx"></script>
+<script type="text/jsx" src="js/react/page/main.jsx"></script>
+<script type="text/jsx" src="js/react/page/about.jsx"></script>
+
+<script type="text/jsx">
+  React.render(<MainPage />, document.getElementById('main-content'));
+</script>
+
+</body>
+</html>
