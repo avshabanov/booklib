@@ -1,9 +1,12 @@
+var app = app || {};
 
 /* Service for fetching book data */
 
-var BookService = (function () {
+app.BookService = (function () {
   //var debugLog = console.debug;
   var debugLog = function () {};
+
+  var DELAY = 900;
 
   function nv(id, name) { // produces name-value pair
     return {'id': id, 'name': name}
@@ -61,22 +64,22 @@ var BookService = (function () {
     {id: 1, title: 'Far Rainbow', fileSize: 255365, addDate: '2007-10-23',
       genres: [selectById(GENRES, 4), selectById(GENRES, 1)],
       authors: [selectById(AUTHORS, 5), selectById(AUTHORS, 6)],
-      langId: 2, originId: 4},
+      lang: selectById(LANG_CODES, 2), origin: selectById(ORIGINS, 4), isFavorite: true},
 
     {id: 2, title: 'Hermit and Sixfinger', fileSize: 169981, addDate: '2010-01-16',
       genres: [selectById(GENRES, 3)],
       authors: [selectById(AUTHORS, 7)],
-      langId: 2, originId: 4},
+      lang: selectById(LANG_CODES, 2), origin: selectById(ORIGINS, 4), isFavorite: true},
 
     {id: 3, title: 'The Dark Tower: The Gunslinger', fileSize: 412035, addDate: '2008-06-10',
       genres: [selectById(GENRES, 2), selectById(GENRES, 6)],
       authors: [selectById(AUTHORS, 3)],
-      langId: 1, originId: 2, series: {seriesId: 2, seriesPos: 1}},
+      lang: selectById(LANG_CODES, 1), origin: selectById(ORIGINS, 2), series: {seriesId: 2, seriesPos: 1}},
 
     {id: 4, title: 'Hard to Be a God', fileSize: 198245, addDate: '2008-05-14',
       genres: [selectById(GENRES, 1), selectById(GENRES, 4)],
       authors: [selectById(AUTHORS, 5), selectById(AUTHORS, 6)],
-      langId: 2, originId: 4, series: {seriesId: 1, seriesPos: 4}},
+      lang: selectById(LANG_CODES, 2), origin: selectById(ORIGINS, 2), series: {seriesId: 1, seriesPos: 4}, isFavorite: true},
 
     {}
   ];
@@ -89,12 +92,58 @@ var BookService = (function () {
     return deferred;
   }
 
+  function withDefaults(promise) {
+    promise.fail(function (e) {
+      console.error("Service call failed. Error=" + e);
+    });
+    return promise;
+  }
+
   // actual object
   // dev, local only version, returns jquery promises (imitates AJAX)
   return {
     getFavoriteBooks: function () {
       debugLog("dev.BookService.getFavoriteBooks started");
-      return resolveAfterDelay(200, new $.Deferred(), [BOOKS[1], BOOKS[2], BOOKS[3]]);
+      var result = [];
+      var i;
+      for (i = 0; i < BOOKS.length; ++i) {
+        if (BOOKS[i].isFavorite === true) {
+          result.push(BOOKS[i]);
+        }
+      }
+      return withDefaults(resolveAfterDelay(DELAY, $.Deferred(), result));
+    },
+
+    getBookById: function (id) {
+      debugLog("dev.BookService.getBookById started");
+      var result = selectById(BOOKS, id);
+      return withDefaults(resolveAfterDelay(DELAY, $.Deferred(), result));
+    },
+
+    setFavorite: function (id, type, isFavorite) {
+      debugLog("dev.BookService.setFavorite started");
+      var deferred = $.Deferred();
+      setTimeout(function () {
+        var col;
+        if (type === "BOOK") {
+          col = BOOKS;
+        } else if (type === "AUTHOR") {
+          col = AUTHORS;
+        } else {
+          deferred.reject(new Error("Unable to set favorite status for entity with type=" + type));
+          return;
+        }
+
+        try {
+          var entity = selectById(col, id);
+          entity.isFavorite = isFavorite;
+          deferred.resolve(isFavorite)
+          return;
+        } catch (e) {
+          deferred.reject(e);
+        }
+      }, DELAY);
+      return withDefaults(deferred);
     }
   };
 })();

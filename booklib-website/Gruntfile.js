@@ -6,6 +6,7 @@ module.exports = function(grunt) {
 
   var sources = [
     'node_modules/react/dist/react.js',
+    'node_modules/director/lib/director.js',
     sdir('js/service/book-service.js'),
     tdir('js/app-react-widgets.js'),
     sdir('js/app.js')

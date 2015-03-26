@@ -10,14 +10,13 @@ var BookItem = React.createClass({
     }
 
     var createAuthor = function (author) {
-      return inlineItem("#author/" + author.id, author);
+      return inlineItem("#/author/" + author.id, author);
     };
 
     var createGenre = function (genre) {
-      return inlineItem("#genre/" + genre.id, genre);
+      return inlineItem("#/genre/" + genre.id, genre);
     };
 
-    var favData = {id: 1000, type: "BOOK", isFavorite: false};
     var bookUrl = '#/book/' + this.props.data.id;
 
     return (
@@ -29,7 +28,9 @@ var BookItem = React.createClass({
             </div>
           </div>
           <div className="row">
-            <div className="col-md-2"><FavStar data={favData}/></div>
+            <div className="col-md-2">
+              <FavStar id={this.props.data.id} type='BOOK' isFavorite={this.props.data.isFavorite}/>
+            </div>
             <div className="col-md-5">{this.props.data.authors.map(createAuthor)}</div>
             <div className="col-md-5">{this.props.data.genres.map(createGenre)}</div>
           </div>

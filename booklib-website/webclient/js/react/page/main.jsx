@@ -1,30 +1,42 @@
+var app = app || {};
+
+var Nav = {
+  MAIN_PAGE: "main",
+  BOOK_PAGE: "book"
+};
+
 var MainPage = React.createClass({
-  getInitialState: function() {
+  getInitialState: function () {
     return {
-      data: {
-        books: []
-      }
+      nowShowing: Nav.MAIN_PAGE,
+      bookId: null
     };
   },
 
-  componentDidMount: function() {
-    var booksPromise = BookService.getFavoriteBooks();
-    booksPromise.done(function (books) {
-      this.setState({data: {books: books}});
-    }.bind(this));
+  componentDidMount: function () {
+    var gotoMainPage = this.setState.bind(this, {nowShowing: Nav.MAIN_PAGE})
+    var gotoBookPage = function (bookId) {
+      this.setState({nowShowing: Nav.BOOK_PAGE, bookId: bookId});
+    }.bind(this);
+
+    var router = Router({
+      '/': gotoMainPage,
+      '/book/:bookId': gotoBookPage
+    });
+
+    router.init('/');
   },
 
   render: function() {
-    return (
-      <div>
-        <h2>Book Library <small>demo</small></h2>
+    switch (this.state.nowShowing) {
+      case Nav.MAIN_PAGE:
+        return (<FavListsPage />);
 
-        <h3>Favorite Books</h3>
-        <BookList data={this.state.data.books} />
+      case Nav.BOOK_PAGE:
+        return (<SingleBookPage bookId={this.state.bookId} />);
 
-        <h3>Favorite Authors</h3>
-        <p>You don't have favorite authors yet.</p>
-      </div>
-    );
+      default:
+        return (<FavListsPage />);
+    }
   }
 });
