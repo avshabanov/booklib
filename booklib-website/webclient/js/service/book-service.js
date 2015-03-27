@@ -2,11 +2,11 @@ var app = app || {};
 
 /* Service for fetching book data */
 
-app.BookService = (function () {
+(function () {
   //var debugLog = console.debug;
   var debugLog = function () {};
 
-  var DELAY = 900;
+  var DELAY = 200;
 
   function nv(id, name) { // produces name-value pair
     return {'id': id, 'name': name}
@@ -101,7 +101,7 @@ app.BookService = (function () {
 
   // actual object
   // dev, local only version, returns jquery promises (imitates AJAX)
-  return {
+  app.BookService = {
     getFavoriteBooks: function () {
       debugLog("dev.BookService.getFavoriteBooks started");
       var result = [];

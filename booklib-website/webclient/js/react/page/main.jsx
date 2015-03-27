@@ -1,35 +1,39 @@
 var app = app || {};
 
 var Nav = {
-  MAIN_PAGE: "main",
+  UNDEFINED: "undefined",
+  FAVS_PAGE: "favs",
   BOOK_PAGE: "book"
 };
 
 var MainPage = React.createClass({
   getInitialState: function () {
     return {
-      nowShowing: Nav.MAIN_PAGE,
+      nowShowing: Nav.UNDEFINED,
       bookId: null
     };
   },
 
   componentDidMount: function () {
-    var gotoMainPage = this.setState.bind(this, {nowShowing: Nav.MAIN_PAGE})
+    var gotoFavsPage = this.setState.bind(this, {nowShowing: Nav.FAVS_PAGE})
     var gotoBookPage = function (bookId) {
       this.setState({nowShowing: Nav.BOOK_PAGE, bookId: bookId});
     }.bind(this);
 
     var router = Router({
-      '/': gotoMainPage,
+      '/favs': gotoFavsPage,
       '/book/:bookId': gotoBookPage
     });
 
-    router.init('/');
+    router.init('/favs');
   },
 
   render: function() {
     switch (this.state.nowShowing) {
-      case Nav.MAIN_PAGE:
+      case Nav.UNDEFINED: // happens once on loading
+        return (<div/>);
+
+      case Nav.FAVS_PAGE:
         return (<FavListsPage />);
 
       case Nav.BOOK_PAGE:
@@ -40,3 +44,4 @@ var MainPage = React.createClass({
     }
   }
 });
+
