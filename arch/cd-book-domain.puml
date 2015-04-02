@@ -1,0 +1,53 @@
+@startuml
+
+class NamedValue {
+  long id
+  String name
+}
+
+class Language extends NamedValue
+
+class Origin extends NamedValue
+
+enum PersonKind {
+  AUTHOR
+  ILLUSTRATOR
+  CRITIC
+}
+
+class Person {
+  long id
+  String name
+  PersonKind personKind
+}
+
+Person ..> PersonKind
+
+class BookMetaInfo {
+    Long id
+    String title
+    Language language
+    Origin origin
+}
+
+class BookPerson {
+  long bookId
+  long personId
+}
+
+BookPerson "n" ..> "1" BookMetaInfo
+BookPerson "n" ..> "1" Person
+
+class BookDownloadInfo {
+  long id
+  long bookId
+  Optional<String> key
+}
+
+note right of BookDownloadInfo : E.g. S3 download key.
+
+BookMetaInfo ..> Language : refers
+BookMetaInfo ..> Origin : refers
+BookDownloadInfo "n" ..> "1" BookMetaInfo : refers(bookId)
+
+@enduml

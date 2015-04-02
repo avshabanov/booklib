@@ -1,0 +1,10 @@
+@startuml
+
+actor :Review Writer: as Writer
+actor :Reader: as Reader
+
+usecase (Write\nReview) as UC1_1
+
+Writer --> UC1_1
+
+@enduml

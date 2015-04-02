@@ -1,0 +1,62 @@
+@startuml
+
+enum FavoriteStatus {
+  NONE
+  FAVORITE
+  UNDECIDED
+}
+
+enum ItemKind {
+  AUTHOR
+  BOOK
+  COMMENT
+  OVERVIEW
+}
+
+class ItemFavoriteStatus {
+  long userId
+  long itemId
+  ItemKind itemKind
+}
+
+ItemFavoriteStatus --> FavoriteStatus : isFavorite?
+ItemFavoriteStatus --> ItemKind
+
+enum OverviewKind {
+  DESCRIPTION /*book, author*/
+  SHORT_CONTENTS /*book only*/
+  FACTS /*book, author*/
+}
+
+class Overview {
+  long id
+  long authorId
+  long parentItemId
+  ItemKind parentItemKind
+  OverviewKind overviewKind
+  String title
+  String content
+}
+
+Overview --> ItemKind
+Overview --> OverviewKind
+
+class Comment {
+  long id
+  long authorId
+  long rootOverviewId
+  Optional<Long> parentCommentId
+  String content
+}
+
+Comment "n" --> "1" Overview
+
+class Rating {
+  long itemId
+  ItemKind itemKind
+  int counter
+}
+
+Rating --> ItemKind
+
+@enduml

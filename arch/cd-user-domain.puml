@@ -1,0 +1,57 @@
+@startuml
+
+class UserProfile {
+  long id
+  String nickname
+  String email
+  String passwordHash
+  DateTime created
+  Set<UserProfileStateFlags> flags
+}
+
+enum UserProfileStateFlags {
+  EMAIL_VERIFIED
+}
+
+UserProfile ..> UserProfileStateFlags
+
+class Role {
+  long id
+  String name
+}
+
+UserProfile "1" --> "n" Role : "UserRole (authorityList)"
+
+
+class UserAccount {
+  long id
+  String nickname
+  String passwordHash
+  List<SimpleGrantedAuthority> roles
+}
+
+UserAccount "1" ..> "1" UserProfile : reflects
+
+class RegistrationData {
+  String nickname
+  String email
+  String password
+  Optional<String> verificationToken
+}
+
+class VerificationToken {
+  long id
+  String tokenValue
+  VerificationKind kind
+  Optional<Long> userId
+}
+
+enum VerificationKind {
+  INVITATION
+  EMAIL
+}
+
+RegistrationData ..> VerificationToken : refers to
+VerificationToken --> VerificationKind
+
+@enduml
