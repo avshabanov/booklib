@@ -1,94 +1,99 @@
 module.exports = function(grunt) {
-
-  function tdir(relPath) { return 'target/webclient/' + relPath; }
-
-  function sdir(relPath) { return 'webclient/' + relPath; }
-
-  var sources = [
-    'node_modules/react/dist/react.js',
-    'node_modules/director/lib/director.js',
-    sdir('js/service/book-service.js'),
-    tdir('js/app-react-widgets.js'),
-    sdir('js/app.js')
-  ];
-
   function prepareSkeleton() {
-    // Skeleton preparation task - see also http://gruntjs.com/api/grunt.file
-    grunt.file.mkdir(tdir('js'));
-    grunt.file.mkdir(tdir('css'));
-    grunt.file.copy(sdir('html/_index.html'), tdir('index.html'));
-    grunt.file.copy(sdir('css/global.css'), tdir('css/global.css'));
+    grunt.file.mkdir('target/web/js');
+    grunt.file.mkdir('target/web/tmp/js');
   }
-
-  // prepare combined reactjs files separately (because of tdir(...) in the object key)
-  var combinedReactFiles = {};
-  combinedReactFiles[tdir('js/app-react-widgets.js')] = [
-    // widgets
-    sdir('js/react/widget/fav-star.jsx'),
-    sdir('js/react/widget/book-item.jsx'),
-    sdir('js/react/widget/book-list.jsx'),
-
-    // pages
-    sdir('js/react/page/main.jsx'),
-    sdir('js/react/page/about.jsx')
-  ];
 
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
+    watch: {
+      scripts: {
+        files: ['web/js/**/*.*', 'web/css/**/*.css', 'web/html/index.html'],
+        tasks: ['copy', 'react', 'browserify']
+      }
+    },
+
+    copy: {
+      main: {
+        files: [
+          {
+            src: 'web/html/index.html',
+            dest: 'target/web/index.html'
+          },
+          {
+            cwd: 'web/css',
+            src: '**',
+            dest: 'target/web/css',
+            expand: true
+          },
+          {
+            cwd: 'web/js',                // source js dir
+            src: ['**', '!**/*.jsx'],     // copy all files and subfolders to the temporary dor, except for jsx
+            dest: 'target/web/tmp/js',    // destination folder, used by browserify
+            expand: true                  // required when using cwd
+          }
+        ]
+      }
+    },
+
     react: {
-      combined_file_output: {
-        files: combinedReactFiles
+      dynamic_mappings: {
+        files: [
+          {
+            expand: true,
+            cwd: 'web/js/view',
+            src: ['**/*.jsx'],
+            dest: 'target/web/tmp/js/view',
+            ext: '.js'
+          }
+        ]
       }
     },
 
-    // (development only)
-    concat: {
-      options: {
-        banner: '/*! Generated app.js */\n',
-        // define a string to put between each file in the concatenated output
-        separator: ''
-      },
+    browserify: {
       dist: {
-        src: sources,
-        dest: tdir('js/app.js')
+        files: {
+          'target/web/js/app.js': ['target/web/tmp/js/main.js'],
+        }
       }
     },
 
-    // (production version)
     uglify: {
       options: {
         banner: '/*! Generated app.js <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
       build: {
-        src: tdir('js/app.js'),
-        dest: tdir('js/app.min.js')
+        src: 'target/web/js/app.js',
+        dest: 'target/web/js/app.min.js'
       }
     }
   });
 
   // Load plugins
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-react');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
   prepareSkeleton();
 
-  grunt.registerTask('dist-finalize', 'Helper subtask for dist task that finalizes files structure', function () {
-    //grunt.file.copy('build/js/app.min.js', 'build/js/app.js');
-    //grunt.file.delete('build/js/app.min.js');
-    //grunt.file.delete('build/tmp');
-  });
-
   // Default task that generates development build
   grunt.registerTask('default', [
-    'react', 'concat'
+    'copy', 'react', 'browserify'
   ]);
+
+  // Helper task for moving app.min.js to app.js
+  grunt.registerTask('uglify-fix-app', 'Rename app.min.js to app.js', function () {
+    grunt.file.copy('target/web/js/app.min.js', 'target/web/js/app.js');
+    grunt.file.delete('target/web/js/app.min.js');
+  });
 
   // Release task that generates production build
   grunt.registerTask('dist', [
-    'react', 'concat', 'uglify', 'dist-finalize'
+    'copy', 'react', 'browserify', 'uglify', 'uglify-fix-app'
   ]);
 
   grunt.registerTask('clean', 'Recursively cleans build folder', function () {
