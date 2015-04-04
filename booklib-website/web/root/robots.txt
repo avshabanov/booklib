@@ -1,0 +1,6 @@
+User-agent: *
+
+Allow: /books
+Allow: /static
+Allow: /assets
+Disallow: /

@@ -10,7 +10,7 @@ module.exports = function(grunt) {
 
     watch: {
       scripts: {
-        files: ['web/js/**/*.*', 'web/css/**/*.css', 'web/html/index.html'],
+        files: ['web/js/**/*.*', 'web/css/**/*.css', 'web/root/**/*.*'],
         tasks: ['copy', 'react', 'browserify']
       }
     },
@@ -19,8 +19,10 @@ module.exports = function(grunt) {
       main: {
         files: [
           {
-            src: 'web/html/index.html',
-            dest: 'target/web/index.html'
+            cwd: 'web/root',
+            src: '**',
+            dest: 'target/web',
+            expand: true
           },
           {
             cwd: 'web/css',

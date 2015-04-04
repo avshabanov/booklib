@@ -1,4 +1,6 @@
 
+var rsvp = require('rsvp');
+
 function debugLog() {}
 
 //
@@ -28,10 +30,10 @@ module.exports.withDefaults = function withDefaults(promise) {
   return promise;
 }
 
-module.exports.resolveAfterDelay = function resolveAfterDelay(timeout, deferred, data) {
-  setTimeout(function () {
-    debugLog("resolved data: " + JSON.stringify(data));
-    deferred.resolve(data);
-  }, timeout);
-  return deferred;
+module.exports.newResolvableDelayedPromise = function newResolvableDelayedPromise(data, delay) {
+  return new rsvp.Promise(function (resolve, reject) {
+    setTimeout(function () {
+      resolve(data);
+    }, delay);
+  });
 }

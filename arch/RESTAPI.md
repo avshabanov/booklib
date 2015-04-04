@@ -13,7 +13,8 @@ Response:
 
   genres: [{1, 'classic'}],
   persons: {authors: [[2, 'Oscar Wilde']]},
-  language: {3, 'en'}
+  language: {3, 'en'},
+  isFavorite: true
 }
 ```
 
