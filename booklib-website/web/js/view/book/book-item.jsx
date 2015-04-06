@@ -3,10 +3,9 @@ var React = require('React');
 module.exports = React.createClass({
   render: function() {
     return (
-      <div className="container">
-        <h3>Book Item</h3>
-        <p>Lorem ipsum</p>
-      </div>
+      <li>
+        <span>Book: id={this.props.book.id} title={this.props.book.title}</span>
+      </li>
     );
   }
 });

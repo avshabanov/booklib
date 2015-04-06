@@ -9,7 +9,8 @@ module.exports = React.createClass({
   componentDidMount: function() {
     var booksPromise = this.props.services.libService.getStorefrontPage();
     booksPromise.then(function (storefrontModel) {
-      this.setState({loading: false, books: storefrontModel.books, persons: storefrontModel.persons});
+      var favs = storefrontModel.favorites;
+      this.setState({loading: false, books: favs.books, persons: favs.persons});
     }.bind(this));
   },
 

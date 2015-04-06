@@ -3,12 +3,13 @@ var BookItem = require('./book-item.js');
 
 module.exports = React.createClass({
   render: function() {
+    var bookNodes = this.props.books.map(function (book) {
+      return (<BookItem key={book.id} book={book} />);
+    });
     return (
-      <div className="container">
-        <h2>Book List</h2>
-        <BookItem />
-        <BookItem />
-      </div>
+      <ul className="book-list">
+        {bookNodes}
+      </ul>
     );
   }
 });
