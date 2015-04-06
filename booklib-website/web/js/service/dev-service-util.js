@@ -7,7 +7,7 @@ function debugLog() {}
 // Exports
 //
 
-module.exports.DELAY = 200;
+module.exports.DELAY = 800;
 
 module.exports.selectById = function selectById(col, id) {
   var i;

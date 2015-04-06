@@ -1,9 +1,13 @@
 var React = require('React');
 
-var StorefrontPage = require('./view/storefront/storefront-page.js');
+var Dispatcher = require('./view/dispatcher.js');
 var LibService = require('./service/lib-service.js').LibService;
 
 window.onload = function () {
-  console.log("main (2)");
-  React.render(React.createElement(StorefrontPage), document.getElementById('main-content'));
+  console.log("main (4)");
+  var services = {
+    libService: new LibService()
+  };
+  React.render(React.createElement(Dispatcher, {services: services}),
+    document.getElementById('main-content'));
 }
