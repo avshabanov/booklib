@@ -30,6 +30,11 @@ class BookMetaInfo {
     Origin origin
 }
 
+note right of BookMetaInfo #e0e0ff
+  Meta information about the book.
+  Serves as a root entry.
+end note
+
 class BookPerson {
   long bookId
   long personId

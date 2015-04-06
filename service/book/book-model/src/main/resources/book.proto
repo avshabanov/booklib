@@ -1,0 +1,102 @@
+package truward.booklib.book;
+
+option java_package = "com.truward.booklib.book.model";
+option java_outer_classname = "BookModel";
+
+message NamedValue {
+  optional int64 id = 1;
+  required string name = 2;
+}
+
+message Genre {
+  required NamedValue value = 1;
+}
+
+enum PersonType {
+  AUTHOR = 1;
+  ILLUSTRATOR = 2;
+}
+
+message Person {
+  required NamedValue value = 1;
+  required PersonType type = 2;
+}
+
+message Language {
+  required NamedValue value = 1;
+}
+
+message Origin {
+  required NamedValue value = 1;
+}
+
+message BookMeta {
+  optional int64 id = 1;
+  required string title = 2;
+  required int32 fileSize = 3;
+  required int64 addDate = 4;
+  required int64 langId = 5;
+  required int64 originId = 6;
+  repeated int64 authorIds = 7;
+  repeated int64 genreIds = 8;
+}
+
+message BookPageIds {
+  optional int64 bookIds = 1;
+  repeated int64 originIds = 2;
+  repeated int64 languageIds = 3;
+  repeated int64 personIds = 4;
+  repeated int64 genreIds = 5;
+}
+
+message BookPageData {
+  optional BookMeta books = 1;
+  repeated Origin origins = 2;
+  repeated Language languages = 3;
+  repeated Person persons = 4;
+  repeated Genre genres = 5;
+}
+
+message BookPageQuery {
+  optional int64 languageId = 1;
+  optional int64 genreId = 2;
+  optional int64 personId = 3;
+  optional int64 originId = 4;
+
+  optional int64 startBookId = 10;
+
+  enum SortType {
+    ID = 1;
+    NAME = 2;
+  }
+  required SortType sortType = 11 [default = ID];
+
+  required int32 limit = 12 [default = 8];
+}
+
+message LanguageList {
+  repeated Language languages = 1;
+}
+
+message OriginList {
+  repeated Origin origins = 1;
+}
+
+message PersonNameHints {
+  repeated string nameParts = 1;
+}
+
+message PersonListRequest {
+  optional string startName = 1;
+  optional PersonType personTypeFilter = 2;
+  optional int64 startBookId = 3;
+  required int32 limit = 4;
+}
+
+message PersonList {
+  repeated Person persons = 2;
+}
+
+message GenreList {
+  repeated Genre genres = 1;
+}
