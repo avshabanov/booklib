@@ -23,10 +23,16 @@ ItemFavoriteStatus --> FavoriteStatus : isFavorite?
 ItemFavoriteStatus --> ItemKind
 
 enum OverviewKind {
-  DESCRIPTION /*book, author*/
-  SHORT_CONTENTS /*book only*/
-  FACTS /*book, author*/
+  DESCRIPTION
+  SHORT_CONTENTS
+  FACTS
 }
+
+note bottom of OverviewKind
+  * DESCRIPTION - book, author
+  * SHORT_CONTENTS - book only
+  * FACTS - book, author
+end note
 
 class Overview {
   long id

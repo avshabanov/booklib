@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * @author Alexander Shabanov
  */
-public interface BookService {
+public interface BookRestService {
 
   @RequestMapping(value = "/books/page", method = RequestMethod.PUT)
   @ResponseBody
