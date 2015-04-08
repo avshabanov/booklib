@@ -1,6 +1,6 @@
 
 -- Author info
-CREATE TABLE author (
+CREATE TABLE person (
   id        INTEGER PRIMARY KEY,
   f_name    VARCHAR(256) NOT NULL
 );
@@ -53,13 +53,14 @@ CREATE TABLE book_series (
   CONSTRAINT pk_book_series PRIMARY KEY (book_id, series_id)
 );
 
--- Book-to-author link
-CREATE TABLE book_author (
+-- Book-to-person link
+CREATE TABLE book_person (
   book_id   INTEGER NOT NULL,
-  author_id INTEGER NOT NULL,
-  CONSTRAINT pk_book_author PRIMARY KEY (book_id, author_id),
+  person_id INTEGER NOT NULL,
+  role      INTEGER NOT NULL DEFAULT 1, -- role == 1 (AUTHOR), 2 (ILLUSTRATOR)
+  CONSTRAINT pk_book_author PRIMARY KEY (book_id, person_id, role),
   CONSTRAINT fk_book_author_book FOREIGN KEY (book_id) REFERENCES book_meta(id),
-  CONSTRAINT fk_book_author_author FOREIGN KEY (author_id) REFERENCES author(id)
+  CONSTRAINT fk_book_author_author FOREIGN KEY (person_id) REFERENCES person(id)
 );
 
 -- Book-to-genre link
@@ -75,4 +76,4 @@ CREATE TABLE book_genre (
 -- Indexes
 --
 
-CREATE UNIQUE INDEX idx_author_f_name ON author(f_name);
+CREATE UNIQUE INDEX idx_person_f_name ON person(f_name);
