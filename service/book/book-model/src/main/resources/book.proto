@@ -18,6 +18,7 @@ message PersonRelation {
   enum Type {
     AUTHOR = 1;
     ILLUSTRATOR = 2;
+    UNKNOWN = 3;
   }
   required Type relation = 2;
 }
@@ -26,7 +27,7 @@ message BookMeta {
   optional int64 id = 1;
   required string title = 2;
   required int32 fileSize = 3;
-  required int64 addDate = 4;
+  optional int64 addDate = 4;
   required int64 langId = 5;
   required int64 originId = 6;
   repeated PersonRelation personRelations = 7;
@@ -34,11 +35,13 @@ message BookMeta {
 }
 
 message BookPageIds {
-  optional int64 bookIds = 1;
-  repeated int64 originIds = 2;
-  repeated int64 languageIds = 3;
-  repeated int64 personIds = 4;
-  repeated int64 genreIds = 5;
+  repeated int64 bookIds = 1;
+  required bool fetchBookDependencies = 2;
+
+  repeated int64 originIds = 3;
+  repeated int64 languageIds = 4;
+  repeated int64 personIds = 5;
+  repeated int64 genreIds = 6;
 }
 
 message BookPageData {
@@ -55,19 +58,20 @@ message BookPageQuery {
   optional int64 personId = 3;
   optional int64 originId = 4;
 
-  optional int64 startBookId = 10;
+  optional string offsetToken = 10;
 
   enum SortType {
     ID = 1;
-    NAME = 2;
+    TITLE = 2;
   }
   required SortType sortType = 11 [default = ID];
 
   required int32 limit = 12 [default = 8];
 }
 
-message BookMetaList {
-  repeated BookMeta books = 1;
+message BookSublist {
+  repeated int64 bookIds = 1;
+  optional string offsetToken = 2;
 }
 
 message PersonNameHints {
