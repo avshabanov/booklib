@@ -15,19 +15,25 @@ public interface BookRestService {
   @ResponseBody
   BookModel.BookPageIds delete(@RequestBody BookModel.BookPageIds request);
 
+  @RequestMapping(value = "/books/query", method = RequestMethod.POST)
+  @ResponseBody
+  BookModel.BookMetaList queryBooks(@RequestBody BookModel.BookPageQuery query);
+
   @RequestMapping(value = "/books/page/fetch", method = RequestMethod.POST)
   @ResponseBody
   BookModel.BookPageData getPage(@RequestBody BookModel.BookPageIds request);
 
-  @RequestMapping(value = "/genres/page/query", method = RequestMethod.POST)
-  @ResponseBody
-  BookModel.BookPageData queryBookPage(@RequestBody BookModel.BookPageQuery query);
-
   @RequestMapping(value = "/genres", method = RequestMethod.GET)
   @ResponseBody
-  BookModel.GenreList getGenres();
+  BookModel.NamedValueList getGenres();
 
   @RequestMapping(value = "/languages", method = RequestMethod.GET)
   @ResponseBody
-  BookModel.LanguageList getLanguages();
+  BookModel.NamedValueList getLanguages();
+
+  @RequestMapping(value = "/persons/query", method = RequestMethod.POST)
+  BookModel.NamedValueList queryPersons(@RequestBody BookModel.PersonListRequest request);
+
+  @RequestMapping(value = "/persons/hint", method = RequestMethod.POST)
+  BookModel.PersonNameHints getPersonHints(@RequestParam String namePart);
 }

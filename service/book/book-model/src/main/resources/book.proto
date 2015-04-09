@@ -8,26 +8,18 @@ message NamedValue {
   required string name = 2;
 }
 
-message Genre {
-  required NamedValue value = 1;
+message NamedValueList {
+  repeated NamedValue values = 1;
 }
 
-enum PersonType {
-  AUTHOR = 1;
-  ILLUSTRATOR = 2;
-}
+message PersonRelation {
+  required int64 id = 1;
 
-message Person {
-  required NamedValue value = 1;
-  required PersonType type = 2;
-}
-
-message Language {
-  required NamedValue value = 1;
-}
-
-message Origin {
-  required NamedValue value = 1;
+  enum Type {
+    AUTHOR = 1;
+    ILLUSTRATOR = 2;
+  }
+  required Type relation = 2;
 }
 
 message BookMeta {
@@ -37,7 +29,7 @@ message BookMeta {
   required int64 addDate = 4;
   required int64 langId = 5;
   required int64 originId = 6;
-  repeated int64 authorIds = 7;
+  repeated PersonRelation personRelations = 7;
   repeated int64 genreIds = 8;
 }
 
@@ -50,11 +42,11 @@ message BookPageIds {
 }
 
 message BookPageData {
-  optional BookMeta books = 1;
-  repeated Origin origins = 2;
-  repeated Language languages = 3;
-  repeated Person persons = 4;
-  repeated Genre genres = 5;
+  repeated BookMeta books = 1;
+  repeated NamedValue origins = 2;
+  repeated NamedValue languages = 3;
+  repeated NamedValue persons = 4;
+  repeated NamedValue genres = 5;
 }
 
 message BookPageQuery {
@@ -74,12 +66,8 @@ message BookPageQuery {
   required int32 limit = 12 [default = 8];
 }
 
-message LanguageList {
-  repeated Language languages = 1;
-}
-
-message OriginList {
-  repeated Origin origins = 1;
+message BookMetaList {
+  repeated BookMeta books = 1;
 }
 
 message PersonNameHints {
@@ -88,15 +76,6 @@ message PersonNameHints {
 
 message PersonListRequest {
   optional string startName = 1;
-  optional PersonType personTypeFilter = 2;
-  optional int64 startBookId = 3;
-  required int32 limit = 4;
-}
-
-message PersonList {
-  repeated Person persons = 2;
-}
-
-message GenreList {
-  repeated Genre genres = 1;
+  optional int64 startPersonId = 2;
+  required int32 limit = 3;
 }

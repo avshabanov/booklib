@@ -10,10 +10,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Nonnull;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -73,14 +76,14 @@ public final class BookRestController implements BookRestService {
     // fetch genres
     for (final long id : request.getGenreIdsList()) {
       builder.addGenres(jdbcOperations.queryForObject("SELECT id, code AS name FROM genre WHERE id=?",
-          GENRE_MAPPER, id));
+          NAMED_VALUE_MAPPER, id));
     }
     recorder.record("getGenres");
 
     // fetch languages
     for (final long id : request.getLanguageIdsList()) {
       builder.addLanguages(jdbcOperations.queryForObject("SELECT id, code AS name FROM lang_code WHERE id=?",
-          LANG_MAPPER, id));
+          NAMED_VALUE_MAPPER, id));
     }
     recorder.record("getLanguages");
 
@@ -89,51 +92,90 @@ public final class BookRestController implements BookRestService {
 
   @Override
   @Transactional(readOnly = true)
-  public BookModel.BookPageData queryBookPage(@RequestBody BookModel.BookPageQuery query) {
+  public BookModel.BookMetaList queryBooks(@RequestBody BookModel.BookPageQuery query) {
+    final StringBuilder queryBuilder = new StringBuilder(200);
+    final List<Object> args = new ArrayList<>(20);
+
+    queryBuilder.append("SELECT bm.id, bm.title, bm.f_size, bm.add_date, bm.lang_id, bm.origin_id FROM book_meta AS bm");
+
+    if (query.hasGenreId()) {
+      queryBuilder.append(" genre_id=?");
+      args.add(query.getGenreId());
+    }
+
+    if (query.hasPersonId())
+
+    queryBuilder.append(" LIMIT ?");
+    args.add(query.getLimit());
+
+    final List<BookModel.BookMeta.Builder> bookBuilders = jdbcOperations.query(queryBuilder.toString(),
+        BOOK_BUILDER_MAPPER, args.toArray(new Object[args.size()]));
+
+    for (final BookModel.BookMeta.Builder builder : bookBuilders) {
+      //builder.addPersonRelations();
+    }
+
+    return BookModel.BookMetaList.newBuilder()
+        .build();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public BookModel.NamedValueList getGenres() {
+    return getNamedValueList("SELECT id, code AS name FROM genre ORDER BY code");
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public BookModel.NamedValueList getLanguages() {
+    return getNamedValueList("SELECT id, code AS name FROM lang_code ORDER BY code");
+  }
+
+  @Override
+  public BookModel.NamedValueList queryPersons(@RequestBody BookModel.PersonListRequest request) {
     return null;
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public BookModel.GenreList getGenres() {
-    return BookModel.GenreList.newBuilder()
-        .addAllGenres(jdbcOperations.query("SELECT id, code AS name FROM genre ORDER BY code", GENRE_MAPPER))
-        .build();
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public BookModel.LanguageList getLanguages() {
-    return BookModel.LanguageList.newBuilder()
-        .addAllLanguages(jdbcOperations.query("SELECT id, code AS name FROM lang_code ORDER BY code", LANG_MAPPER))
-        .build();
+  public BookModel.PersonNameHints getPersonHints(@RequestParam String namePart) {
+    return null;
   }
 
   //
   // Private
   //
 
-  private static BookModel.NamedValue getNamedValue(ResultSet rs) throws SQLException {
-    return BookModel.NamedValue.newBuilder().setId(rs.getLong("id")).setName(rs.getString("name")).build();
+  @Nonnull
+  private BookModel.NamedValueList getNamedValueList(@Nonnull String sql) {
+    return BookModel.NamedValueList.newBuilder()
+        .addAllValues(jdbcOperations.query(sql, NAMED_VALUE_MAPPER))
+        .build();
   }
 
-  private static final class GenreRowMapper implements RowMapper<BookModel.Genre> {
+  //
+  // Mapper Definitions
+  //
+
+  private static final class NamedValueMapper implements RowMapper<BookModel.NamedValue> {
 
     @Override
-    public BookModel.Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
-      return BookModel.Genre.newBuilder().setValue(getNamedValue(rs)).build();
+    public BookModel.NamedValue mapRow(ResultSet rs, int rowNum) throws SQLException {
+      return BookModel.NamedValue.newBuilder().setId(rs.getLong("id")).setName(rs.getString("name")).build();
     }
   }
 
-  private static final class LanguageRowMapper implements RowMapper<BookModel.Language> {
+  private static final class BookMetaBuilderRowMapper implements RowMapper<BookModel.BookMeta.Builder> {
 
     @Override
-    public BookModel.Language mapRow(ResultSet rs, int rowNum) throws SQLException {
-      return BookModel.Language.newBuilder().setValue(getNamedValue(rs)).build();
+    public BookModel.BookMeta.Builder mapRow(ResultSet rs, int rowNum) throws SQLException {
+      return null;
     }
   }
 
-  private static final GenreRowMapper GENRE_MAPPER = new GenreRowMapper();
+  //
+  // Mapper Instances
+  //
 
-  private static final LanguageRowMapper LANG_MAPPER = new LanguageRowMapper();
+  private static final NamedValueMapper NAMED_VALUE_MAPPER = new NamedValueMapper();
+  private static final BookMetaBuilderRowMapper BOOK_BUILDER_MAPPER = new BookMetaBuilderRowMapper();
 }

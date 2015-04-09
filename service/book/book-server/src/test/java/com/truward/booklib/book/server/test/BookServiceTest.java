@@ -26,9 +26,9 @@ public class BookServiceTest {
     // Given:
 
     // When:
-    final BookModel.GenreList list = bookService.getGenres();
+    final BookModel.NamedValueList list = bookService.getGenres();
 
     // Then:
-    assertTrue(list.getGenresCount() > 0);
+    assertTrue(list.getValuesCount() > 0);
   }
 }
