@@ -9,6 +9,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -30,5 +31,29 @@ public class BookServiceTest {
 
     // Then:
     assertTrue(list.getValuesCount() > 0);
+  }
+
+  @Test
+  public void shouldQueryBooks() {
+    final BookModel.BookSublist list = bookService.queryBooks(BookModel.BookPageQuery.newBuilder()
+        .setLimit(2)
+        .setSortType(BookModel.BookPageQuery.SortType.ID)
+        .build());
+    assertEquals(2, list.getBookIdsCount());
+  }
+
+  @Test
+  public void shouldSavePage() {
+    // Given:
+    final String genre = "fantastische";
+
+    // When:
+    final BookModel.BookPageIds ids = bookService.savePage(BookModel.BookPageData.newBuilder()
+        .addGenres(BookModel.NamedValue.newBuilder().setName(genre)).build());
+
+    // Then:
+    final BookModel.BookPageData pageData = bookService.getPage(ids);
+    assertEquals(1, pageData.getGenresCount());
+    assertEquals(genre, pageData.getGenres(0).getName());
   }
 }

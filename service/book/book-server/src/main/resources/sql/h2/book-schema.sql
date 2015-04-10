@@ -30,6 +30,12 @@ CREATE TABLE book_origin (
 CREATE TABLE book_meta (
   id        INTEGER PRIMARY KEY,
   title     VARCHAR(1024) NOT NULL,
+
+  -- title_idx field is needed to support offset-limit queries for title
+  -- every insert in this table should look as follows:
+  -- INSERT (..., title_idx, ...) VALUES (..., (SELECT 1+ifnull(max(b.title_idx),0) FROM book AS b WHERE b.title=:title), ...);
+  title_idx INTEGER NOT NULL DEFAULT(1),
+
   f_size    INTEGER NOT NULL,
   add_date  DATE,
   lang_id   INTEGER,
@@ -57,7 +63,8 @@ CREATE TABLE book_series (
 CREATE TABLE book_person (
   book_id   INTEGER NOT NULL,
   person_id INTEGER NOT NULL,
-  role      INTEGER NOT NULL DEFAULT 1, -- role == 1 (AUTHOR), 2 (ILLUSTRATOR)
+  -- role == 1 (AUTHOR), 2 (ILLUSTRATOR)
+  role      INTEGER NOT NULL DEFAULT(1),
   CONSTRAINT pk_book_author PRIMARY KEY (book_id, person_id, role),
   CONSTRAINT fk_book_author_book FOREIGN KEY (book_id) REFERENCES book_meta(id),
   CONSTRAINT fk_book_author_author FOREIGN KEY (person_id) REFERENCES person(id)
@@ -71,6 +78,17 @@ CREATE TABLE book_genre (
   CONSTRAINT fk_book_genre_book FOREIGN KEY (book_id) REFERENCES book_meta(id),
   CONSTRAINT fk_book_genre_genre FOREIGN KEY (genre_id) REFERENCES genre(id)
 );
+
+--
+-- Sequences
+--
+
+CREATE SEQUENCE seq_genre       START WITH 1000;
+CREATE SEQUENCE seq_person      START WITH 1000;
+CREATE SEQUENCE seq_lang_code   START WITH 1000;
+CREATE SEQUENCE seq_origin      START WITH 1000;
+CREATE SEQUENCE seq_book        START WITH 1000;
+CREATE SEQUENCE seq_series      START WITH 1000;
 
 --
 -- Indexes

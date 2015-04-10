@@ -2,6 +2,7 @@ package com.truward.booklib.book.server.controller;
 
 import com.truward.booklib.book.model.BookModel;
 import com.truward.booklib.book.model.BookRestService;
+import com.truward.booklib.book.server.util.IdConcealingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -26,9 +27,11 @@ import java.util.Set;
  * @author Alexander Shabanov
  */
 @Controller
-@RequestMapping("/rest/todo")
+@RequestMapping("/rest/book")
 @Transactional
 public final class BookRestController implements BookRestService {
+  private static final int MAX_LIMIT = 64;
+
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final JdbcOperations jdbcOperations;
 
@@ -38,12 +41,55 @@ public final class BookRestController implements BookRestService {
 
   @Override
   public BookModel.BookPageIds savePage(@RequestBody BookModel.BookPageData request) {
-    throw new UnsupportedOperationException();
+    final BookModel.BookPageIds.Builder builder = BookModel.BookPageIds.newBuilder().setFetchBookDependencies(false);
+
+    // Genres
+    for (final BookModel.NamedValue val : request.getGenresList()) {
+      final long genreId;
+      if (val.hasId()) {
+        genreId = val.getId();
+        jdbcOperations.update("UPDATE genre SET code=? WHERE id=?", val.getName(), genreId);
+      } else {
+        genreId = jdbcOperations.queryForObject("SELECT seq_genre.nextval", Long.class);
+        jdbcOperations.update("INSERT INTO genre (id, code) VALUES (?, ?)", genreId, val.getName());
+      }
+      builder.addGenreIds(genreId);
+    }
+
+    return builder.build();
   }
 
   @Override
   public BookModel.BookPageIds delete(@RequestBody BookModel.BookPageIds request) {
-    throw new UnsupportedOperationException();
+    // Genres
+    for (final long id : request.getGenreIdsList()) {
+      jdbcOperations.update("DELETE FROM book_genre WHERE genre_id=?", id);
+      jdbcOperations.update("DELETE FROM genre WHERE id=?", id);
+    }
+
+    // Persons
+    for (final long id : request.getPersonIdsList()) {
+      jdbcOperations.update("DELETE FROM book_person WHERE person_id=?", id);
+      jdbcOperations.update("DELETE FROM person WHERE id=?", id);
+    }
+
+    // Books
+    for (final long id : request.getBookIdsList()) {
+      jdbcOperations.update("DELETE FROM book_series WHERE book_id=?", id);
+      jdbcOperations.update("DELETE FROM book_meta WHERE id=?", id);
+    }
+
+    // Languages
+    for (final long id : request.getLanguageIdsList()) {
+      jdbcOperations.update("DELETE FROM lang_code WHERE id=?", id);
+    }
+
+    // Origins
+    for (final long id : request.getOriginIdsList()) {
+      jdbcOperations.update("DELETE FROM book_origin WHERE id=?", id);
+    }
+
+    return request;
   }
 
   @Override
@@ -127,19 +173,113 @@ public final class BookRestController implements BookRestService {
   @Override
   @Transactional(readOnly = true)
   public BookModel.BookSublist queryBooks(@RequestBody BookModel.BookPageQuery query) {
+    final BookModel.BookSublist.Builder builder = BookModel.BookSublist.newBuilder();
     if (query.getLimit() == 0) {
       // edge condition: zero elements requested
-      final BookModel.BookSublist.Builder builder = BookModel.BookSublist.newBuilder();
       if (query.hasOffsetToken()) {
         builder.setOffsetToken(query.getOffsetToken());
       }
       return builder.build();
     }
 
-    // generate and execute a query
-    final StringBuilder queryBuilder = new StringBuilder(200);
-    final List<Object> args = new ArrayList<>(20);
+    switch (query.getSortType()) {
+      case ID:
+        queryBooksOrderedById(builder, query);
+        break;
 
+      case TITLE:
+        queryBooksOrderedByTitle(builder, query);
+        break;
+
+      default:
+        throw new UnsupportedOperationException("Unknown sortType=" + query.getSortType());
+    }
+
+    return builder.build();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public BookModel.NamedValueList getGenres() {
+    return getNamedValueList("SELECT id, code AS name FROM genre ORDER BY code");
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public BookModel.NamedValueList getLanguages() {
+    return getNamedValueList("SELECT id, code AS name FROM lang_code ORDER BY code");
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public BookModel.NamedValueList queryPersons(@RequestBody BookModel.PersonListRequest request) {
+    checkLimitBounds(request.getLimit());
+    final BookModel.NamedValueList.Builder builder = BookModel.NamedValueList.newBuilder();
+    if (request.getLimit() == 0) {
+      // short cirquit for limit=0
+      if (request.hasOffsetToken()) {
+        builder.setOffsetToken(request.getOffsetToken());
+      }
+      return builder.build();
+    }
+
+    final StringBuilder sql = new StringBuilder(100);
+    final List<Object> args = new ArrayList<>();
+
+    sql.append("SELECT id, f_name AS name FROM person\nWHERE 1=1");
+
+    if (request.hasOffsetToken()) {
+      sql.append(" AND f_name>?");
+      args.add(request.getOffsetToken());
+    }
+
+    if (request.hasStartName()) {
+      sql.append(" AND f_name LIKE ?");
+      args.add(request.getStartName() + '%');
+    }
+
+    sql.append("\nORDER BY f_name LIMIT ?");
+    args.add(request.getLimit());
+
+    final List<BookModel.NamedValue> values = jdbcOperations.query(sql.toString(), NAMED_VALUE_MAPPER,
+        args.toArray(new Object[args.size()]));
+    builder.addAllValues(values);
+
+    if (values.size() == request.getLimit()) {
+      // offset token is available if and only if we were able to get a full page
+      builder.setOffsetToken(values.get(values.size() - 1).getName());
+    }
+
+    return builder.build();
+  }
+
+  @Override
+  public BookModel.PersonNameHints getPersonHints(@RequestParam(value = "prefix", required = false) String prefix) {
+    final String prefixParam;
+    final int charCount;
+    if (prefix != null) {
+      prefixParam = prefix + '%';
+      charCount = prefix.length() + 1;
+    } else {
+      prefixParam = null;
+      charCount = 1;
+    }
+
+    final List<String> parts = jdbcOperations.queryForList(
+        "SELECT DISTINCT SUBSTR(f_name, 0, ?) AS name_part FROM person\n" +
+        "WHERE (? IS NULL OR f_name LIKE ?)\n" +
+        "ORDER BY name_part", String.class, charCount, prefixParam, prefixParam);
+
+    return BookModel.PersonNameHints.newBuilder().addAllNameParts(parts).build();
+  }
+
+  //
+  // Private
+  //
+
+  private void addCommonBookQueryParameters(@Nonnull StringBuilder queryBuilder,
+                                            @Nonnull List<Object> args,
+                                            @Nonnull BookModel.BookPageQuery query) {
     queryBuilder.append("SELECT bm.id FROM book_meta AS bm\n");
 
     // [1] Joined tables
@@ -168,41 +308,50 @@ public final class BookRestController implements BookRestService {
       queryBuilder.append(" AND bm.origin_id=?");
       args.add(query.getOriginId());
     }
+  }
 
-    if (query.hasOffsetToken() && query.getSortType() == BookModel.BookPageQuery.SortType.ID) {
-      // parse startId
-      final Long startId;
-      try {
-        startId = Long.parseLong(query.getOffsetToken(), 16);
-      } catch (NumberFormatException e) {
-        throw new IllegalArgumentException("Invalid offsetToken value", e);
-      }
+  private void queryBooksOrderedById(@Nonnull BookModel.BookSublist.Builder builder,
+                                     @Nonnull BookModel.BookPageQuery query) {
+    // generate and execute a query
+    final StringBuilder queryBuilder = new StringBuilder(200);
+    final List<Object> args = new ArrayList<>(20);
 
+    addCommonBookQueryParameters(queryBuilder, args, query);
+
+    if (query.hasOffsetToken()) {
       queryBuilder.append(" AND bm.id>?");
-      args.add(startId);
+      args.add(IdConcealingUtil.parseHexLong(query.getOffsetToken(), "offsetToken"));
     }
 
-    // [4] 'ORDER BY' clause
-    switch (query.getSortType()) {
-      case ID:
-        queryBuilder.append(" ORDER BY bm.id");
-        break;
-      case TITLE:
-        queryBuilder.append(" ORDER BY bm.title");
-        break;
-      default:
-        throw new UnsupportedOperationException("Unsupported sortType=" + query.getSortType());
-    }
+    queryBuilder.append(" ORDER BY bm.id");
+
+    // [5] 'LIMIT' clause
+    queryBuilder.append(" LIMIT ?");
+    args.add(query.getLimit());
+
+    // Query for ids
+    final List<Long> ids = jdbcOperations.queryForList(queryBuilder.toString(),
+        args.toArray(new Object[args.size()]), Long.class);
+
+    builder.addAllBookIds(ids);
+    builder.setOffsetToken(IdConcealingUtil.toString(ids.get(ids.size() - 1)));
+  }
+
+  private void queryBooksOrderedByTitle(@Nonnull BookModel.BookSublist.Builder builder,
+                                        @Nonnull BookModel.BookPageQuery query) {
+    // generate and execute a query
+    final StringBuilder queryBuilder = new StringBuilder(200);
+    final List<Object> args = new ArrayList<>(20);
+
+    addCommonBookQueryParameters(queryBuilder, args, query);
+
+    queryBuilder.append(" ORDER BY bm.title");
 
     // [5] 'OFFSET' clause
     // TODO: replace with something like offset behavior for ID sort type
-    if (query.hasOffsetToken() && query.getSortType() == BookModel.BookPageQuery.SortType.TITLE) {
-      final Integer offset;
-      try {
-        offset = Integer.parseInt(query.getOffsetToken(), 16);
-      } catch (NumberFormatException e) {
-        throw new IllegalArgumentException("Invalid offsetToken value", e);
-      }
+    int offset = 0;
+    if (query.hasOffsetToken()) {
+      offset = IdConcealingUtil.parseHexInt(query.getOffsetToken(), "offsetToken");
       queryBuilder.append(" OFFSET ?");
       args.add(offset);
     }
@@ -215,51 +364,23 @@ public final class BookRestController implements BookRestService {
     final List<Long> ids = jdbcOperations.queryForList(queryBuilder.toString(),
         args.toArray(new Object[args.size()]), Long.class);
 
-    final BookModel.BookSublist.Builder builder = BookModel.BookSublist.newBuilder();
     builder.addAllBookIds(ids);
 
     // now get an offset token (and we know that limit is greater than zero)
     if (ids.size() == query.getLimit()) {
-      switch (query.getSortType()) {
-        case ID:
-          builder.setOffsetToken(Long.toString(ids.get(ids.size() - 1), 16));
-          break;
-
-        case TITLE:
-          // newOffsetToken = toInt(prevOffsetToken) + limit
-          builder.setOffsetToken(Integer.toString(Integer.parseInt(query.getOffsetToken(), 16) + query.getLimit(), 16));
-          break;
-      }
+      final int newOffset = offset + query.getLimit();
+      builder.setOffsetToken(IdConcealingUtil.toString(newOffset));
     }
-
-    return builder.build();
   }
 
-  @Override
-  @Transactional(readOnly = true)
-  public BookModel.NamedValueList getGenres() {
-    return getNamedValueList("SELECT id, code AS name FROM genre ORDER BY code");
+  private static void checkLimitBounds(int limit) {
+    if (limit < 0) {
+      throw new IllegalArgumentException("limit can't be less than zero");
+    }
+    if (limit > MAX_LIMIT) {
+      throw new IllegalArgumentException("limit exceeds allowed upper bound which is " + MAX_LIMIT);
+    }
   }
-
-  @Override
-  @Transactional(readOnly = true)
-  public BookModel.NamedValueList getLanguages() {
-    return getNamedValueList("SELECT id, code AS name FROM lang_code ORDER BY code");
-  }
-
-  @Override
-  public BookModel.NamedValueList queryPersons(@RequestBody BookModel.PersonListRequest request) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public BookModel.PersonNameHints getPersonHints(@RequestParam String namePart) {
-    throw new UnsupportedOperationException();
-  }
-
-  //
-  // Private
-  //
 
   @Nonnull
   private BookModel.NamedValueList getNamedValueList(@Nonnull String sql) {
@@ -281,8 +402,30 @@ public final class BookRestController implements BookRestService {
   }
 
   //
+  // Helper models
+  //
+
+  private static final class IdWithIndex {
+    final long id;
+    final int index;
+
+    public IdWithIndex(long id, int index) {
+      this.id = id;
+      this.index = index;
+    }
+  }
+
+  //
   // Mapper Definitions
   //
+
+  private static final class IdWithIndexRowMapper implements RowMapper<IdWithIndex> {
+
+    @Override
+    public IdWithIndex mapRow(ResultSet rs, int rowNum) throws SQLException {
+      return new IdWithIndex(rs.getLong("id"), rs.getInt("index"));
+    }
+  }
 
   private static final class NamedValueMapper implements RowMapper<BookModel.NamedValue> {
 
@@ -327,6 +470,11 @@ public final class BookRestController implements BookRestService {
   private static final NamedValueMapper NAMED_VALUE_MAPPER = new NamedValueMapper();
   private static final BookMetaBuilderRowMapper BOOK_BUILDER_MAPPER = new BookMetaBuilderRowMapper();
   private static final PersonRelationRowMapper PERSON_REL_MAPPER = new PersonRelationRowMapper();
+  private static final IdWithIndexRowMapper ID_WITH_INDEX_MAPPER = new IdWithIndexRowMapper();
+
+  //
+  // Helpers
+  //
 
   // TODO: move to brikar
   private static final class SnapshotTimeRecorder {

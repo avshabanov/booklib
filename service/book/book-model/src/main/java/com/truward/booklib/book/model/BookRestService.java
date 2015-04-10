@@ -35,5 +35,5 @@ public interface BookRestService {
   BookModel.NamedValueList queryPersons(@RequestBody BookModel.PersonListRequest request);
 
   @RequestMapping(value = "/persons/hint", method = RequestMethod.POST)
-  BookModel.PersonNameHints getPersonHints(@RequestParam String namePart);
+  BookModel.PersonNameHints getPersonHints(@RequestParam(value = "prefix", required = false) String prefix);
 }

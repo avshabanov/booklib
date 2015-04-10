@@ -10,6 +10,7 @@ message NamedValue {
 
 message NamedValueList {
   repeated NamedValue values = 1;
+  optional string offsetToken = 2;
 }
 
 message PersonRelation {
@@ -36,7 +37,7 @@ message BookMeta {
 
 message BookPageIds {
   repeated int64 bookIds = 1;
-  required bool fetchBookDependencies = 2;
+  required bool fetchBookDependencies = 2 [default = false];
 
   repeated int64 originIds = 3;
   repeated int64 languageIds = 4;
@@ -80,6 +81,6 @@ message PersonNameHints {
 
 message PersonListRequest {
   optional string startName = 1;
-  optional int64 startPersonId = 2;
+  optional string offsetToken = 2;
   required int32 limit = 3;
 }
