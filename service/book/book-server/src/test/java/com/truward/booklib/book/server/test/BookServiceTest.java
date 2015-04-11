@@ -32,8 +32,8 @@ public final class BookServiceTest {
         .setSortType(BookModel.BookPageQuery.SortType.ID).setLimit(64).build();
     final BookModel.BookList list = bookService.queryBooks(queryAll);
 
-    final BookModel.BookPageData page = bookService.getPage(BookModel.BookPageIds.newBuilder()
-        .addAllBookIds(list.getBookIdsList())
+    final BookModel.BookPageData page = bookService.getPage(BookModel.BookPageIdsRequest.newBuilder()
+        .setPageIds(BookModel.BookPageIds.newBuilder().addAllBookIds(list.getBookIdsList()).build())
         .setFetchBookDependencies(true)
         .build());
 
@@ -52,12 +52,12 @@ public final class BookServiceTest {
   @Test
   public void shouldQueryPersons() {
     // Given:
-    final BookModel.PersonListRequest request = BookModel.PersonListRequest.newBuilder()
+    final BookModel.PersonListQuery query = BookModel.PersonListQuery.newBuilder()
         .setLimit(64)
         .build();
 
     // When:
-    final BookModel.NamedValueList persons = bookService.queryPersons(request);
+    final BookModel.NamedValueList persons = bookService.queryPersons(query);
 
     // Then:
     assertEquals(8, persons.getValuesCount());
@@ -84,7 +84,8 @@ public final class BookServiceTest {
         .addGenres(BookModel.NamedValue.newBuilder().setName(genre)).build());
 
     // Then:
-    final BookModel.BookPageData pageData = bookService.getPage(ids);
+    final BookModel.BookPageData pageData = bookService.getPage(BookModel.BookPageIdsRequest.newBuilder()
+        .setPageIds(ids).setFetchBookDependencies(false).build());
     assertEquals(1, pageData.getGenresCount());
     assertEquals(genre, pageData.getGenres(0).getName());
   }
@@ -94,7 +95,7 @@ public final class BookServiceTest {
   //
 
   @Nonnull static BookModel.BookPageIds toPageIds(@Nonnull BookModel.BookPageData page) {
-    final BookModel.BookPageIds.Builder builder = BookModel.BookPageIds.newBuilder().setFetchBookDependencies(false);
+    final BookModel.BookPageIds.Builder builder = BookModel.BookPageIds.newBuilder();
 
     builder.addAllGenreIds(getIds(page.getGenresList()));
     builder.addAllLanguageIds(getIds(page.getLanguagesList()));

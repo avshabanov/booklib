@@ -43,12 +43,15 @@ message BookMeta {
 
 message BookPageIds {
   repeated int64 bookIds = 1;
-  required bool fetchBookDependencies = 2 [default = false];
+  repeated int64 originIds = 2;
+  repeated int64 languageIds = 3;
+  repeated int64 personIds = 4;
+  repeated int64 genreIds = 5;
+}
 
-  repeated int64 originIds = 3;
-  repeated int64 languageIds = 4;
-  repeated int64 personIds = 5;
-  repeated int64 genreIds = 6;
+message BookPageIdsRequest {
+  required BookPageIds pageIds = 1;
+  required bool fetchBookDependencies = 2 [default = false];
 }
 
 message BookPageData {
@@ -85,7 +88,7 @@ message PersonNameHints {
   repeated string nameParts = 1;
 }
 
-message PersonListRequest {
+message PersonListQuery {
   optional string startName = 1;
   optional string offsetToken = 2;
   required int32 limit = 3;

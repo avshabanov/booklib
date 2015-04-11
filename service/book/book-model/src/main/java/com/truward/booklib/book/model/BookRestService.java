@@ -21,7 +21,7 @@ public interface BookRestService {
 
   @RequestMapping(value = "/books/page/fetch", method = RequestMethod.POST)
   @ResponseBody
-  BookModel.BookPageData getPage(@RequestBody BookModel.BookPageIds request);
+  BookModel.BookPageData getPage(@RequestBody BookModel.BookPageIdsRequest request);
 
   @RequestMapping(value = "/genres", method = RequestMethod.GET)
   @ResponseBody
@@ -32,7 +32,7 @@ public interface BookRestService {
   BookModel.NamedValueList getLanguages();
 
   @RequestMapping(value = "/persons/query", method = RequestMethod.POST)
-  BookModel.NamedValueList queryPersons(@RequestBody BookModel.PersonListRequest request);
+  BookModel.NamedValueList queryPersons(@RequestBody BookModel.PersonListQuery query);
 
   @RequestMapping(value = "/persons/hint", method = RequestMethod.POST)
   BookModel.PersonNameHints getPersonHints(@RequestParam(value = "prefix", required = false) String prefix);

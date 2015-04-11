@@ -39,7 +39,7 @@ public final class BookRestController implements BookRestService {
 
   @Override
   public BookModel.BookPageIds savePage(@RequestBody BookModel.BookPageData request) {
-    final BookModel.BookPageIds.Builder builder = BookModel.BookPageIds.newBuilder().setFetchBookDependencies(false);
+    final BookModel.BookPageIds.Builder builder = BookModel.BookPageIds.newBuilder();
 
     // Genres
     for (final BookModel.NamedValue val : request.getGenresList()) {
@@ -170,19 +170,20 @@ public final class BookRestController implements BookRestService {
 
   @Override
   @Transactional(readOnly = true)
-  public BookModel.BookPageData getPage(@RequestBody BookModel.BookPageIds request) {
+  public BookModel.BookPageData getPage(@RequestBody BookModel.BookPageIdsRequest request) {
+    final BookModel.BookPageIds pageIds = request.getPageIds();
     final BookModel.BookPageData.Builder builder = BookModel.BookPageData.newBuilder();
 
     final SnapshotTimeRecorder recorder = new SnapshotTimeRecorder("BookRestController.getPage", log);
 
     // prepare IDs
-    final Set<Long> genreIds = new HashSet<>(request.getGenreIdsList());
-    final Set<Long> languageIds = new HashSet<>(request.getLanguageIdsList());
-    final Set<Long> originIds = new HashSet<>(request.getOriginIdsList());
-    final Set<Long> personIds = new HashSet<>(request.getPersonIdsList());
+    final Set<Long> genreIds = new HashSet<>(pageIds.getGenreIdsList());
+    final Set<Long> languageIds = new HashSet<>(pageIds.getLanguageIdsList());
+    final Set<Long> originIds = new HashSet<>(pageIds.getOriginIdsList());
+    final Set<Long> personIds = new HashSet<>(pageIds.getPersonIdsList());
 
     // fetch basic book fields
-    final Set<Long> idSet = new HashSet<>(request.getBookIdsList());
+    final Set<Long> idSet = new HashSet<>(pageIds.getBookIdsList());
     final List<BookModel.BookMeta> books = new ArrayList<>(idSet.size());
     recorder.start();
     for (final long id : idSet) {
@@ -289,13 +290,13 @@ public final class BookRestController implements BookRestService {
 
   @Override
   @Transactional(readOnly = true)
-  public BookModel.NamedValueList queryPersons(@RequestBody BookModel.PersonListRequest request) {
-    checkLimitBounds(request.getLimit());
+  public BookModel.NamedValueList queryPersons(@RequestBody BookModel.PersonListQuery query) {
+    checkLimitBounds(query.getLimit());
     final BookModel.NamedValueList.Builder builder = BookModel.NamedValueList.newBuilder();
-    if (request.getLimit() == 0) {
+    if (query.getLimit() == 0) {
       // short cirquit for limit=0
-      if (request.hasOffsetToken()) {
-        builder.setOffsetToken(request.getOffsetToken());
+      if (query.hasOffsetToken()) {
+        builder.setOffsetToken(query.getOffsetToken());
       }
       return builder.build();
     }
@@ -305,24 +306,24 @@ public final class BookRestController implements BookRestService {
 
     sql.append("SELECT id, f_name AS name FROM person\nWHERE 1=1");
 
-    if (request.hasOffsetToken()) {
+    if (query.hasOffsetToken()) {
       sql.append(" AND f_name>?");
-      args.add(request.getOffsetToken());
+      args.add(query.getOffsetToken());
     }
 
-    if (request.hasStartName()) {
+    if (query.hasStartName()) {
       sql.append(" AND f_name LIKE ?");
-      args.add(request.getStartName() + '%');
+      args.add(query.getStartName() + '%');
     }
 
     sql.append("\nORDER BY f_name LIMIT ?");
-    args.add(request.getLimit());
+    args.add(query.getLimit());
 
     final List<BookModel.NamedValue> values = jdbcOperations.query(sql.toString(), NAMED_VALUE_MAPPER,
         args.toArray(new Object[args.size()]));
     builder.addAllValues(values);
 
-    if (values.size() == request.getLimit()) {
+    if (values.size() == query.getLimit()) {
       // offset token is available if and only if we were able to get a full page
       builder.setOffsetToken(values.get(values.size() - 1).getName());
     }
