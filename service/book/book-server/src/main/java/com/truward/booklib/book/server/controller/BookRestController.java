@@ -4,6 +4,8 @@ import com.truward.booklib.book.model.BookModel;
 import com.truward.booklib.book.model.BookRestService;
 import com.truward.booklib.book.server.util.IdConcealingUtil;
 import com.truward.booklib.book.server.util.PersonRoleMapper;
+import com.truward.time.UtcTime;
+import com.truward.time.jdbc.UtcTimeSqlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -68,7 +70,7 @@ public final class BookRestController implements BookRestService {
     }
 
     // Languages
-    for (final BookModel.NamedValue val : request.getOriginsList()) {
+    for (final BookModel.NamedValue val : request.getLanguagesList()) {
       final long langId;
       if (val.hasId()) {
         langId = val.getId();
@@ -81,7 +83,7 @@ public final class BookRestController implements BookRestService {
     }
 
     // Persons
-    for (final BookModel.NamedValue val : request.getOriginsList()) {
+    for (final BookModel.NamedValue val : request.getPersonsList()) {
       final long personId;
       if (val.hasId()) {
         personId = val.getId();
@@ -122,7 +124,7 @@ public final class BookRestController implements BookRestService {
     // Books
     for (final BookModel.BookMeta val : request.getBooksList()) {
       final long bookId;
-      final Date addDate = new Date(val.getAddDate()); // TODO: use Java8 time (preferred) or joda time or UTC time
+      final Calendar addDate = UtcTime.valueOf(val.getAddDate()).asCalendar();
       if (val.hasId()) {
         bookId = val.getId();
         jdbcOperations.update("UPDATE book_meta SET " +
@@ -132,7 +134,7 @@ public final class BookRestController implements BookRestService {
             "lang_id=?, " +
             "origin_id=? " +
             "WHERE id=?",
-            val.getTitle(), val.getFileSize(), addDate, val.getLangId(), val.getOriginId());
+            val.getTitle(), val.getFileSize(), addDate, val.getLangId(), val.getOriginId(), bookId);
 
         // delete old genres, persons, series, external ids
         jdbcOperations.update("DELETE FROM book_genre WHERE book_id=?", bookId);
@@ -141,7 +143,7 @@ public final class BookRestController implements BookRestService {
         jdbcOperations.update("DELETE FROM book_external_id WHERE book_id=?", bookId);
       } else {
         bookId = jdbcOperations.queryForObject("SELECT seq_book.nextval", Long.class);
-        jdbcOperations.update("INSERT INTO book_meta (id, title, title_idx, f_size, add_date, lang_id, origin_id)\n" +
+        jdbcOperations.update("INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)\n" +
             "VALUES (?, ?, ?, ?, ?, ?)",
             bookId, val.getTitle(), val.getFileSize(), addDate, val.getLangId(), val.getOriginId());
       }
@@ -159,12 +161,12 @@ public final class BookRestController implements BookRestService {
 
       for (final BookModel.SeriesPos seriesPos : val.getSeriesPosList()) {
         jdbcOperations.update("INSERT INTO book_series (book_id, series_id, pos) VALUES (?, ?, ?)",
-            val.getId(), seriesPos.getId(), seriesPos.getPos());
+            bookId, seriesPos.getId(), seriesPos.getPos());
       }
 
       for (final BookModel.ExternalBookId externalId : val.getExternalIdsList()) {
         jdbcOperations.update("INSERT INTO book_external_id (book_id, external_id, external_id_type) VALUES (?, ?, ?)",
-            val.getId(), externalId.getId(), externalId.getTypeId());
+            bookId, externalId.getId(), externalId.getTypeId());
       }
 
       builder.addBookIds(bookId);
@@ -191,6 +193,12 @@ public final class BookRestController implements BookRestService {
     for (final long id : request.getSeriesIdsList()) {
       jdbcOperations.update("DELETE FROM book_series WHERE series_id=?", id);
       jdbcOperations.update("DELETE FROM series WHERE id=?", id);
+    }
+
+    // External IDs
+    for (final long id : request.getExternalBookTypeIdsList()) {
+      jdbcOperations.update("DELETE FROM book_external_id WHERE external_id_type=?", id);
+      jdbcOperations.update("DELETE FROM external_id_type WHERE id=?", id);
     }
 
     // Books
@@ -252,6 +260,8 @@ public final class BookRestController implements BookRestService {
       // add external ids
       bookBuilder.addAllExternalIds(jdbcOperations.query(
           "SELECT external_id_type, external_id FROM book_external_id WHERE book_id=?", EXTERNAL_BOOK_ID_MAPPER, id));
+
+
 
       // construct book and add to list
       final BookModel.BookMeta book = bookBuilder.build();
@@ -617,7 +627,8 @@ public final class BookRestController implements BookRestService {
           .setId(rs.getLong("id")).setFileSize(rs.getInt("f_size")).setLangId(rs.getLong("lang_id"))
           .setOriginId(rs.getLong("origin_id")).setTitle(rs.getString("title"));
 
-      final Timestamp addDate = rs.getTimestamp("add_date");
+
+      final UtcTime addDate = UtcTimeSqlUtil.getNullableUtcTime(rs, "add_date");
       if (addDate != null) {
         builder.setAddDate(addDate.getTime());
       }

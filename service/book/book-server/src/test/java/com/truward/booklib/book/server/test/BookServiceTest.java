@@ -2,6 +2,7 @@ package com.truward.booklib.book.server.test;
 
 import com.truward.booklib.book.model.BookModel;
 import com.truward.booklib.book.model.BookRestService;
+import com.truward.time.UtcTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -80,11 +81,19 @@ public final class BookServiceTest {
     // Given:
     final String genre = "fantastische";
     final String series = "The Noon";
+    final String extType = "google";
+    final String author = "bob";
+    final String lang = "cn";
+    final String origin = "origin";
 
     // When:
     final BookModel.BookPageIds ids = bookService.savePage(BookModel.BookPageData.newBuilder()
         .addSeries(BookModel.NamedValue.newBuilder().setName(series))
         .addGenres(BookModel.NamedValue.newBuilder().setName(genre))
+        .addExternalBookTypes(BookModel.NamedValue.newBuilder().setName(extType))
+        .addPersons(BookModel.NamedValue.newBuilder().setName(author))
+        .addLanguages(BookModel.NamedValue.newBuilder().setName(lang))
+        .addOrigins(BookModel.NamedValue.newBuilder().setName(origin))
         .build());
 
     // Then:
@@ -96,11 +105,79 @@ public final class BookServiceTest {
 
     assertEquals(1, pageData.getSeriesCount());
     assertEquals(series, pageData.getSeries(0).getName());
+
+    assertEquals(1, pageData.getExternalBookTypesCount());
+    assertEquals(extType, pageData.getExternalBookTypes(0).getName());
+
+    assertEquals(1, pageData.getPersonsCount());
+    assertEquals(author, pageData.getPersons(0).getName());
+
+    assertEquals(1, pageData.getLanguagesCount());
+    assertEquals(lang, pageData.getLanguages(0).getName());
+
+    assertEquals(1, pageData.getOriginsCount());
+    assertEquals(origin, pageData.getOrigins(0).getName());
+
+    // [2] Given:
+    final BookModel.BookMeta book = BookModel.BookMeta.newBuilder()
+        .setAddDate(UtcTime.days(10).getTime())
+        .setFileSize(12)
+        .setTitle("title")
+        .setLangId(pageData.getLanguages(0).getId())
+        .setOriginId(pageData.getOrigins(0).getId())
+        .addPersonRelations(BookModel.PersonRelation.newBuilder().setId(pageData.getPersons(0).getId())
+            .setRelation(BookModel.PersonRelation.Type.AUTHOR))
+        .addExternalIds(BookModel.ExternalBookId.newBuilder().setId("externalId")
+            .setTypeId(pageData.getExternalBookTypes(0).getId()))
+        .addGenreIds(pageData.getGenres(0).getId())
+        .addSeriesPos(BookModel.SeriesPos.newBuilder().setId(pageData.getSeries(0).getId()).setPos(5))
+        .build();
+
+    // [2] When:
+    final BookModel.BookPageIds ids2 = bookService.savePage(BookModel.BookPageData.newBuilder().addBooks(book).build());
+
+    // [2] Then:
+    assertEquals(1, ids2.getBookIdsCount());
+    final long bookId = ids2.getBookIds(0);
+    final BookModel.BookPageIdsRequest bookPageIdsRequest = BookModel.BookPageIdsRequest.newBuilder()
+        .setFetchBookDependencies(true).setPageIds(BookModel.BookPageIds.newBuilder().addBookIds(bookId)).build();
+    final BookModel.BookPageData pageData2 = bookService.getPage(bookPageIdsRequest);
+
+    assertEquals(BookModel.BookPageData.newBuilder(pageData)
+        .addBooks(BookModel.BookMeta.newBuilder(book).setId(bookId)).build(), pageData2);
+
+    // [3] Given:
+    final BookModel.BookPageData pageData3 = BookModel.BookPageData.newBuilder()
+        .addGenres(updateSingle(pageData2.getGenresList(), "newGenre"))
+        .addLanguages(updateSingle(pageData2.getLanguagesList(), "newLang"))
+        .addPersons(updateSingle(pageData2.getPersonsList(), "newPerson"))
+        .addSeries(updateSingle(pageData2.getSeriesList(), "newSeries"))
+        .addExternalBookTypes(updateSingle(pageData2.getExternalBookTypesList(), "newBookType"))
+        .addOrigins(updateSingle(pageData2.getOriginsList(), "newOrigin"))
+        .addBooks(BookModel.BookMeta.newBuilder(book)
+            .setId(bookId)
+            .setTitle("newTitle")
+            .setFileSize(456)
+            .setAddDate(UtcTime.days(456).getTime())
+            .build())
+        .build();
+
+    // [3] When:
+    final BookModel.BookPageIds ids3 = bookService.savePage(pageData3);
+
+    // [3] Then:
+    assertEquals(BookModel.BookPageIds.newBuilder(ids).addBookIds(bookId).build(), ids3);
+    assertEquals(pageData3, bookService.getPage(bookPageIdsRequest));
   }
 
   //
   // Private
   //
+
+  @Nonnull static BookModel.NamedValue updateSingle(@Nonnull List<BookModel.NamedValue> l, @Nonnull String newName) {
+    assertEquals(1, l.size());
+    return BookModel.NamedValue.newBuilder(l.get(0)).setName(newName).build();
+  }
 
   @Nonnull static BookModel.BookPageIds toPageIds(@Nonnull BookModel.BookPageData page) {
     final BookModel.BookPageIds.Builder builder = BookModel.BookPageIds.newBuilder();
