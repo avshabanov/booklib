@@ -30,12 +30,6 @@ CREATE TABLE book_origin (
 CREATE TABLE book_meta (
   id        INTEGER PRIMARY KEY,
   title     VARCHAR(1024) NOT NULL,
-
-  -- title_idx field is needed to support offset-limit queries for title
-  -- every insert in this table should look as follows:
-  -- INSERT (..., title_idx, ...) VALUES (..., (SELECT 1+ifnull(max(b.title_idx),0) FROM book AS b WHERE b.title=:title), ...);
-  title_idx INTEGER NOT NULL DEFAULT(1),
-
   f_size    INTEGER NOT NULL,
   add_date  DATE,
   lang_id   INTEGER,

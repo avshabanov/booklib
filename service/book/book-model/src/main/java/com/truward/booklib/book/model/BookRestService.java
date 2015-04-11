@@ -17,7 +17,7 @@ public interface BookRestService {
 
   @RequestMapping(value = "/books/query", method = RequestMethod.POST)
   @ResponseBody
-  BookModel.BookSublist queryBooks(@RequestBody BookModel.BookPageQuery query);
+  BookModel.BookList queryBooks(@RequestBody BookModel.BookPageQuery query);
 
   @RequestMapping(value = "/books/page/fetch", method = RequestMethod.POST)
   @ResponseBody

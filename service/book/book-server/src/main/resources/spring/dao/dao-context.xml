@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="
-        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean id="dao.book.jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
@@ -12,8 +10,6 @@
 
   <bean id="dao.book.txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     <property name="dataSource" ref="dao.book.dataSource"/>
-    <!--<qualifier value="bookTxManager"/>-->
+    <qualifier value="bookTxManager"/>
   </bean>
-
-  <tx:annotation-driven transaction-manager="dao.book.txManager" proxy-target-class="false"/>
 </beans>

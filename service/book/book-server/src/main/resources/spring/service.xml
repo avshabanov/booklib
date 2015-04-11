@@ -17,4 +17,7 @@
       </util:list>
     </property>
   </bean>
+
+  <import resource="dao-context.xml"/>
+  <import resource="tx-context.xml"/>
 </beans>

@@ -14,7 +14,7 @@ INSERT INTO genre (id, code) VALUES (1, 'sci_fi');
 INSERT INTO genre (id, code) VALUES (2, 'fantasy');
 INSERT INTO genre (id, code) VALUES (3, 'essay');
 INSERT INTO genre (id, code) VALUES (4, 'novel');
-INSERT INTO genre (id, code) VALUES (5, 'comics');
+INSERT INTO genre (id, code) VALUES (5, 'humour');
 INSERT INTO genre (id, code) VALUES (6, 'western');
 INSERT INTO genre (id, code) VALUES (7, 'horror');
 
@@ -197,16 +197,15 @@ INSERT INTO book_genre (book_id, genre_id) VALUES (22, 4);
 
 -- Snail on the Slope
 INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
-  VALUES (30, 'Disquiet', 0, '2014-08-10', 2, 4);
+  VALUES (30, 'Snail on the Slope', 0, '2014-08-10', 2, 4);
 INSERT INTO book_person (book_id, person_id) VALUES (30, 5);
 INSERT INTO book_person (book_id, person_id) VALUES (30, 6);
 INSERT INTO book_genre (book_id, genre_id) VALUES (30, 4);
 
 -- The Ugly Swans
 INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
-  VALUES (31, 'The Ugly Swans', 0, '2014-08-10', 2, 4);
-INSERT INTO book_person (book_id, person_id) VALUES (31, 5);
-INSERT INTO book_person (book_id, person_id) VALUES (31, 6);
+  VALUES (31, 'The Little Lady of the Big House', 0, '2012-04-22', 1, 2);
+INSERT INTO book_person (book_id, person_id) VALUES (31, 1);
 INSERT INTO book_genre (book_id, genre_id) VALUES (31, 4);
 
 -- The Second Invasion from Mars
@@ -222,6 +221,7 @@ INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
 INSERT INTO book_person (book_id, person_id) VALUES (33, 5);
 INSERT INTO book_person (book_id, person_id) VALUES (33, 6);
 INSERT INTO book_genre (book_id, genre_id) VALUES (33, 4);
+INSERT INTO book_genre (book_id, genre_id) VALUES (33, 5);
 
 -- Prisoners of Power
 INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)

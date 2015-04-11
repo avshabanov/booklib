@@ -24,6 +24,11 @@ message PersonRelation {
   required Type relation = 2;
 }
 
+message ExternalBookId {
+  required string id = 1;
+  required string type = 2;
+}
+
 message BookMeta {
   optional int64 id = 1;
   required string title = 2;
@@ -33,6 +38,7 @@ message BookMeta {
   required int64 originId = 6;
   repeated PersonRelation personRelations = 7;
   repeated int64 genreIds = 8;
+  repeated ExternalBookId externalIds = 9;
 }
 
 message BookPageIds {
@@ -70,7 +76,7 @@ message BookPageQuery {
   required int32 limit = 12 [default = 8];
 }
 
-message BookSublist {
+message BookList {
   repeated int64 bookIds = 1;
   optional string offsetToken = 2;
 }

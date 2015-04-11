@@ -10,8 +10,8 @@
   <name>BookLib - Parent</name>
 
   <modules>
-    <module>booklib-website</module>
     <module>service</module>
+    <module>booklib-website</module>
   </modules>
 
   <properties>
@@ -25,8 +25,10 @@
 
     <brikar.version>1.0.4</brikar.version>
 
-    <aspectj.version>1.6.10</aspectj.version>
-    <spring.version>3.2.3.RELEASE</spring.version>
+    <!--<spring.version>3.2.3.RELEASE</spring.version>-->
+    <spring.version>4.0.6.RELEASE</spring.version>
+    <spring.security.version>4.0.0.RELEASE</spring.security.version>
+
 
     <apache.httpcomponents.version>4.2.1</apache.httpcomponents.version>
 
@@ -150,20 +152,6 @@
         <version>${jetty.version}</version>
       </dependency>
 
-      <!-- AOP support -->
-      <dependency>
-        <groupId>org.aspectj</groupId>
-        <artifactId>aspectjrt</artifactId>
-        <version>${aspectj.version}</version>
-      </dependency>
-
-      <!-- CGLIB -->
-      <dependency>
-        <groupId>cglib</groupId>
-        <artifactId>cglib-nodep</artifactId>
-        <version>2.2</version>
-      </dependency>
-
       <!-- New commons lang -->
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -250,11 +238,6 @@
       <!-- Spring -->
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>spring-aspects</artifactId>
-        <version>${spring.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
         <artifactId>spring-context-support</artifactId>
         <version>${spring.version}</version>
       </dependency>
@@ -292,24 +275,24 @@
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-web</artifactId>
-        <version>${spring.version}</version>
+        <version>${spring.security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-config</artifactId>
-        <version>${spring.version}</version>
+        <version>${spring.security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-core</artifactId>
-        <version>${spring.version}</version>
+        <version>${spring.security.version}</version>
       </dependency>
 
       <!-- Spring security JSP tags -->
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-taglibs</artifactId>
-        <version>${spring.version}</version>
+        <version>${spring.security.version}</version>
       </dependency>
 
       <!-- Servlet API -->
