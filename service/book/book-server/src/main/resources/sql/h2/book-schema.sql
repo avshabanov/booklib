@@ -26,6 +26,22 @@ CREATE TABLE book_origin (
   CONSTRAINT uq_book_origin UNIQUE (code)
 );
 
+-- External ID types
+CREATE TABLE external_id_type (
+  id        INTEGER PRIMARY KEY,
+  code      VARCHAR(256) NOT NULL,
+  CONSTRAINT uq_external_id_type_code UNIQUE (code)
+);
+
+-- Book series
+CREATE TABLE series (
+  id        INTEGER PRIMARY KEY,
+  name      VARCHAR(1024) NOT NULL,
+  CONSTRAINT uq_series_name UNIQUE (name)
+);
+
+
+
 -- Book meta information
 CREATE TABLE book_meta (
   id        INTEGER PRIMARY KEY,
@@ -38,18 +54,11 @@ CREATE TABLE book_meta (
   CONSTRAINT fk_book_meta_origin FOREIGN KEY (origin_id) REFERENCES book_origin (id)
 );
 
--- Book series
-CREATE TABLE series (
-  id        INTEGER PRIMARY KEY,
-  name      VARCHAR(1024) NOT NULL,
-  CONSTRAINT uq_series_name UNIQUE (name)
-);
-
 -- Book-to-series mapping
 CREATE TABLE book_series (
   book_id   INTEGER NOT NULL,
   series_id INTEGER NOT NULL,
-  pos       INTEGER,
+  pos       INTEGER NOT NULL,
   CONSTRAINT pk_book_series PRIMARY KEY (book_id, series_id)
 );
 
@@ -59,9 +68,9 @@ CREATE TABLE book_person (
   person_id INTEGER NOT NULL,
   -- role == 1 (AUTHOR), 2 (ILLUSTRATOR)
   role      INTEGER NOT NULL DEFAULT(1),
-  CONSTRAINT pk_book_author PRIMARY KEY (book_id, person_id, role),
-  CONSTRAINT fk_book_author_book FOREIGN KEY (book_id) REFERENCES book_meta(id),
-  CONSTRAINT fk_book_author_author FOREIGN KEY (person_id) REFERENCES person(id)
+  CONSTRAINT pk_book_person PRIMARY KEY (book_id, person_id, role),
+  CONSTRAINT fk_book_person_book FOREIGN KEY (book_id) REFERENCES book_meta(id),
+  CONSTRAINT fk_book_person_person FOREIGN KEY (person_id) REFERENCES person(id)
 );
 
 -- Book-to-genre link
@@ -71,6 +80,14 @@ CREATE TABLE book_genre (
   CONSTRAINT pk_book_genre PRIMARY KEY (book_id, genre_id),
   CONSTRAINT fk_book_genre_book FOREIGN KEY (book_id) REFERENCES book_meta(id),
   CONSTRAINT fk_book_genre_genre FOREIGN KEY (genre_id) REFERENCES genre(id)
+);
+
+-- Book-to-external-id link
+CREATE TABLE book_external_id (
+  book_id           INTEGER NOT NULL,
+  external_id_type  INTEGER NOT NULL,
+  external_id       VARCHAR(256) NOT NULL,
+  CONSTRAINT pk_book_external_id PRIMARY KEY (book_id, external_id_type, external_id)
 );
 
 --
@@ -83,9 +100,11 @@ CREATE SEQUENCE seq_lang_code   START WITH 1000;
 CREATE SEQUENCE seq_origin      START WITH 1000;
 CREATE SEQUENCE seq_book        START WITH 1000;
 CREATE SEQUENCE seq_series      START WITH 1000;
+CREATE SEQUENCE seq_ext_id_type START WITH 1000;
 
 --
 -- Indexes
 --
 
 CREATE UNIQUE INDEX idx_person_f_name ON person(f_name);
+CREATE UNIQUE INDEX idx_book_external_id ON book_external_id(external_id_type, external_id);

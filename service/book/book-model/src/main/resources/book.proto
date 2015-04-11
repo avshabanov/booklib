@@ -26,7 +26,7 @@ message PersonRelation {
 
 message ExternalBookId {
   required string id = 1;
-  required string type = 2;
+  required int64 typeId = 2;
 }
 
 message SeriesPos {
@@ -54,6 +54,7 @@ message BookPageIds {
   repeated int64 personIds = 4;
   repeated int64 genreIds = 5;
   repeated int64 seriesIds = 6;
+  repeated int64 externalBookTypeIds = 7;
 }
 
 message BookPageIdsRequest {
@@ -68,6 +69,7 @@ message BookPageData {
   repeated NamedValue persons = 4;
   repeated NamedValue genres = 5;
   repeated NamedValue series = 6;
+  repeated NamedValue externalBookTypes = 7;
 }
 
 message BookPageQuery {

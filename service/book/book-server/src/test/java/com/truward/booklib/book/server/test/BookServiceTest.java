@@ -110,6 +110,7 @@ public final class BookServiceTest {
     builder.addAllPersonIds(getIds(page.getPersonsList()));
     builder.addAllOriginIds(getIds(page.getOriginsList()));
     builder.addAllSeriesIds(getIds(page.getSeriesList()));
+    builder.addAllExternalBookTypeIds(getIds(page.getExternalBookTypesList()));
 
     for (final BookModel.BookMeta book : page.getBooksList()) {
       builder.addBookIds(book.getId());
