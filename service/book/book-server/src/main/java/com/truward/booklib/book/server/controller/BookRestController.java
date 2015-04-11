@@ -93,6 +93,19 @@ public final class BookRestController implements BookRestService {
       builder.addPersonIds(personId);
     }
 
+    // Series
+    for (final BookModel.NamedValue val : request.getSeriesList()) {
+      final long seriesId;
+      if (val.hasId()) {
+        seriesId = val.getId();
+        jdbcOperations.update("UPDATE series SET name=? WHERE id=?", val.getName(), seriesId);
+      } else {
+        seriesId = jdbcOperations.queryForObject("SELECT seq_series.nextval", Long.class);
+        jdbcOperations.update("INSERT INTO series (id, name) VALUES (?, ?)", seriesId, val.getName());
+      }
+      builder.addSeriesIds(seriesId);
+    }
+
     // Books
     for (final BookModel.BookMeta val : request.getBooksList()) {
       final long bookId;
@@ -114,11 +127,12 @@ public final class BookRestController implements BookRestService {
             bookId, val.getTitle(), val.getFileSize(), addDate, val.getLangId(), val.getOriginId());
       }
 
-      // delete old genres and persons
+      // delete old genres, persons and series
       jdbcOperations.update("DELETE FROM book_genre WHERE book_id=?", bookId);
       jdbcOperations.update("DELETE FROM book_person WHERE book_id=?", bookId);
+      jdbcOperations.update("DELETE FROM book_series WHERE book_id=?", bookId);
 
-      // insert new genres and persons
+      // insert new genres, persons and series
       for (final long genreId : val.getGenreIdsList()) {
         jdbcOperations.update("INSERT INTO book_genre (book_id, genre_id) VALUES (?, ?)", bookId, genreId);
       }
@@ -127,6 +141,11 @@ public final class BookRestController implements BookRestService {
         final int role = PersonRoleMapper.toCode(rel.getRelation());
         jdbcOperations.update("INSERT INTO book_person (book_id, person_id, role) VALUES (?, ?, ?)",
             bookId, rel.getId(), role);
+      }
+
+      for (final BookModel.SeriesPos seriesPos : val.getSeriesPosList()) {
+        jdbcOperations.update("INSERT INTO book_series (book_id, series_id, pos) VALUES (?, ?, ?)",
+            val.getId(), seriesPos.getId(), seriesPos.getPos());
       }
 
       builder.addBookIds(bookId);
@@ -147,6 +166,12 @@ public final class BookRestController implements BookRestService {
     for (final long id : request.getPersonIdsList()) {
       jdbcOperations.update("DELETE FROM book_person WHERE person_id=?", id);
       jdbcOperations.update("DELETE FROM person WHERE id=?", id);
+    }
+
+    // Series
+    for (final long id : request.getSeriesIdsList()) {
+      jdbcOperations.update("DELETE FROM book_series WHERE series_id=?", id);
+      jdbcOperations.update("DELETE FROM series WHERE id=?", id);
     }
 
     // Books
@@ -181,6 +206,7 @@ public final class BookRestController implements BookRestService {
     final Set<Long> languageIds = new HashSet<>(pageIds.getLanguageIdsList());
     final Set<Long> originIds = new HashSet<>(pageIds.getOriginIdsList());
     final Set<Long> personIds = new HashSet<>(pageIds.getPersonIdsList());
+    final Set<Long> seriesIds = new HashSet<>(pageIds.getSeriesIdsList());
 
     // fetch basic book fields
     final Set<Long> idSet = new HashSet<>(pageIds.getBookIdsList());
@@ -199,6 +225,10 @@ public final class BookRestController implements BookRestService {
       bookBuilder.addAllPersonRelations(jdbcOperations.query("SELECT person_id, role FROM book_person WHERE book_id=?",
           PERSON_REL_MAPPER, id));
 
+      // add series info
+      bookBuilder.addAllSeriesPos(jdbcOperations.query("SELECT series_id, pos FROM book_series WHERE book_id=?",
+          SERIES_POS_MAPPER, id));
+
       // construct book and add to list
       final BookModel.BookMeta book = bookBuilder.build();
       books.add(book);
@@ -210,6 +240,9 @@ public final class BookRestController implements BookRestService {
         originIds.add(book.getOriginId());
         for (final BookModel.PersonRelation rel : book.getPersonRelationsList()) {
           personIds.add(rel.getId());
+        }
+        for (final BookModel.SeriesPos pos : book.getSeriesPosList()) {
+          seriesIds.add(pos.getId());
         }
       }
     }
@@ -243,6 +276,12 @@ public final class BookRestController implements BookRestService {
           NAMED_VALUE_MAPPER, id));
     }
     recorder.record("getPersons");
+
+    // fetch series
+    for (final long id : seriesIds) {
+      builder.addSeries(jdbcOperations.queryForObject("SELECT id, name FROM series WHERE id=?",
+          NAMED_VALUE_MAPPER, id));
+    }
 
     return builder.build();
   }
@@ -319,8 +358,7 @@ public final class BookRestController implements BookRestService {
     sql.append("\nORDER BY f_name LIMIT ?");
     args.add(query.getLimit());
 
-    final List<BookModel.NamedValue> values = jdbcOperations.query(sql.toString(), NAMED_VALUE_MAPPER,
-        args.toArray(new Object[args.size()]));
+    final List<BookModel.NamedValue> values = queryForList(sql, NAMED_VALUE_MAPPER, args);
     builder.addAllValues(values);
 
     if (values.size() == query.getLimit()) {
@@ -351,9 +389,46 @@ public final class BookRestController implements BookRestService {
     return BookModel.PersonNameHints.newBuilder().addAllNameParts(parts).build();
   }
 
+  @Override
+  public BookModel.NamedValueList querySeries(@RequestBody BookModel.SeriesQuery query) {
+    checkLimitBounds(query.getLimit());
+    final BookModel.NamedValueList.Builder builder = BookModel.NamedValueList.newBuilder();
+    if (query.getLimit() == 0) {
+      if (query.hasOffsetToken()) {
+        builder.setOffsetToken(query.getOffsetToken());
+      }
+      return builder.build();
+    }
+
+    final StringBuilder sql = new StringBuilder(200);
+    final List<Object> args = new ArrayList<>();
+    sql.append("SELECT id, name FROM series\n");
+
+    if (query.hasOffsetToken()) {
+      sql.append("WHERE name>?\n");
+      args.add(query.getOffsetToken());
+    }
+
+    sql.append("ORDER BY name LIMIT ?");
+    args.add(query.getLimit());
+
+    builder.addAllValues(queryForList(sql, NAMED_VALUE_MAPPER, args));
+
+    if (query.getLimit() == builder.getValuesCount()) {
+      builder.setOffsetToken(builder.getValues(builder.getValuesCount() - 1).getName());
+    }
+
+    return builder.build();
+  }
+
   //
   // Private
   //
+
+  @Nonnull
+  private <T> List<T> queryForList(@Nonnull StringBuilder sql, @Nonnull RowMapper<T> m, @Nonnull List<Object> args) {
+    return jdbcOperations.query(sql.toString(), m, args.toArray(new Object[args.size()]));
+  }
 
   private void addCommonBookQueryParameters(@Nonnull StringBuilder queryBuilder,
                                             @Nonnull List<Object> args,
@@ -529,6 +604,17 @@ public final class BookRestController implements BookRestService {
     }
   }
 
+  private static final class SeriesPosRowMapper implements RowMapper<BookModel.SeriesPos> {
+
+    @Override
+    public BookModel.SeriesPos mapRow(ResultSet rs, int i) throws SQLException {
+      return BookModel.SeriesPos.newBuilder()
+          .setId(rs.getLong("series_id"))
+          .setPos(rs.getInt("pos"))
+          .build();
+    }
+  }
+
   //
   // Mapper Instances
   //
@@ -536,6 +622,7 @@ public final class BookRestController implements BookRestService {
   private static final NamedValueMapper NAMED_VALUE_MAPPER = new NamedValueMapper();
   private static final BookMetaBuilderRowMapper BOOK_BUILDER_MAPPER = new BookMetaBuilderRowMapper();
   private static final PersonRelationRowMapper PERSON_REL_MAPPER = new PersonRelationRowMapper();
+  private static final SeriesPosRowMapper SERIES_POS_MAPPER = new SeriesPosRowMapper();
 
   //
   // Helpers

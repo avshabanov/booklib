@@ -47,6 +47,7 @@ public final class BookServiceTest {
     assertEquals(0, bookService.getLanguages().getValuesCount());
     assertEquals(2, bookService.getPersonHints(null).getNamePartsCount());
     assertEquals(0, bookService.queryBooks(queryAll).getBookIdsCount());
+    assertEquals(0, bookService.querySeries(BookModel.SeriesQuery.newBuilder().setLimit(2).build()).getValuesCount());
   }
 
   @Test
@@ -78,16 +79,23 @@ public final class BookServiceTest {
   public void shouldSavePage() {
     // Given:
     final String genre = "fantastische";
+    final String series = "The Noon";
 
     // When:
     final BookModel.BookPageIds ids = bookService.savePage(BookModel.BookPageData.newBuilder()
-        .addGenres(BookModel.NamedValue.newBuilder().setName(genre)).build());
+        .addSeries(BookModel.NamedValue.newBuilder().setName(series))
+        .addGenres(BookModel.NamedValue.newBuilder().setName(genre))
+        .build());
 
     // Then:
     final BookModel.BookPageData pageData = bookService.getPage(BookModel.BookPageIdsRequest.newBuilder()
         .setPageIds(ids).setFetchBookDependencies(false).build());
+
     assertEquals(1, pageData.getGenresCount());
     assertEquals(genre, pageData.getGenres(0).getName());
+
+    assertEquals(1, pageData.getSeriesCount());
+    assertEquals(series, pageData.getSeries(0).getName());
   }
 
   //
@@ -101,6 +109,7 @@ public final class BookServiceTest {
     builder.addAllLanguageIds(getIds(page.getLanguagesList()));
     builder.addAllPersonIds(getIds(page.getPersonsList()));
     builder.addAllOriginIds(getIds(page.getOriginsList()));
+    builder.addAllSeriesIds(getIds(page.getSeriesList()));
 
     for (final BookModel.BookMeta book : page.getBooksList()) {
       builder.addBookIds(book.getId());

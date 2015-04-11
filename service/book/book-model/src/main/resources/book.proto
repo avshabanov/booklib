@@ -29,6 +29,11 @@ message ExternalBookId {
   required string type = 2;
 }
 
+message SeriesPos {
+  required int64 id = 1;
+  required int32 pos = 2;
+}
+
 message BookMeta {
   optional int64 id = 1;
   required string title = 2;
@@ -39,6 +44,7 @@ message BookMeta {
   repeated PersonRelation personRelations = 7;
   repeated int64 genreIds = 8;
   repeated ExternalBookId externalIds = 9;
+  repeated SeriesPos seriesPos = 10;
 }
 
 message BookPageIds {
@@ -47,6 +53,7 @@ message BookPageIds {
   repeated int64 languageIds = 3;
   repeated int64 personIds = 4;
   repeated int64 genreIds = 5;
+  repeated int64 seriesIds = 6;
 }
 
 message BookPageIdsRequest {
@@ -60,6 +67,7 @@ message BookPageData {
   repeated NamedValue languages = 3;
   repeated NamedValue persons = 4;
   repeated NamedValue genres = 5;
+  repeated NamedValue series = 6;
 }
 
 message BookPageQuery {
@@ -91,5 +99,10 @@ message PersonNameHints {
 message PersonListQuery {
   optional string startName = 1;
   optional string offsetToken = 2;
-  required int32 limit = 3;
+  required int32 limit = 3 [default = 8];
+}
+
+message SeriesQuery {
+  optional string offsetToken = 1;
+  required int32 limit = 2 [default = 8];
 }
