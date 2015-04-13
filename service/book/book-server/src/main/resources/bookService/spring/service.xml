@@ -12,12 +12,15 @@
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="locations">
       <util:list>
-        <value>classpath:/settings/core.properties</value>
+        <value>classpath:/bookService/core.properties</value>
         <value>${brikar.settings.path}</value>
       </util:list>
     </property>
   </bean>
 
-  <import resource="dao-context.xml"/>
-  <import resource="tx-context.xml"/>
+  <import resource="dao/datasource-context.xml"/>
+  <import resource="dao/dao-context.xml"/>
+
+  <!-- TODO: enable once controller will be separated from service -->
+  <!--<import resource="dao/tx-context.xml"/>-->
 </beans>

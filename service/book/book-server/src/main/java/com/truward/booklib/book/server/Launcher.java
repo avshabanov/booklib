@@ -1,4 +1,4 @@
-package com.truward.brikar.sample.todo.server;
+package com.truward.booklib.book.server;
 
 import com.truward.brikar.server.auth.SimpleAuthenticatorUtil;
 import com.truward.brikar.server.auth.SimpleServiceUser;
@@ -11,18 +11,21 @@ import java.util.Collections;
 /**
  * @author Alexander Shabanov
  */
-public final class Launcher {
+public final class Launcher extends StandardLauncher {
+
   public static void main(String[] args) throws Exception {
-    final StandardLauncher launcher = new StandardLauncher() {
-      @Override
-      protected void initServlets(@Nonnull ServletContextHandler contextHandler) {
-        super.initServlets(contextHandler);
+    new Launcher().setDefaultDirPrefix("classpath:/bookService/").start(args);
+  }
 
-        contextHandler.setSecurityHandler(SimpleAuthenticatorUtil.newSecurityHandler(Collections.singletonList(
-            new SimpleServiceUser("testonly", "test"))));
-      }
-    };
+  //
+  // Overridden
+  //
 
-    launcher.start(args);
+  @Override
+  protected void initServlets(@Nonnull ServletContextHandler contextHandler) {
+    super.initServlets(contextHandler);
+
+    contextHandler.setSecurityHandler(SimpleAuthenticatorUtil.newSecurityHandler(Collections.singletonList(
+        new SimpleServiceUser("testonly", "test"))));
   }
 }

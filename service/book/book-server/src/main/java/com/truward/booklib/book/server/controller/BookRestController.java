@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.annotation.Nonnull;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.*;
 
 
@@ -28,7 +27,7 @@ import java.util.*;
  */
 @Controller
 @RequestMapping("/rest/book")
-@Transactional
+@Transactional // TODO: move to service, @Transactional doesn't work here.
 public final class BookRestController implements BookRestService {
   private static final int MAX_LIMIT = 64;
 

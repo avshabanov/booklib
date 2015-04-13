@@ -23,8 +23,8 @@
       <bean class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
         <property name="scripts">
           <array>
-            <value>classpath:/sql/h2/book-schema.sql</value>
-            <value>classpath:/sql/h2/book-fixture.sql</value>
+            <value>classpath:/com/truward/booklib/book/config/sql/book-schema.sql</value>
+            <value>classpath:/com/truward/booklib/book/config/sql/book-fixture.sql</value>
           </array>
         </property>
       </bean>
@@ -33,7 +33,7 @@
 
   <bean id="dao.book.dataSource" factory-bean="test.dao.databaseFactory" factory-method="getDatabase" destroy-method="shutdown" />
 
-  <import resource="classpath:/spring/dao/dao-context.xml" />
+  <import resource="classpath:/com/truward/booklib/book/config/spring/dao/dao-context.xml" />
 
   <!-- Service -->
   <bean class="com.truward.booklib.book.server.controller.BookRestController">
