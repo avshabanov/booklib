@@ -15,6 +15,6 @@ public class AjaxController {
 
   @RequestMapping("/books/{id}")
   public void getBookById(HttpServletResponse response) throws IOException {
-    response.getWriter().append("{book: 1}");
+    response.getWriter().append("{\"book\": 1}");
   }
 }

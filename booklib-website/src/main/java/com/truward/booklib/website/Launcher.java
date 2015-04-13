@@ -35,8 +35,7 @@ public final class Launcher extends StandardLauncher {
   }
 
   public static void main(String[] args) throws Exception {
-    final Launcher launcher = new Launcher();
-    launcher.start(args);
+    new Launcher().setDefaultDirPrefix("classpath:/booklibWebsite/").start(args);
   }
 
   //
@@ -54,7 +53,7 @@ public final class Launcher extends StandardLauncher {
       log.info("Using override path for static resources: {}", overrideStaticPath);
       resource = Resource.newResource(new File(overrideStaticPath));
     } else {
-      resource = Resource.newClassPathResource("/web/static");
+      resource = Resource.newClassPathResource("/booklibWebsite/web/static");
     }
 
     resourceHandler.setBaseResource(resource);
