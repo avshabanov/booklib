@@ -11,10 +11,10 @@ import java.util.Collections;
 /**
  * @author Alexander Shabanov
  */
-public final class Launcher extends StandardLauncher {
+public final class BookServerLauncher extends StandardLauncher {
 
   public static void main(String[] args) throws Exception {
-    new Launcher().setDefaultDirPrefix("classpath:/bookService/").start(args);
+    new BookServerLauncher().setDefaultDirPrefix("classpath:/bookService/").start(args);
   }
 
   //

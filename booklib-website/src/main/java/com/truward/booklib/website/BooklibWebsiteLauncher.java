@@ -18,11 +18,11 @@ import java.util.List;
  *
  * @author Alexander Shabanov
  */
-public final class Launcher extends StandardLauncher {
+public final class BooklibWebsiteLauncher extends StandardLauncher {
   private final Logger log = LoggerFactory.getLogger(getClass());
   private final ResourceHandler resourceHandler;
 
-  public Launcher() throws IOException {
+  public BooklibWebsiteLauncher() throws IOException {
     resourceHandler = createStaticHandler();
   }
 
@@ -35,7 +35,7 @@ public final class Launcher extends StandardLauncher {
   }
 
   public static void main(String[] args) throws Exception {
-    new Launcher().setDefaultDirPrefix("classpath:/booklibWebsite/").start(args);
+    new BooklibWebsiteLauncher().setDefaultDirPrefix("classpath:/booklibWebsite/").start(args);
   }
 
   //

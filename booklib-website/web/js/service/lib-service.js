@@ -1,6 +1,7 @@
 // dev-only post-service
 
 var u = require('./dev-service-util.js');
+var rsvp = require('rsvp');
 
 //
 // Test Data
@@ -82,13 +83,75 @@ function listSelectById(col, listIds) {
 }
 
 //
-// Service Definition
+// Prod Lib Service Definition
 //
 
-function LibService() {
+function getFetchedPageToFavsHandler(data) {
+  console.log("[2]...");
+  return function transformFetchedPageToFavs(resolve, reject) {
+    console.log("[3]...");
+    //var result = {favorites: {books: [1, 3, 4], persons: [5, 6, 3]}};
+    console.log("[3] data.books = " + JSON.stringify(data.books));
+    return resolve({favorites: {persons: [], books: data.books}});
+  }
 }
 
-LibService.prototype.getStorefrontPage = function getStorefrontPage() {
+function ProdLibService() {
+}
+
+ProdLibService.prototype.getStorefrontPage = function prodGetStorefrontPage() {
+  var url = "/rest/ajax/books/page/fetch";
+  var promise = new rsvp.Promise(function(resolve, reject) {
+    function xmlHttpRequestHandler() {
+      if (this.readyState === this.DONE) {
+        if (this.status === 200) {
+          resolve(this.response);
+        } else {
+          reject(this);
+        }
+      }
+    };
+
+    var client = new XMLHttpRequest();
+    client.open("POST", url);
+    client.onreadystatechange = xmlHttpRequestHandler;
+    client.responseType = "json";
+    client.setRequestHeader("Accept", "application/json");
+    client.setRequestHeader("Content-Type", "application/json");
+    client.send(JSON.stringify({
+      "pageIds": {"bookIds": [1,3,4]},
+      "fetchBookDependencies": true}));
+  });
+
+  return promise.then(function (d) {
+    console.log("[1]...");
+    return new rsvp.Promise(getFetchedPageToFavsHandler(d));
+  }, function (e) {
+    console.error("got error response: " + e);
+  });
+
+//  // get favorites...
+//  var result = {favorites: {books: [1, 3, 4], persons: [5, 6, 3]}};
+//
+//  result.favorites.books = listSelectById(BOOKS, result.favorites.books);
+//  result.favorites.persons = listSelectById(PERSONS, result.favorites.persons);
+//
+//  return u.newResolvableDelayedPromise(result, u.DELAY);
+}
+
+ProdLibService.prototype.getBooks = function prodGetBooks(booksId) {
+  var result = [];
+  return u.newResolvableDelayedPromise(result, u.DELAY);
+}
+
+//
+// Development Lib Service Definition
+//
+
+function DevLibService() {
+}
+
+DevLibService.prototype.getStorefrontPage = function devGetStorefrontPage() {
   // get favorites...
   var result = {favorites: {books: [1, 3], persons: [5, 6, 3]}};
 
@@ -98,9 +161,12 @@ LibService.prototype.getStorefrontPage = function getStorefrontPage() {
   return u.newResolvableDelayedPromise(result, u.DELAY);
 }
 
-LibService.prototype.getBooks = function getBooks(booksId) {
+DevLibService.prototype.getBooks = function devGetBooks(booksId) {
   var result = [];
   return u.newResolvableDelayedPromise(result, u.DELAY);
 }
 
-module.exports.LibService = LibService;
+
+
+
+module.exports.LibService = ProdLibService;

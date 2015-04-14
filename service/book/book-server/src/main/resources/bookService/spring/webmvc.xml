@@ -11,7 +11,7 @@
 
   <!-- Controllers -->
   <bean class="com.truward.booklib.book.server.controller.BookRestController">
-    <constructor-arg ref="dao.book.jdbcTemplate"/>
+    <constructor-arg ref="bookService.service.bookService"/>
   </bean>
 
   <!-- Annotation driven support for MVC controllers -->

@@ -20,7 +20,9 @@
 
   <import resource="dao/datasource-context.xml"/>
   <import resource="dao/dao-context.xml"/>
+  <import resource="dao/tx-context.xml"/>
 
-  <!-- TODO: enable once controller will be separated from service -->
-  <!--<import resource="dao/tx-context.xml"/>-->
+  <bean id="bookService.service.bookService" class="com.truward.booklib.book.server.service.BookService">
+    <constructor-arg ref="bookService.dao.jdbcTemplate" />
+  </bean>
 </beans>

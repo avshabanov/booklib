@@ -11,7 +11,7 @@
   <artifactId>booklib-website</artifactId>
 
   <properties>
-    <launcher.mainClass>com.truward.booklib.website.Launcher</launcher.mainClass>
+    <launcher.mainClass>com.truward.booklib.website.BooklibWebsiteLauncher</launcher.mainClass>
   </properties>
 
   <name>BookLib Website</name>
@@ -21,6 +21,12 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
+    </dependency>
+
+    <dependency>
+      <artifactId>book-server</artifactId>
+      <groupId>com.truward.booklib</groupId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- Exposure Base -->
@@ -42,7 +48,7 @@
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
-      <scope>provided</scope>
+      <!--<scope>provided</scope>-->
     </dependency>
 
     <!-- Freemarker -->
