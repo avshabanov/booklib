@@ -1,4 +1,26 @@
 
+## How to create a database
+
+Sample:
+
+Create database:
+
+```
+java -cp ~/.m2/repository/com/h2database/h2/1.4.183/h2-1.4.183.jar org.h2.tools.RunScript -url jdbc:h2:/tmp/bookdb -user sa -script service/book/book-server/src/main/resources/bookService/sql/book-schema.sql
+```
+
+Fill it with test data:
+
+```
+java -cp ~/.m2/repository/com/h2database/h2/1.4.183/h2-1.4.183.jar org.h2.tools.RunScript -url jdbc:h2:/tmp/bookdb -user sa -script service/book/book-server/src/main/resources/bookService/sql/book-fixture.sql
+```
+
+Then you can connect to it using h2 shell (remove rlwrap if you don't want to use readline):
+
+```
+rlwrap java -cp ~/.m2/repository/com/h2database/h2/1.4.183/h2-1.4.183.jar org.h2.tools.Shell -url jdbc:h2:/tmp/bookdb -user sa
+```
+
 ## Sample invocation
 
 ```

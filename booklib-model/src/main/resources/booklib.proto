@@ -1,0 +1,13 @@
+package truward.booklib.book;
+
+option java_package = "com.truward.booklib.model";
+option java_outer_classname = "BooklibModel";
+
+message GetFavoritesResponse {
+  message Favorites {
+    repeated int64 bookIds = 1;
+    repeated int64 personIds = 2;
+  }
+
+  required Favorites favorites = 1;
+}

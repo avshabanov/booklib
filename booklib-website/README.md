@@ -26,3 +26,14 @@ Add the following to the program JVM arguments (example):
 ```
 curl -u testonly:test -H 'Accept: application/json' -H "Content-Type: application/json" -X POST -d '{"pageIds": {"bookIds": [1,2,3,4,5,18]}, "fetchBookDependencies": true}' http://127.0.0.1:8080/rest/ajax/books/page/fetch -s | python -mjson.tool
 ```
+
+### How to configure logging
+
+This is the sample configuration for logging used for dev purposes:
+
+```
+-Dapp.logback.logBaseName=/tmp/devlog-booklib -Dapp.logback.rootLogId=ROLLING_FILE
+```
+
+This configuration tells slf4j to use ROLLING_FILE appender and log everything to the files starting
+with ``/tmp/devlog-booklib`` path.

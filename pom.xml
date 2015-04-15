@@ -11,6 +11,7 @@
 
   <modules>
     <module>service</module>
+    <module>booklib-model</module>
     <module>booklib-website</module>
   </modules>
 
@@ -23,7 +24,7 @@
 
     <awssdk.version>1.9.13</awssdk.version>
 
-    <brikar.version>1.0.5</brikar.version>
+    <brikar.version>1.0.6</brikar.version>
 
     <!--<spring.version>3.2.3.RELEASE</spring.version>-->
     <spring.version>4.0.6.RELEASE</spring.version>

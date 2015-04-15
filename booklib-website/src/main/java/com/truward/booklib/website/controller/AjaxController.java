@@ -2,8 +2,12 @@ package com.truward.booklib.website.controller;
 
 import com.truward.booklib.book.model.BookModel;
 import com.truward.booklib.book.model.BookRestService;
+import com.truward.booklib.model.BooklibModel;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Alexander Shabanov
@@ -13,9 +17,37 @@ import org.springframework.web.bind.annotation.*;
 public final class AjaxController {
   private final BookRestService bookService;
 
+  private final List<Long> favBooks = Arrays.asList(1L, 4L, 5L);
+  private final List<Long> favPersons = Arrays.asList(1L, 2L);
+
   public AjaxController(BookRestService bookService) {
     this.bookService = bookService;
   }
+
+  //
+  // P13n API
+  //
+
+  @RequestMapping(value = "/p13n/favorites", method = RequestMethod.GET)
+  @ResponseBody
+  public BooklibModel.GetFavoritesResponse getFavorites() {
+    return BooklibModel.GetFavoritesResponse.newBuilder()
+        .setFavorites(BooklibModel.GetFavoritesResponse.Favorites.newBuilder()
+            .addAllBookIds(favBooks)
+            .addAllPersonIds(favPersons)
+            .build())
+        .build();
+  }
+
+//  @RequestMapping(value = "/p13n/favorites", method = RequestMethod.PUT)
+//  @ResponseBody
+//  public BookModel.BookPageIds savePage() {
+//    return bookService.savePage(request);
+//  }
+
+  //
+  // Book API
+  //
 
   @RequestMapping(value = "/books/page", method = RequestMethod.PUT)
   @ResponseBody

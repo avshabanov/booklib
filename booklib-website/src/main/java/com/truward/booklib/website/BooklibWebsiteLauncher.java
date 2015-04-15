@@ -19,11 +19,14 @@ import java.util.List;
  * @author Alexander Shabanov
  */
 public final class BooklibWebsiteLauncher extends StandardLauncher {
-  private final Logger log = LoggerFactory.getLogger(getClass());
   private final ResourceHandler resourceHandler;
 
   public BooklibWebsiteLauncher() throws IOException {
-    resourceHandler = createStaticHandler();
+    this.resourceHandler = createStaticHandler();
+  }
+
+  public static void main(String[] args) throws Exception {
+    new BooklibWebsiteLauncher().setDefaultDirPrefix("classpath:/booklibWebsite/").start(args);
   }
 
   @Override
@@ -32,10 +35,6 @@ public final class BooklibWebsiteLauncher extends StandardLauncher {
     handlers.addAll(super.getHandlers());
     handlers.add(resourceHandler);
     return handlers;
-  }
-
-  public static void main(String[] args) throws Exception {
-    new BooklibWebsiteLauncher().setDefaultDirPrefix("classpath:/booklibWebsite/").start(args);
   }
 
   //
@@ -50,7 +49,7 @@ public final class BooklibWebsiteLauncher extends StandardLauncher {
 
     final String overrideStaticPath = System.getProperty("booklib.override.staticPath");
     if (overrideStaticPath != null) {
-      log.info("Using override path for static resources: {}", overrideStaticPath);
+      LoggerFactory.getLogger(getClass()).info("Using override path for static resources: {}", overrideStaticPath);
       resource = Resource.newResource(new File(overrideStaticPath));
     } else {
       resource = Resource.newClassPathResource("/booklibWebsite/web/static");

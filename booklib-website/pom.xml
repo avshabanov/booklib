@@ -24,6 +24,11 @@
     </dependency>
 
     <dependency>
+      <artifactId>booklib-model</artifactId>
+      <groupId>com.truward.booklib</groupId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <artifactId>book-server</artifactId>
       <groupId>com.truward.booklib</groupId>
       <version>${project.version}</version>

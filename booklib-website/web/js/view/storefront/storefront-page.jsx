@@ -9,7 +9,8 @@ module.exports = React.createClass({
   componentDidMount: function() {
     var booksPromise = this.props.services.libService.getStorefrontPage();
     booksPromise.then(function (storefrontModel) {
-      console.log("[StorefrontPage] Fetched Books... storefrontModel=" + JSON.stringify(storefrontModel));
+      if (!this.isMounted()) { return; } // ignore
+
       var favs = storefrontModel.favorites;
       this.setState({loading: false, books: favs.books, persons: favs.persons});
     }.bind(this));
