@@ -1,5 +1,6 @@
 var React = require('React');
 var BookList = require('../book/book-list.js');
+var PersonList = require('../person/person-list.js');
 
 module.exports = React.createClass({
   getInitialState: function() {
@@ -29,7 +30,11 @@ module.exports = React.createClass({
       <div>
         <h2>Storefront Page</h2>
         <hr/>
+        <h3>Favorite Books</h3>
         <BookList books={this.state.books} />
+        <hr/>
+        <h3>Favorite Persons</h3>
+        <PersonList persons={this.state.persons} />
       </div>
     );
   }
