@@ -125,7 +125,7 @@ function AjaxLibService() {
   };
 }
 
-AjaxLibService.prototype.getStorefrontPage = function prodGetStorefrontPage() {
+AjaxLibService.prototype.getStorefrontPage = function ajaxGetStorefrontPage() {
   // inter-promise processing context
   var context = {
     personIds: null
@@ -155,9 +155,51 @@ AjaxLibService.prototype.getStorefrontPage = function prodGetStorefrontPage() {
   return promise; // end of processing
 }
 
-AjaxLibService.prototype.getBooks = function prodGetBooks(booksId) {
+AjaxLibService.prototype.getBooks = function ajaxGetBooks(booksId) {
   var result = [];
   return u.newResolvableDelayedPromise(result, u.DELAY);
 }
 
-module.exports.LibService = AjaxLibService;
+//
+// StubLibService
+//
+
+function StubLibService() {
+}
+
+StubLibService.prototype.getStorefrontPage = function ajaxGetStorefrontPage() {
+  var result = {
+    favorites: {
+      books: [
+        {
+          id: 123,
+          title: 'Sample Book',
+          addDate: 123000000,
+          lang: {id: 1000, name: "en"},
+          origin: {id: 2000, name: "sampleOrigin"},
+          persons: [{id: 3000, name: "Alex"}],
+          genres: [{id: 4000, name: "sf"}]
+        }
+      ],
+      persons: [
+        {id: 3000, name: "Alex"}
+      ]
+    }
+  };
+  return u.newResolvableDelayedPromise(result, u.DELAY);
+}
+
+StubLibService.prototype.getBooks = function (booksId) {
+  var result = [];
+  return u.newResolvableDelayedPromise(result, u.DELAY);
+}
+
+//
+// exports
+//
+
+if (window.location.href.startsWith("file")) {
+  module.exports.LibService = StubLibService; // use stub service
+} else {
+  module.exports.LibService = AjaxLibService; // use real service
+}
