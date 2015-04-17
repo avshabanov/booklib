@@ -20,6 +20,8 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
+ * TODO: batch operations
+ *
  * @author Alexander Shabanov
  */
 @Transactional

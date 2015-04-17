@@ -1,0 +1,50 @@
+package truward.booklib.extid;
+
+option java_package = "com.truward.booklib.extid.model";
+option java_outer_classname = "ExtId";
+
+message Group {
+  required int32 id = 1;
+  required string code = 2;
+}
+
+message Type {
+  required int32 id = 1;
+  required string name = 2;
+}
+
+message Id {
+  required int64 intId = 1;
+  required int32 typeId = 3;
+  required string extId = 2;
+  optional int32 groupId = 4;
+}
+
+message QueryByInternalIds {
+  repeated int64 intIds = 1;
+}
+
+message IdPage {
+  repeated Id ids = 1;
+  repeated Group groups = 2;
+  repeated Type type = 3;
+}
+
+message SaveIdRequest {
+  message IdPart {
+    required int64 intId = 1;
+    required string type = 2;
+    required string extId = 3;
+    optional string group = 4;
+  }
+
+  repeated IdPart ids = 1;
+}
+
+message DeleteByIntIdRequest {
+  repeated int64 intIds = 1;
+}
+
+message DeleteByTypeRequest {
+  repeated int32 typeIds = 1;
+}

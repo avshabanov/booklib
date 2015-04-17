@@ -84,6 +84,13 @@ CREATE TABLE book_genre (
   CONSTRAINT fk_book_genre_genre FOREIGN KEY (genre_id) REFERENCES genre(id)
 );
 
+CREATE TABLE external_id_group (
+  id                INTEGER,
+  name              VARCHAR(256) NOT NULL,
+  CONSTRAINT pk_external_id_group PRIMARY KEY (id),
+  CONSTRAINT uq_external_id_group_name UNIQUE (name)
+);
+
 -- Book-to-external-id link
 CREATE TABLE book_external_id (
   book_id           INTEGER NOT NULL,
