@@ -1,7 +1,10 @@
 // dev-only post-service
 
-var u = require('./dev-service-util.js');
+var domainUtil = require('../util/domain-util.js');
+var devUtil = require('../util/dev-util.js');
+var ajax = require('../util/ajax-util.js');
 var rsvp = require('rsvp');
+var StubLibService = require('./stub-lib-service.js').StubLibService;
 
 //
 // Helpers
@@ -10,19 +13,13 @@ var rsvp = require('rsvp');
 function getBookData(page, book) {
   var i;
 
-  var genres = [];
-  var genreIds = book["genreIds"];
-  for (i = 0; i < genreIds.length; ++i) {
-    genres.push(u.selectById(page["genres"], genreIds[i]));
-  }
-
   var persons = [];
   var personRelations = book["personRelations"];
   for (i = 0; i < personRelations.length; ++i) {
     var rel = personRelations[i];
     persons.push({
       id: rel["id"],
-      name: u.selectById(page["persons"], rel["id"]).name,
+      name: domainUtil.selectById(page["persons"], rel["id"]).name,
       relation: rel["relation"]
     });
   }
@@ -31,10 +28,10 @@ function getBookData(page, book) {
     id: book["id"],
     title: book["title"],
     addDate: book["addDate"],
-    lang: u.selectById(page["languages"], book["langId"]),
-    origin: u.selectById(page["origins"], book["originId"]),
+    lang: domainUtil.selectById(page["languages"], book["langId"]),
+    origin: domainUtil.selectById(page["origins"], book["originId"]),
     persons: persons,
-    genres: genres
+    genres: domainUtil.selectByIds(page["genres"], book["genreIds"])
 
     // TODO: externalIds
     // TODO: series
@@ -53,10 +50,7 @@ function getFetchedPageToFavsHandler(data, personIds) {
     }
 
     // extract persons
-    var persons = [];
-    for (i = 0; i < personIds.length; ++i) {
-      persons.push(u.selectById(data["persons"], personIds[i]));
-    }
+    var persons = domainUtil.selectByIds(data["persons"], personIds);
 
     return resolve({
       favorites: {
@@ -65,49 +59,6 @@ function getFetchedPageToFavsHandler(data, personIds) {
       }
     });
   }
-}
-
-/**
- * Creates a new HTTP request for data fetched by using async AJAX interface.
- * TODO: make common
- *
- * @arg method String, that identifies HTTP request method, e.g. 'GET', 'PUT', 'POST', 'DELETE'
- * @arg url URL to the AJAX resource, e.g. '/rest/ajax/foo/bar/baz'
- * @arg requestBody An object, that represents a request, can be null
- * @return A new rsvp.Promise instance
- */
-function makeAjaxRequest(method, url, requestBody) {
-  return new rsvp.Promise(function(resolve, reject) {
-    function xmlHttpRequestHandler() {
-      if (this.readyState !== this.DONE) {
-        return;
-      }
-
-      if (this.status === 200 || this.status === 201 || this.status === 204) {
-        resolve(this.response);
-      } else {
-        reject(this);
-      }
-    };
-
-    var client = new XMLHttpRequest();
-    client.open(method, url);
-    client.onreadystatechange = xmlHttpRequestHandler;
-    client.responseType = "json";
-    client.setRequestHeader("Accept", "application/json");
-
-    if (requestBody != null) {
-      client.setRequestHeader("Content-Type", "application/json");
-      client.send(JSON.stringify(requestBody));
-    } else {
-      client.send();
-    }
-  });
-}
-
-// TODO: make common
-function onAjaxError(e) {
-  console.error("AJAX error: " + e);
 }
 
 //
@@ -125,74 +76,45 @@ function AjaxLibService() {
   };
 }
 
-AjaxLibService.prototype.getStorefrontPage = function ajaxGetStorefrontPage() {
+AjaxLibService.prototype.getStorefrontPage = function () {
   // inter-promise processing context
   var context = {
     personIds: null
   };
 
   // [1] fetch favorites (persons and authors)
-  var promise = makeAjaxRequest("GET", "/rest/ajax/p13n/favorites");
+  var promise = ajax.request("GET", "/rest/ajax/p13n/favorites");
 
   // [2] fetch book and person data
   promise = promise.then(function (response) {
     var favs = response["favorites"];
     context.personIds = favs["personIds"]; // save personIds (for later use in transformation)
-    return makeAjaxRequest("POST", "/rest/ajax/books/page/fetch", {
+    return ajax.request("POST", "/rest/ajax/books/page/fetch", {
       "pageIds": {
         "bookIds": favs["bookIds"],
         "personIds": favs["personIds"]
       },
       "fetchBookDependencies": true
     });
-  }, onAjaxError);
+  }, ajax.onError);
 
   // [3] transform fetched data
   promise = promise.then(function (d) {
     return new rsvp.Promise(getFetchedPageToFavsHandler(d, context.personIds));
-  }, onAjaxError);
+  });
 
   return promise; // end of processing
 }
 
-AjaxLibService.prototype.getBooks = function ajaxGetBooks(booksId) {
+AjaxLibService.prototype.getBooks = function (booksId) {
   var result = [];
-  return u.newResolvableDelayedPromise(result, u.DELAY);
+    return devUtil.newResolvableDelayedPromise(result);
 }
 
 //
 // StubLibService
 //
 
-function StubLibService() {
-}
-
-StubLibService.prototype.getStorefrontPage = function ajaxGetStorefrontPage() {
-  var result = {
-    favorites: {
-      books: [
-        {
-          id: 123,
-          title: 'Sample Book',
-          addDate: 123000000,
-          lang: {id: 1000, name: "en"},
-          origin: {id: 2000, name: "sampleOrigin"},
-          persons: [{id: 3000, name: "Alex"}],
-          genres: [{id: 4000, name: "sf"}]
-        }
-      ],
-      persons: [
-        {id: 3000, name: "Alex"}
-      ]
-    }
-  };
-  return u.newResolvableDelayedPromise(result, u.DELAY);
-}
-
-StubLibService.prototype.getBooks = function (booksId) {
-  var result = [];
-  return u.newResolvableDelayedPromise(result, u.DELAY);
-}
 
 //
 // exports

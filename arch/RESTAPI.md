@@ -1,44 +1,6 @@
 
 # AJAX API
 
-## GET /books/{id}
-
-Response:
-
-```js
-{
-  id: <long>
-  title: <String>
-  ...
-
-  genres: [{1, 'classic'}],
-  persons: {authors: [[2, 'Oscar Wilde']]},
-  language: {3, 'en'},
-  isFavorite: true
-}
-```
-
-## GET /comments/{id}
-
-## GET /authors/{id}
-
-##  GET /authors/query
-
-Query Parameters:
-
-* ``String nameStart``
-* ``long lastId``
-* ``int limit``
-
-## GET /genres
-
-## GET /genres/{id}
-
-## GET /languages
-
-## GET /languages/{id}
-
-## PUT /favorites/{type:book,author}/{id}?isFavorite=true/false
 
 Sample:
 
@@ -53,7 +15,7 @@ PUT /favorites/book/1?isFavorite=true
 Request Sample:
 
 ```js
-{items: {books: [1, 2, 3], authors: [1]}}
+{items: [{id: 1, type: 1}, {id: 2, type 3}]}
 ```
 
 Response Sample (only favorites included):
@@ -61,3 +23,75 @@ Response Sample (only favorites included):
 ```js
 {favorites: {books: [1, 2, 3], authors: [4, 5, 6]}}
 ```
+
+# Page Interactions
+
+## Storefront
+
+* p13n.GetFavorites
+* book.GetPage
+* p13n.GetPersonalizedInfo
+** GetRatings
+** GetOverviews
+** GetCommentsCount
+** GetComments
+
+# Sample Flow
+
+## Storefront
+
+```js
+
+// p13n.GetFavorites request:
+{userId: 15000, types: [AUTHOR, BOOK]}
+// response:
+{elements: [{type: AUTHOR, ids: [100, 200, 300]}, {type: BOOK, ids: [10000, 12000]}]}
+
+// book.GetPage
+{pageIds: {bookIds: [10000, 12000], personIds: [100, 200, 300]}, fetchBookDependencies: true}
+// response:
+{
+    books: [
+        {id: 1, title: 'Alice in the Wonderland'}
+        //...
+    ],
+    personIds: [
+        {id: 100, name: 'Alice'}
+        //...
+    ]
+}
+
+// p13n.GetPage
+{
+    userId: 15000,
+    elements: [{type: AUTHOR, ids: [100, 200, 300]}, {type: BOOK, ids: [10000, 12000]}]
+}
+// response:
+{
+    elements: [
+        {
+            type: AUTHOR,
+            
+            items: [
+                {
+                    id: 100,
+                    rating: 495,
+                    favorite: true,
+                    comments: {
+                        total: 12
+                    },
+                    overviews: {
+                        total: 14
+                    }
+                }
+            ]
+        },
+        {
+            type: BOOKS,
+            items: [/* ... */]
+        }
+    ]
+}
+
+```
+

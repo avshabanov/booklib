@@ -1,0 +1,48 @@
+package truward.booklib.book;
+
+option java_package = "com.truward.booklib.cat.model";
+option java_outer_classname = "CatModel";
+
+message NamedValue {
+  optional int64 id = 1;
+  required string name = 2;
+}
+
+message NamedValueList {
+  repeated NamedValue values = 1;
+  optional string offsetToken = 2;
+}
+
+message PersonRelation {
+  required int64 id = 1;
+
+  enum Type {
+    AUTHOR = 1;
+    ILLUSTRATOR = 2;
+    UNKNOWN = 3;
+  }
+  required Type relation = 2;
+}
+
+message SeriesPos {
+  required int64 id = 1;
+  required int32 pos = 2;
+}
+
+message Item {
+  optional int64 id = 1;
+  required string title = 2;
+}
+
+message BookItemData {
+  optional int64 id = 1; /* matches Item.id */
+
+  required int32 fileSize = 3;
+  optional int64 addDate = 4;
+
+  required int64 langId = 5;
+
+  repeated int64 genreIds = 8;
+  repeated SeriesPos seriesPos = 10;
+  repeated PersonRelation personRelations = 7;
+}
