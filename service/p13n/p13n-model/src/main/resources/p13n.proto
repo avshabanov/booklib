@@ -1,0 +1,57 @@
+package truward.booklib.p13n;
+
+option java_package = "com.truward.booklib.p13n.model";
+option java_outer_classname = "P13n";
+
+/*
+ *
+ * Favorites
+ *
+ */
+
+message GetFavoritesRequest {
+  required int64 userId = 1;
+  repeated int32 types = 2;
+}
+
+message GetFavoritesResponse {
+  message Element {
+    required int32 type = 1; // from extid
+    repeated int64 ids = 2;
+  }
+
+  repeated Element elements = 1;
+}
+
+enum ContentFormatKind {
+  PLAIN_TEXT = 1;
+}
+
+message Comment {
+  optional int64 id = 1;
+  required int64 parentItemId = 2;
+  required int32 parentItemType = 3;
+  required string content = 4;
+  required ContentFormatKind contentFormatKind = 5;
+}
+
+message Overview {
+  optional int64 id = 1;
+  required int64 parentItemId = 2;
+  required int32 parentItemType = 3;
+  required string content = 4;
+  required ContentFormatKind contentFormatKind = 5;
+}
+
+message CommentPage {
+  required int32 total = 1;
+  repeated Comment comments = 2;
+  optional string offsetToken = 3;
+}
+
+message ItemData {
+  required int64 id = 1;
+  required int32 rating = 2;
+  required bool favorite = 3;
+  required CommentPage comments = 4;
+}

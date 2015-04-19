@@ -43,9 +43,9 @@ Response Sample (only favorites included):
 ```js
 
 // p13n.GetFavorites request:
-{userId: 15000, types: [AUTHOR, BOOK]}
+{userId: 15000, types: [1, 2]}
 // response:
-{elements: [{type: AUTHOR, ids: [100, 200, 300]}, {type: BOOK, ids: [10000, 12000]}]}
+{elements: [{type: 1, ids: [100, 200, 300]}, {type: 2, ids: [10000, 12000]}]}
 
 // book.GetPage
 {pageIds: {bookIds: [10000, 12000], personIds: [100, 200, 300]}, fetchBookDependencies: true}
@@ -64,13 +64,13 @@ Response Sample (only favorites included):
 // p13n.GetPage
 {
     userId: 15000,
-    elements: [{type: AUTHOR, ids: [100, 200, 300]}, {type: BOOK, ids: [10000, 12000]}]
+    elements: [{type: 1, ids: [100, 200, 300]}, {type: 2, ids: [10000, 12000]}]
 }
 // response:
 {
     elements: [
         {
-            type: AUTHOR,
+            type: 1,
             
             items: [
                 {
@@ -87,7 +87,7 @@ Response Sample (only favorites included):
             ]
         },
         {
-            type: BOOKS,
+            type: 2,
             items: [/* ... */]
         }
     ]

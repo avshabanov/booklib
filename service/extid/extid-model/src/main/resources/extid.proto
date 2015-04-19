@@ -3,14 +3,32 @@ package truward.booklib.extid;
 option java_package = "com.truward.booklib.extid.model";
 option java_outer_classname = "ExtId";
 
+/* Type of external ID */
+message Type {
+  optional int32 id = 1;
+  required string name = 2;
+}
+
+message DeleteTypesRequest {
+  repeated int32 types = 1;
+}
+
+message SaveTypesRequest {
+  repeated Type types = 1;
+}
+
+message SaveTypesResponse {
+  repeated int32 ids = 1;
+}
+
+message GetTypesResponse {
+  repeated Type types = 1;
+}
+
+/* External ID group (e.g. domain or country) */
 message Group {
   required int32 id = 1;
   required string code = 2;
-}
-
-message Type {
-  required int32 id = 1;
-  required string name = 2;
 }
 
 message Id {
@@ -27,13 +45,12 @@ message QueryByInternalIds {
 message IdPage {
   repeated Id ids = 1;
   repeated Group groups = 2;
-  repeated Type type = 3;
 }
 
 message SaveIdRequest {
   message IdPart {
     required int64 intId = 1;
-    required string type = 2;
+    required int32 typeId = 2;
     required string extId = 3;
     optional string group = 4;
   }

@@ -16,6 +16,7 @@
   <modules>
     <module>book</module>
     <module>extid</module>
+    <module>p13n</module>
   </modules>
 </project>
 
