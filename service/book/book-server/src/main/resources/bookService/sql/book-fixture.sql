@@ -1,4 +1,5 @@
 -- Fixture Data
+-- Fixture Data
 -- NOTE: There should be no zero values assigned to 'id' fields.
 
 INSERT INTO person (id, f_name) VALUES (1, 'Jack London');
@@ -29,11 +30,6 @@ INSERT INTO book_origin (id, code) VALUES (4, 'RussianBooks');
 INSERT INTO series (id, name) VALUES (1, 'Noon: 22nd Century');
 INSERT INTO series (id, name) VALUES (2, 'The Dark Tower');
 
-INSERT INTO external_id_type (id, code) VALUES (20, 'eBay');
-INSERT INTO external_id_type (id, code) VALUES (21, 'AmazonKindleStore');
-INSERT INTO external_id_type (id, code) VALUES (22, 'AmazonPaperback');
-INSERT INTO external_id_type (id, code) VALUES (24, 'GoogleBooks');
-
 -- Far Rainbow
 INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
   VALUES (1, 'Far Rainbow', 255365, '2007-10-23', 2, 4);
@@ -56,10 +52,6 @@ INSERT INTO book_person (book_id, person_id) VALUES (3, 3);
 INSERT INTO book_genre (book_id, genre_id) VALUES (3, 2);
 INSERT INTO book_genre (book_id, genre_id) VALUES (3, 6);
 INSERT INTO book_series (book_id, series_id, pos) VALUES (3, 2, 1);
-INSERT INTO book_external_id (book_id, external_id_type, external_id) VALUES (3, 20, '301575949364'); -- http://www.ebay.com/itm/301575949364
-INSERT INTO book_external_id (book_id, external_id_type, external_id) VALUES (3, 21, 'B000OCXILW'); -- http://www.amazon.com/dp/B000OCXILW
-INSERT INTO book_external_id (book_id, external_id_type, external_id) VALUES (3, 22, 'B0012GV992'); -- http://www.amazon.com/dp/B0012GV992
-INSERT INTO book_external_id (book_id, external_id_type, external_id) VALUES (3, 24, 'OxM59ts4iloC'); -- https://books.google.com/books?id=OxM59ts4iloC
 
 -- Hard to Be a God
 INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)

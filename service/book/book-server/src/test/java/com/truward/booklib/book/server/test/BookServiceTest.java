@@ -81,7 +81,6 @@ public final class BookServiceTest {
     // Given:
     final String genre = "fantastische";
     final String series = "The Noon";
-    final String extType = "google";
     final String author = "bob";
     final String lang = "cn";
     final String origin = "origin";
@@ -90,7 +89,6 @@ public final class BookServiceTest {
     final BookModel.BookPageIds ids = bookService.savePage(BookModel.BookPageData.newBuilder()
         .addSeries(BookModel.NamedValue.newBuilder().setName(series))
         .addGenres(BookModel.NamedValue.newBuilder().setName(genre))
-        .addExternalBookTypes(BookModel.NamedValue.newBuilder().setName(extType))
         .addPersons(BookModel.NamedValue.newBuilder().setName(author))
         .addLanguages(BookModel.NamedValue.newBuilder().setName(lang))
         .addOrigins(BookModel.NamedValue.newBuilder().setName(origin))
@@ -106,8 +104,6 @@ public final class BookServiceTest {
     assertEquals(1, pageData.getSeriesCount());
     assertEquals(series, pageData.getSeries(0).getName());
 
-    assertEquals(1, pageData.getExternalBookTypesCount());
-    assertEquals(extType, pageData.getExternalBookTypes(0).getName());
 
     assertEquals(1, pageData.getPersonsCount());
     assertEquals(author, pageData.getPersons(0).getName());
@@ -127,8 +123,6 @@ public final class BookServiceTest {
         .setOriginId(pageData.getOrigins(0).getId())
         .addPersonRelations(BookModel.PersonRelation.newBuilder().setId(pageData.getPersons(0).getId())
             .setRelation(BookModel.PersonRelation.Type.AUTHOR))
-        .addExternalIds(BookModel.ExternalBookId.newBuilder().setId("externalId")
-            .setTypeId(pageData.getExternalBookTypes(0).getId()))
         .addGenreIds(pageData.getGenres(0).getId())
         .addSeriesPos(BookModel.SeriesPos.newBuilder().setId(pageData.getSeries(0).getId()).setPos(5))
         .build();
@@ -152,7 +146,6 @@ public final class BookServiceTest {
         .addLanguages(updateSingle(pageData2.getLanguagesList(), "newLang"))
         .addPersons(updateSingle(pageData2.getPersonsList(), "newPerson"))
         .addSeries(updateSingle(pageData2.getSeriesList(), "newSeries"))
-        .addExternalBookTypes(updateSingle(pageData2.getExternalBookTypesList(), "newBookType"))
         .addOrigins(updateSingle(pageData2.getOriginsList(), "newOrigin"))
         .addBooks(BookModel.BookMeta.newBuilder(book)
             .setId(bookId)
@@ -187,7 +180,6 @@ public final class BookServiceTest {
     builder.addAllPersonIds(getIds(page.getPersonsList()));
     builder.addAllOriginIds(getIds(page.getOriginsList()));
     builder.addAllSeriesIds(getIds(page.getSeriesList()));
-    builder.addAllExternalBookTypeIds(getIds(page.getExternalBookTypesList()));
 
     for (final BookModel.BookMeta book : page.getBooksList()) {
       builder.addBookIds(book.getId());

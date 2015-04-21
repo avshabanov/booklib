@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public final class ExtidRestController implements ExtidRestService {
 
   @Override
+  public ExtId.GetTypesResponse getTypes() {
+    return ExtId.GetTypesResponse.newBuilder().build();
+  }
+
+  @Override
   public ExtId.IdPage queryByInternalIds(@RequestBody ExtId.QueryByInternalIds request) {
     return ExtId.IdPage.newBuilder().build();
   }

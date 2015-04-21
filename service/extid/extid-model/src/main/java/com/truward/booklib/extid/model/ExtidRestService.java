@@ -8,19 +8,22 @@ import org.springframework.web.bind.annotation.*;
  */
 public interface ExtidRestService {
 
-  @RequestMapping(value = "/extid/query", method = RequestMethod.POST)
+  @RequestMapping(value = "/extid/types", method = RequestMethod.POST)
+  ExtId.GetTypesResponse getTypes();
+
+  @RequestMapping(value = "/extid/page/query", method = RequestMethod.POST)
   @ResponseBody
   ExtId.IdPage queryByInternalIds(@RequestBody ExtId.QueryByInternalIds request);
 
-  @RequestMapping(value = "/extid", method = RequestMethod.PUT)
+  @RequestMapping(value = "/extid/ids", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   void saveIds(@RequestBody ExtId.SaveIdRequest request);
 
-  @RequestMapping(value = "/extid/int-id", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/extid/ids/ints", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   void deleteByIntId(@RequestBody ExtId.DeleteByIntIdRequest request);
 
-  @RequestMapping(value = "/extid/type", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/extid/ids/types", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   void deleteByType(@RequestBody ExtId.DeleteByTypeRequest request);
 }

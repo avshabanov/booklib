@@ -1,10 +1,16 @@
 package com.truward.booklib.book.server.test;
 
+import com.truward.booklib.extid.model.ExtId;
+import com.truward.booklib.extid.model.ExtidRestService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Alexander Shabanov
@@ -13,6 +19,16 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = "/spring/ExtidServiceTest-context.xml")
 @Transactional
 public final class ExtidServiceTest {
+  @Resource ExtidRestService extidService;
+
   @Test
-  public void dummy() {}
+  public void shouldQueryAllIds() {
+    // When:
+    final ExtId.IdPage page = extidService.queryByInternalIds(ExtId.QueryByInternalIds.newBuilder()
+        .addTypeIds(10).addIntIds(3).setIncludeAllGroupIds(true)
+        .build());
+
+    // Then:
+    assertTrue(page.getIdsCount() > 0);
+  }
 }

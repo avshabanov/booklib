@@ -2,7 +2,7 @@ package com.truward.booklib.book.server.service;
 
 import com.truward.booklib.book.model.BookModel;
 import com.truward.booklib.book.model.BookRestService;
-import com.truward.booklib.book.server.util.IdConcealingUtil;
+import com.truward.booklib.util.IdConcealingUtil;
 import com.truward.booklib.book.server.util.PersonRoleMapper;
 import com.truward.time.UtcTime;
 import com.truward.time.jdbc.UtcTimeSqlUtil;
@@ -104,19 +104,6 @@ public final class BookService implements BookRestService {
       builder.addSeriesIds(seriesId);
     }
 
-    // External ID Types
-    for (final BookModel.NamedValue val : request.getExternalBookTypesList()) {
-      final long extTypeId;
-      if (val.hasId()) {
-        extTypeId = val.getId();
-        jdbcOperations.update("UPDATE external_id_type SET code=? WHERE id=?", val.getName(), extTypeId);
-      } else {
-        extTypeId = jdbcOperations.queryForObject("SELECT seq_ext_id_type.nextval", Long.class);
-        jdbcOperations.update("INSERT INTO external_id_type (id, code) VALUES (?, ?)", extTypeId, val.getName());
-      }
-      builder.addExternalBookTypeIds(extTypeId);
-    }
-
     // Books
     for (final BookModel.BookMeta val : request.getBooksList()) {
       final long bookId;
@@ -136,7 +123,6 @@ public final class BookService implements BookRestService {
         jdbcOperations.update("DELETE FROM book_genre WHERE book_id=?", bookId);
         jdbcOperations.update("DELETE FROM book_person WHERE book_id=?", bookId);
         jdbcOperations.update("DELETE FROM book_series WHERE book_id=?", bookId);
-        jdbcOperations.update("DELETE FROM book_external_id WHERE book_id=?", bookId);
       } else {
         bookId = jdbcOperations.queryForObject("SELECT seq_book.nextval", Long.class);
         jdbcOperations.update("INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)\n" +
@@ -158,11 +144,6 @@ public final class BookService implements BookRestService {
       for (final BookModel.SeriesPos seriesPos : val.getSeriesPosList()) {
         jdbcOperations.update("INSERT INTO book_series (book_id, series_id, pos) VALUES (?, ?, ?)",
             bookId, seriesPos.getId(), seriesPos.getPos());
-      }
-
-      for (final BookModel.ExternalBookId externalId : val.getExternalIdsList()) {
-        jdbcOperations.update("INSERT INTO book_external_id (book_id, external_id, external_id_type) VALUES (?, ?, ?)",
-            bookId, externalId.getId(), externalId.getTypeId());
       }
 
       builder.addBookIds(bookId);
@@ -189,12 +170,6 @@ public final class BookService implements BookRestService {
     for (final long id : request.getSeriesIdsList()) {
       jdbcOperations.update("DELETE FROM book_series WHERE series_id=?", id);
       jdbcOperations.update("DELETE FROM series WHERE id=?", id);
-    }
-
-    // External IDs
-    for (final long id : request.getExternalBookTypeIdsList()) {
-      jdbcOperations.update("DELETE FROM book_external_id WHERE external_id_type=?", id);
-      jdbcOperations.update("DELETE FROM external_id_type WHERE id=?", id);
     }
 
     // Books
@@ -230,7 +205,7 @@ public final class BookService implements BookRestService {
     final Set<Long> originIds = new HashSet<>(pageIds.getOriginIdsList());
     final Set<Long> personIds = new HashSet<>(pageIds.getPersonIdsList());
     final Set<Long> seriesIds = new HashSet<>(pageIds.getSeriesIdsList());
-    final Set<Long> externalIdTypeIds = new HashSet<>(pageIds.getExternalBookTypeIdsList());
+
 
     // fetch basic book fields
     final Set<Long> idSet = new HashSet<>(pageIds.getBookIdsList());
@@ -253,12 +228,6 @@ public final class BookService implements BookRestService {
       bookBuilder.addAllSeriesPos(jdbcOperations.query("SELECT series_id, pos FROM book_series WHERE book_id=?",
           SERIES_POS_MAPPER, id));
 
-      // add external ids
-      bookBuilder.addAllExternalIds(jdbcOperations.query(
-          "SELECT external_id_type, external_id FROM book_external_id WHERE book_id=?", EXTERNAL_BOOK_ID_MAPPER, id));
-
-
-
       // construct book and add to list
       final BookModel.BookMeta book = bookBuilder.build();
       books.add(book);
@@ -273,9 +242,6 @@ public final class BookService implements BookRestService {
         }
         for (final BookModel.SeriesPos pos : book.getSeriesPosList()) {
           seriesIds.add(pos.getId());
-        }
-        for (final BookModel.ExternalBookId externalBookId : book.getExternalIdsList()) {
-          externalIdTypeIds.add(externalBookId.getTypeId());
         }
       }
     }
@@ -314,12 +280,6 @@ public final class BookService implements BookRestService {
     for (final long id : seriesIds) {
       builder.addSeries(jdbcOperations.queryForObject("SELECT id, name FROM series WHERE id=?",
           NAMED_VALUE_MAPPER, id));
-    }
-
-    // fetch external id types
-    for (final long id : externalIdTypeIds) {
-      builder.addExternalBookTypes(jdbcOperations.queryForObject(
-          "SELECT id, code AS name FROM external_id_type WHERE id=?", NAMED_VALUE_MAPPER, id));
     }
 
     return builder.build();
@@ -655,17 +615,6 @@ public final class BookService implements BookRestService {
     }
   }
 
-  private static final class ExternalBookIdRowMapper implements RowMapper<BookModel.ExternalBookId> {
-
-    @Override
-    public BookModel.ExternalBookId mapRow(ResultSet rs, int i) throws SQLException {
-      return BookModel.ExternalBookId.newBuilder()
-          .setId(rs.getString("external_id"))
-          .setTypeId(rs.getLong("external_id_type"))
-          .build();
-    }
-  }
-
   //
   // Mapper Instances
   //
@@ -674,7 +623,6 @@ public final class BookService implements BookRestService {
   private static final BookMetaBuilderRowMapper BOOK_BUILDER_MAPPER = new BookMetaBuilderRowMapper();
   private static final PersonRelationRowMapper PERSON_REL_MAPPER = new PersonRelationRowMapper();
   private static final SeriesPosRowMapper SERIES_POS_MAPPER = new SeriesPosRowMapper();
-  private static final ExternalBookIdRowMapper EXTERNAL_BOOK_ID_MAPPER = new ExternalBookIdRowMapper();
 
   //
   // Helpers

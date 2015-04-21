@@ -1,4 +1,4 @@
-package com.truward.booklib.book.server.util;
+package com.truward.booklib.util;
 
 import javax.annotation.Nonnull;
 

@@ -14,6 +14,7 @@
   <name>Booklib Microservices</name>
 
   <modules>
+    <module>service-common</module>
     <module>book</module>
     <module>extid</module>
     <module>p13n</module>

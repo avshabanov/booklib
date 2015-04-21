@@ -40,6 +40,9 @@ message Id {
 
 message QueryByInternalIds {
   repeated int64 intIds = 1;
+  repeated int32 typeIds = 2;
+  repeated int32 groupIds = 3; /* will be ignored if includeAllGroupIds=true */
+  required bool includeAllGroupIds = 4;
 }
 
 message IdPage {

@@ -26,13 +26,6 @@ CREATE TABLE book_origin (
   CONSTRAINT uq_book_origin UNIQUE (code)
 );
 
--- External ID types
-CREATE TABLE external_id_type (
-  id        INTEGER PRIMARY KEY,
-  code      VARCHAR(256) NOT NULL,
-  CONSTRAINT uq_external_id_type_code UNIQUE (code)
-);
-
 -- Book series
 CREATE TABLE series (
   id        INTEGER PRIMARY KEY,
@@ -84,29 +77,11 @@ CREATE TABLE book_genre (
   CONSTRAINT fk_book_genre_genre FOREIGN KEY (genre_id) REFERENCES genre(id)
 );
 
-CREATE TABLE external_id_group (
-  id                INTEGER,
-  name              VARCHAR(256) NOT NULL,
-  CONSTRAINT pk_external_id_group PRIMARY KEY (id),
-  CONSTRAINT uq_external_id_group_name UNIQUE (name)
-);
-
--- Book-to-external-id link
-CREATE TABLE book_external_id (
-  book_id           INTEGER NOT NULL,
-  external_id_type  INTEGER NOT NULL,
-  external_id       VARCHAR(256) NOT NULL,
-  CONSTRAINT pk_book_external_id PRIMARY KEY (book_id, external_id_type, external_id),
-  CONSTRAINT fk_book_ext_id_book FOREIGN KEY (book_id) REFERENCES book_meta (id),
-  CONSTRAINT fk_book_ext_id_type FOREIGN KEY (external_id_type) REFERENCES external_id_type (id)
-);
-
 --
 -- Sequences
 --
 
 CREATE SEQUENCE seq_lang_code   START WITH 1000;
-CREATE SEQUENCE seq_ext_id_type START WITH 2000;
 CREATE SEQUENCE seq_origin      START WITH 3000;
 CREATE SEQUENCE seq_genre       START WITH 4000;
 CREATE SEQUENCE seq_series      START WITH 5000;
@@ -118,4 +93,3 @@ CREATE SEQUENCE seq_book        START WITH 150000;
 --
 
 CREATE UNIQUE INDEX idx_person_f_name ON person(f_name);
-CREATE UNIQUE INDEX idx_book_external_id ON book_external_id(external_id_type, external_id);
