@@ -4,6 +4,7 @@ import com.truward.booklib.extid.model.ExtId;
 import com.truward.booklib.extid.model.ExtidRestService;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -11,12 +12,15 @@ import javax.annotation.Nonnull;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Alexander Shabanov
  */
-public class ExtidService implements ExtidRestService {
+@Transactional
+public final class ExtidService implements ExtidRestService {
   private final JdbcOperations jdbc;
 
   public ExtidService(@Nonnull JdbcOperations jdbc) {
@@ -67,10 +71,27 @@ public class ExtidService implements ExtidRestService {
 
     final List<ExtId.Id> ids = jdbc.query(sql.toString(), EXT_ID_MAPPER, args.toArray(new Object[args.size()]));
 
-    return ExtId.IdPage.newBuilder()
-        .addAllIds(ids)
-        //.addAllGroups()
-        .build();
+    // fetch group IDs
+    final Set<Integer> groupIds = new HashSet<>();
+    for (final ExtId.Id id : ids) {
+      groupIds.add(id.getGroupId());
+    }
+
+    final ExtId.IdPage.Builder builder = ExtId.IdPage.newBuilder().addAllIds(ids);
+
+    // Then fetch real groups
+    sql.setLength(0);
+    args.clear();
+
+    sql.append("SELECT id, name FROM ext_group WHERE id IN (");
+    for (final Integer id : groupIds) {
+      sql.append(sql.charAt(sql.length() - 1) == '?' ? ", ?" : "?");
+      args.add(id);
+    }
+    sql.append(") ORDER BY id");
+    builder.addAllGroups(jdbc.query(sql.toString(), GROUP_ROW_MAPPER, args.toArray(new Object[args.size()])));
+
+    return builder.build();
   }
 
   @Override
@@ -92,7 +113,13 @@ public class ExtidService implements ExtidRestService {
   // Private
   //
 
+  private static final class GroupRowMapper implements RowMapper<ExtId.Group> {
 
+    @Override
+    public ExtId.Group mapRow(ResultSet rs, int i) throws SQLException {
+      return ExtId.Group.newBuilder().setId(rs.getInt("id")).setCode(rs.getString("name")).build();
+    }
+  }
 
   private static final class ExtIdRowMapper implements RowMapper<ExtId.Id> {
 
@@ -108,6 +135,7 @@ public class ExtidService implements ExtidRestService {
   }
 
   private static final ExtIdRowMapper EXT_ID_MAPPER = new ExtIdRowMapper();
+  private static final GroupRowMapper GROUP_ROW_MAPPER = new GroupRowMapper();
 
   private void save() {
 //    // External ID Types

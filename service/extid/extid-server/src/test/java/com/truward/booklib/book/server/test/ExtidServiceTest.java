@@ -23,12 +23,29 @@ public final class ExtidServiceTest {
 
   @Test
   public void shouldQueryAllIds() {
-    // When:
-    final ExtId.IdPage page = extidService.queryByInternalIds(ExtId.QueryByInternalIds.newBuilder()
+    // Given:
+    final ExtId.QueryByInternalIds request = ExtId.QueryByInternalIds.newBuilder()
         .addTypeIds(10).addIntIds(3).setIncludeAllGroupIds(true)
-        .build());
+        .build();
+
+    // When:
+    final ExtId.IdPage page = extidService.queryByInternalIds(request);
 
     // Then:
     assertTrue(page.getIdsCount() > 0);
+    assertTrue(page.getGroupsCount() > 0);
+  }
+
+  @Test
+  public void shouldReturnNothingForNoIdsAndTypeIds() {
+    // Given:
+    final ExtId.QueryByInternalIds request = ExtId.QueryByInternalIds.newBuilder().setIncludeAllGroupIds(true).build();
+
+    // When:
+    final ExtId.IdPage page = extidService.queryByInternalIds(request);
+
+    // Then:
+    assertTrue(page.getIdsCount() == 0);
+    assertTrue(page.getGroupsCount() == 0);
   }
 }
