@@ -1,8 +1,16 @@
 module.exports = function(grunt) {
-  function prepareSkeleton() {
-    grunt.file.mkdir('target/web/js');
-    grunt.file.mkdir('target/web/tmp/js');
+  //var dst = '../target/';
+  function target(path) {
+    return 'target/web/' + path;
   }
+
+  function prepareSkeleton() {
+    grunt.file.mkdir(target('js'));
+    grunt.file.mkdir(target('tmp/js'));
+  }
+
+  var browserifyFiles = {};
+  browserifyFiles[target('js/app.js')] = [target('tmp/js/main.js')];
 
   // Project configuration.
   grunt.initConfig({
@@ -10,7 +18,7 @@ module.exports = function(grunt) {
 
     watch: {
       scripts: {
-        files: ['web/js/**/*.*', 'web/css/**/*.css', 'web/root/**/*.*'],
+        files: ['js/**/*.*', 'css/**/*.css', 'root/**/*.*'],
         tasks: ['copy', 'react', 'browserify']
       }
     },
@@ -19,27 +27,27 @@ module.exports = function(grunt) {
       main: {
         files: [
           {
-            cwd: 'web/root',
+            cwd: 'root',
             src: '**',
-            dest: 'target/web',
+            dest: target(''),
             expand: true
           },
           {
             cwd: 'node_modules/bootstrap/dist',
             src: '**',
-            dest: 'target/web/libs/bootstrap',
+            dest: target('libs/bootstrap'),
             expand: true
           },
           {
-            cwd: 'web/css',
+            cwd: 'css',
             src: '**',
-            dest: 'target/web/css',
+            dest: target('css'),
             expand: true
           },
           {
-            cwd: 'web/js',                // source js dir
+            cwd: 'js',                    // source js dir
             src: ['**', '!**/*.jsx'],     // copy all files and subfolders to the temporary dor, except for jsx
-            dest: 'target/web/tmp/js',    // destination folder, used by browserify
+            dest: target('tmp/js'),   // destination folder, used by browserify
             expand: true                  // required when using cwd
           }
         ]
@@ -51,9 +59,9 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true,
-            cwd: 'web/js/view',
+            cwd: 'js/view',
             src: ['**/*.jsx'],
-            dest: 'target/web/tmp/js/view',
+            dest: target('tmp/js/view'),
             ext: '.js'
           }
         ]
@@ -62,9 +70,7 @@ module.exports = function(grunt) {
 
     browserify: {
       dist: {
-        files: {
-          'target/web/js/app.js': ['target/web/tmp/js/main.js'],
-        }
+        files: browserifyFiles
       }
     },
 
@@ -73,8 +79,8 @@ module.exports = function(grunt) {
         banner: '/*! Generated app.js <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
       build: {
-        src: 'target/web/js/app.js',
-        dest: 'target/web/js/app.min.js'
+        src: target('js/app.js'),
+        dest: target('js/app.min.js')
       }
     }
   });
@@ -95,8 +101,8 @@ module.exports = function(grunt) {
 
   // Helper task for moving app.min.js to app.js
   grunt.registerTask('uglify-fix-app', 'Rename app.min.js to app.js', function () {
-    grunt.file.copy('target/web/js/app.min.js', 'target/web/js/app.js');
-    grunt.file.delete('target/web/js/app.min.js');
+    grunt.file.copy(target('js/app.min.js'), target('js/app.js'));
+    grunt.file.delete(target('js/app.min.js'));
   });
 
   // Release task that generates production build
@@ -104,7 +110,9 @@ module.exports = function(grunt) {
     'copy', 'react', 'browserify', 'uglify', 'uglify-fix-app'
   ]);
 
+
+
   grunt.registerTask('clean', 'Recursively cleans build folder', function () {
-    grunt.file.delete('target');
+    grunt.file.delete(target(''));
   });
 };
