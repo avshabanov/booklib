@@ -10,8 +10,8 @@
   <context:annotation-config/>
 
   <!-- Controllers -->
-  <bean class="com.truward.booklib.extid.server.controller.ExtidRestController">
-    <!--<constructor-arg ref="extidService.service.extidService"/>-->
+  <bean class="com.truward.booklib.extid.server.controller.ExtIdRestController">
+    <constructor-arg ref="extidService.service.extidService"/>
   </bean>
 
   <!-- Annotation driven support for MVC controllers -->

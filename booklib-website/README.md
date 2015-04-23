@@ -18,7 +18,7 @@ For web devs - you can use watchify:
 Add the following to the program JVM arguments (example):
 
 ```
--Dbooklib.override.staticPath=/path/to/booklib/booklib-website/target/web/
+-Dbooklib.override.staticPath=/path/to/booklib/booklib-website/web/target/
 ```
 
 ### How to invoke REST API
@@ -37,3 +37,8 @@ This is the sample configuration for logging used for dev purposes:
 
 This configuration tells slf4j to use ROLLING_FILE appender and log everything to the files starting
 with ``/tmp/devlog-booklib`` path.
+
+### How to run web client test
+
+``npm test`` in web dir.
+

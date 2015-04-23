@@ -1,117 +1,301 @@
 package com.truward.booklib.extid.server.service;
 
 import com.truward.booklib.extid.model.ExtId;
-import com.truward.booklib.extid.model.ExtidRestService;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Nonnull;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Alexander Shabanov
  */
-@Transactional
-public final class ExtidService implements ExtidRestService {
-  private final JdbcOperations jdbc;
+public final class ExtIdService {
+  private ExtIdService() {}
 
-  public ExtidService(@Nonnull JdbcOperations jdbc) {
-    Assert.notNull(jdbc, "jdbc operations parameter can't be null");
-    this.jdbc = jdbc;
+  public interface Contract {
+    @Nonnull List<ExtId.Type> getTypes();
+
+    void saveType(@Nonnull ExtId.Type type);
+
+    @Nonnull List<ExtId.Id> queryByInternalIds(@Nonnull ExtId.QueryByInternalIds request);
+
+    void saveIds(@Nonnull List<ExtId.Id> ids);
+
+    void deleteByIntIds(@Nonnull List<Long> idsList);
+
+    void deleteByTypeIds(@Nonnull List<Integer> idsList);
+
+    @Nonnull List<ExtId.Group> getGroups();
+
+    @Nonnull List<ExtId.Group> queryGroups(@Nonnull List<Integer> idsList);
+
+    @Nonnull List<Integer> saveGroups(@Nonnull List<ExtId.Group> groups);
+
+    void deleteGroups(@Nonnull List<Integer> groupIds);
   }
 
-  @Override
-  public ExtId.GetTypesResponse getTypes() {
-    throw new UnsupportedOperationException();
-  }
+  @Transactional
+  public static final class Impl implements Contract {
+    private final JdbcOperations jdbc;
 
-  @Override
-  public ExtId.IdPage queryByInternalIds(@RequestBody ExtId.QueryByInternalIds request) {
-    final StringBuilder sql = new StringBuilder(250);
-    final List<Object> args = new ArrayList<>();
-
-    sql.append("SELECT int_id, int_type_id, ext_group_id, ext_id FROM ext_id\nWHERE");
-
-    // int ids
-    sql.append(" int_id IN (");
-    for (int i = 0; i < request.getIntIdsCount(); ++i) {
-      sql.append(i > 0 ? ", ?" : "?");
-      args.add(request.getIntIds(i));
+    public Impl(@Nonnull JdbcOperations jdbc) {
+      Assert.notNull(jdbc, "jdbc operations parameter can't be null");
+      this.jdbc = jdbc;
     }
-    sql.append(')');
 
-    // types
-    sql.append(" AND int_type_id IN (");
-    for (int i = 0; i < request.getTypeIdsCount(); ++i) {
-      sql.append(i > 0 ? ", ?" : "?");
-      args.add(request.getTypeIds(i));
+    @Nonnull
+    @Override
+    public List<ExtId.Type> getTypes() {
+      return jdbc.query("SELECT id, name FROM int_type ORDER BY id", TYPE_ROW_MAPPER);
     }
-    sql.append(')');
 
-    // groups
-    if (!request.getIncludeAllGroupIds()) {
-      // take into an account group IDs
-      sql.append(" AND ext_group_id IN (");
-      for (int i = 0; i < request.getGroupIdsCount(); ++i) {
+    @Override
+    public void saveType(@Nonnull ExtId.Type type) {
+      if (type.hasId()) {
+        jdbc.update("UPDATE int_type SET name=? WHERE id=?", type.getName(), type.getId());
+      } else {
+        jdbc.update("INSERT INTO int_type (id, name) VALUES ((SELECT seq_type.nextval), ?)", type.getName());
+      }
+    }
+
+    @Override
+    @Nonnull
+    public List<ExtId.Id> queryByInternalIds(@Nonnull ExtId.QueryByInternalIds request) {
+      if (request.getIntIdsCount() == 0 || request.getTypeIdsCount() == 0 ||
+          (!request.getIncludeAllGroupIds() && request.getGroupIdsCount() == 0)) {
+        return Collections.emptyList();
+      }
+
+      final StringBuilder sql = new StringBuilder(200);
+      final List<Object> args = new ArrayList<>();
+
+      sql.append("SELECT int_id, int_type_id, ext_group_id, ext_id FROM ext_id\nWHERE");
+
+      // int ids
+      sql.append(" int_id IN (");
+      for (int i = 0; i < request.getIntIdsCount(); ++i) {
         sql.append(i > 0 ? ", ?" : "?");
-        args.add(request.getGroupIds(i));
+        args.add(request.getIntIds(i));
       }
       sql.append(')');
+
+      // types
+      sql.append(" AND int_type_id IN (");
+      for (int i = 0; i < request.getTypeIdsCount(); ++i) {
+        sql.append(i > 0 ? ", ?" : "?");
+        args.add(request.getTypeIds(i));
+      }
+      sql.append(')');
+
+      // groups
+      if (!request.getIncludeAllGroupIds()) {
+        // take into an account group IDs
+        sql.append(" AND ext_group_id IN (");
+        for (int i = 0; i < request.getGroupIdsCount(); ++i) {
+          sql.append(i > 0 ? ", ?" : "?");
+          args.add(request.getGroupIds(i));
+        }
+        sql.append(')');
+      }
+
+      sql.append("\nORDER BY int_id"); // order by internal IDs to have pre-determined order
+
+      return jdbc.query(sql.toString(), EXT_ID_MAPPER, args.toArray(new Object[args.size()]));
     }
 
-    sql.append("\nORDER BY int_id"); // order by internal IDs to have pre-determined order
+    @Override
+    public void saveIds(@Nonnull final List<ExtId.Id> ids) {
+      if (ids.isEmpty()) {
+        return;
+      }
 
-    final List<ExtId.Id> ids = jdbc.query(sql.toString(), EXT_ID_MAPPER, args.toArray(new Object[args.size()]));
+      jdbc.batchUpdate("INSERT INTO ext_id (int_id, int_type_id, ext_group_id, ext_id) VALUES (?, ?, ?, ?)", new BatchPreparedStatementSetter() {
+        @Override
+        public void setValues(PreparedStatement ps, int i) throws SQLException {
+          final ExtId.Id id = ids.get(i);
+          ps.setLong(1, id.getIntId());
+          ps.setInt(2, id.getTypeId());
+          ps.setInt(3, id.getGroupId());
+          ps.setString(4, id.getExtId());
+        }
 
-    // fetch group IDs
-    final Set<Integer> groupIds = new HashSet<>();
-    for (final ExtId.Id id : ids) {
-      groupIds.add(id.getGroupId());
+        @Override
+        public int getBatchSize() {
+          return ids.size();
+        }
+      });
     }
 
-    final ExtId.IdPage.Builder builder = ExtId.IdPage.newBuilder().addAllIds(ids);
+    @Override
+    public void deleteByIntIds(@Nonnull final List<Long> idsList) {
+      if (idsList.isEmpty()) {
+        return;
+      }
 
-    // Then fetch real groups
-    sql.setLength(0);
-    args.clear();
+      jdbc.batchUpdate("DELETE FROM ext_id WHERE int_id=?", new BatchPreparedStatementSetter() {
+        @Override
+        public void setValues(PreparedStatement ps, int i) throws SQLException {
+          ps.setLong(1, idsList.get(i));
+        }
 
-    sql.append("SELECT id, name FROM ext_group WHERE id IN (");
-    for (final Integer id : groupIds) {
-      sql.append(sql.charAt(sql.length() - 1) == '?' ? ", ?" : "?");
-      args.add(id);
+        @Override
+        public int getBatchSize() {
+          return idsList.size();
+        }
+      });
     }
-    sql.append(") ORDER BY id");
-    builder.addAllGroups(jdbc.query(sql.toString(), GROUP_ROW_MAPPER, args.toArray(new Object[args.size()])));
 
-    return builder.build();
-  }
+    @Override
+    public void deleteByTypeIds(@Nonnull final List<Integer> idsList) {
+      if (idsList.isEmpty()) {
+        return;
+      }
 
-  @Override
-  public void saveIds(@RequestBody ExtId.SaveIdRequest request) {
-    throw new UnsupportedOperationException();
-  }
+      jdbc.batchUpdate("DELETE FROM ext_id WHERE int_type_id=?", new BatchPreparedStatementSetter() {
+        @Override
+        public void setValues(PreparedStatement ps, int i) throws SQLException {
+          ps.setInt(1, idsList.get(i));
+        }
 
-  @Override
-  public void deleteByIntId(@RequestBody ExtId.DeleteByIntIdRequest request) {
-    throw new UnsupportedOperationException();
-  }
+        @Override
+        public int getBatchSize() {
+          return idsList.size();
+        }
+      });
+    }
 
-  @Override
-  public void deleteByType(@RequestBody ExtId.DeleteByTypeRequest request) {
-    throw new UnsupportedOperationException();
+    @Nonnull
+    @Override
+    public List<ExtId.Group> getGroups() {
+      return jdbc.query("SELECT id, name FROM ext_group ORDER BY id", GROUP_ROW_MAPPER);
+    }
+
+    @Nonnull
+    @Override
+    public List<ExtId.Group> queryGroups(@Nonnull List<Integer> idsList) {
+      if (idsList.isEmpty()) {
+        return Collections.emptyList();
+      }
+
+      final StringBuilder sql = new StringBuilder(200);
+      final List<Object> args = new ArrayList<>();
+
+      sql.append("SELECT id, name FROM ext_group WHERE id IN (");
+      for (final Integer id : idsList) {
+        sql.append(sql.charAt(sql.length() - 1) == '?' ? ", ?" : "?");
+        args.add(id);
+      }
+      sql.append(") ORDER BY id");
+
+      return jdbc.query(sql.toString(), GROUP_ROW_MAPPER, args.toArray(new Object[args.size()]));
+    }
+
+    @Nonnull
+    @Override
+    public List<Integer> saveGroups(@Nonnull List<ExtId.Group> groups) {
+      if (groups.isEmpty()) {
+        return Collections.emptyList();
+      }
+
+      // populate list of ids for groups to be inserted/updated
+      final List<ExtId.Group> inserted = new ArrayList<>();
+      final List<ExtId.Group> updated = new ArrayList<>();
+      final List<Integer> returnIds = new ArrayList<>(groups.size());
+      for (final ExtId.Group group : groups) {
+        if (group.hasId()) {
+          updated.add(group);
+          returnIds.add(group.getId());
+        } else {
+          inserted.add(group);
+          returnIds.add(null);
+        }
+      }
+
+      // insert groups
+      if (!inserted.isEmpty()) {
+        final List<Integer> newIds = jdbc.queryForList("SELECT seq_group.nextval FROM system_range(1, ?)",
+            Integer.class, inserted.size());
+
+        // update returnIds
+        for (int i = 0, next = 0; i < returnIds.size(); ++i) {
+          if (returnIds.get(i) == null) {
+            returnIds.set(i, newIds.get(next));
+            ++next;
+          }
+        }
+
+        jdbc.batchUpdate("INSERT INTO ext_group (id, name) VALUES (?, ?)", new BatchPreparedStatementSetter() {
+          @Override
+          public void setValues(PreparedStatement ps, int i) throws SQLException {
+            ps.setInt(1, newIds.get(i));
+            ps.setString(2, inserted.get(i).getCode());
+          }
+
+          @Override
+          public int getBatchSize() {
+            return inserted.size();
+          }
+        });
+      }
+
+      // update groups
+      if (!updated.isEmpty()) {
+        jdbc.batchUpdate("UPDATE ext_group SET name=? WHERE id=?", new BatchPreparedStatementSetter() {
+          @Override
+          public void setValues(PreparedStatement ps, int i) throws SQLException {
+            final ExtId.Group group = updated.get(i);
+            ps.setString(1, group.getCode());
+            ps.setInt(1, group.getId());
+          }
+
+          @Override
+          public int getBatchSize() {
+            return updated.size();
+          }
+        });
+      }
+
+      return returnIds; // return IDs of entities
+    }
+
+    @Override
+    public void deleteGroups(@Nonnull final List<Integer> groupIds) {
+      if (groupIds.isEmpty()) {
+        return;
+      }
+
+      jdbc.batchUpdate("DELETE FROM ext_group WHERE id=?", new BatchPreparedStatementSetter() {
+        @Override
+        public void setValues(PreparedStatement ps, int i) throws SQLException {
+          ps.setLong(1, groupIds.get(i));
+        }
+
+        @Override
+        public int getBatchSize() {
+          return groupIds.size();
+        }
+      });
+    }
   }
 
   //
   // Private
   //
+
+  private static final class TypeRowMapper implements RowMapper<ExtId.Type> {
+
+    @Override
+    public ExtId.Type mapRow(ResultSet rs, int i) throws SQLException {
+      return ExtId.Type.newBuilder().setId(rs.getInt("id")).setName(rs.getString("name")).build();
+    }
+  }
 
   private static final class GroupRowMapper implements RowMapper<ExtId.Group> {
 
@@ -134,51 +318,7 @@ public final class ExtidService implements ExtidRestService {
     }
   }
 
-  private static final ExtIdRowMapper EXT_ID_MAPPER = new ExtIdRowMapper();
+  private static final TypeRowMapper TYPE_ROW_MAPPER = new TypeRowMapper();
   private static final GroupRowMapper GROUP_ROW_MAPPER = new GroupRowMapper();
-
-  private void save() {
-//    // External ID Types
-//    for (final BookModel.NamedValue val : request.getExternalBookTypesList()) {
-//      final long extTypeId;
-//      if (val.hasId()) {
-//        extTypeId = val.getId();
-//        jdbcOperations.update("UPDATE external_id_type SET code=? WHERE id=?", val.getName(), extTypeId);
-//      } else {
-//        extTypeId = jdbcOperations.queryForObject("SELECT seq_ext_id_type.nextval", Long.class);
-//        jdbcOperations.update("INSERT INTO external_id_type (id, code) VALUES (?, ?)", extTypeId, val.getName());
-//      }
-//      builder.addExternalBookTypeIds(extTypeId);
-//    }
-
-
-//
-//    for (final BookModel.ExternalBookId externalId : val.getExternalIdsList()) {
-//      jdbcOperations.update("INSERT INTO book_external_id (book_id, external_id, external_id_type) VALUES (?, ?, ?)",
-//          bookId, externalId.getId(), externalId.getTypeId());
-//    }
-//
-//    // External IDs
-//    for (final long id : request.getExternalBookTypeIdsList()) {
-//      jdbcOperations.update("DELETE FROM book_external_id WHERE external_id_type=?", id);
-//      jdbcOperations.update("DELETE FROM external_id_type WHERE id=?", id);
-//    }
-//
-//    for (final BookModel.ExternalBookId externalBookId : book.getExternalIdsList()) {
-//      externalIdTypeIds.add(externalBookId.getTypeId());
-//    }
-//
-//    // fetch external id types
-//    for (final long id : externalIdTypeIds) {
-//      builder.addExternalBookTypes(jdbcOperations.queryForObject(
-//          "SELECT id, code AS name FROM external_id_type WHERE id=?", NAMED_VALUE_MAPPER, id));
-//    }
-//
-//    // add external ids
-//    bookBuilder.addAllExternalIds(jdbcOperations.query(
-//        "SELECT external_id_type, external_id FROM book_external_id WHERE book_id=?", EXT_ID_MAPPER, id));
-//
-//
-//    final Set<Long> externalIdTypeIds = new HashSet<>(pageIds.getExternalBookTypeIdsList());
-  }
+  private static final ExtIdRowMapper EXT_ID_MAPPER = new ExtIdRowMapper();
 }

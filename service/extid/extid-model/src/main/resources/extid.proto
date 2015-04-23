@@ -27,7 +27,7 @@ message GetTypesResponse {
 
 /* External ID group (e.g. domain or country) */
 message Group {
-  required int32 id = 1;
+  optional int32 id = 1;
   required string code = 2;
 }
 
@@ -45,20 +45,12 @@ message QueryByInternalIds {
   required bool includeAllGroupIds = 4;
 }
 
-message IdPage {
+message IdList {
   repeated Id ids = 1;
-  repeated Group groups = 2;
 }
 
 message SaveIdRequest {
-  message IdPart {
-    required int64 intId = 1;
-    required int32 typeId = 2;
-    required string extId = 3;
-    optional string group = 4;
-  }
-
-  repeated IdPart ids = 1;
+  repeated Id ids = 1;
 }
 
 message DeleteByIntIdRequest {
@@ -67,4 +59,24 @@ message DeleteByIntIdRequest {
 
 message DeleteByTypeRequest {
   repeated int32 typeIds = 1;
+}
+
+message GetGroupByIdRequest {
+  repeated int32 groupIds = 1;
+}
+
+message GroupList {
+  repeated Group groups = 1;
+}
+
+message SaveGroupsRequest {
+  repeated Group groups = 1;
+}
+
+message SaveGroupsResponse {
+  repeated int32 groupIds = 1;
+}
+
+message DeleteGroupsRequest {
+  repeated int32 groupIds = 1;
 }

@@ -22,7 +22,7 @@
   <import resource="dao/dao-context.xml"/>
   <import resource="dao/tx-context.xml"/>
 
-  <!--<bean id="extidService.service.extidService" class="com.truward.booklib.extid.server.service.ExtidService">-->
-    <!--<constructor-arg ref="extidService.dao.jdbcTemplate" />-->
-  <!--</bean>-->
+  <bean id="extidService.service.extidService" class="com.truward.booklib.extid.server.service.ExtIdService$Impl">
+    <constructor-arg ref="extidService.dao.jdbcTemplate" />
+  </bean>
 </beans>
