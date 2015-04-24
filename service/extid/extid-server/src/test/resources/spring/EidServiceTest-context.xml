@@ -23,20 +23,20 @@
       <bean class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
         <property name="scripts">
           <array>
-            <value>classpath:/extidService/sql/extid-schema.sql</value>
-            <value>classpath:/extidService/sql/extid-fixture.sql</value>
+            <value>classpath:/eidService/sql/extid-schema.sql</value>
+            <value>classpath:/eidService/sql/extid-fixture.sql</value>
           </array>
         </property>
       </bean>
     </property>
   </bean>
 
-  <bean id="extidService.dao.dataSource" factory-bean="test.dao.databaseFactory" factory-method="getDatabase" destroy-method="shutdown" />
+  <bean id="eidService.dao.dataSource" factory-bean="test.dao.databaseFactory" factory-method="getDatabase" destroy-method="shutdown" />
 
-  <import resource="classpath:/extidService/spring/dao/dao-context.xml" />
+  <import resource="classpath:/eidService/spring/dao/dao-context.xml" />
 
   <!-- Service -->
-  <bean class="com.truward.booklib.extid.server.service.ExtIdService$Impl">
-    <constructor-arg ref="extidService.dao.jdbcTemplate" />
+  <bean class="com.truward.booklib.extid.server.service.EidService$Impl">
+    <constructor-arg ref="eidService.dao.jdbcTemplate" />
   </bean>
 </beans>

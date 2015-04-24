@@ -1,7 +1,7 @@
 package com.truward.booklib.book.server.test;
 
 import com.truward.booklib.extid.model.ExtId;
-import com.truward.booklib.extid.server.service.ExtIdService;
+import com.truward.booklib.extid.server.service.EidService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -19,20 +19,20 @@ import static org.junit.Assert.*;
  * @author Alexander Shabanov
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/spring/ExtIdServiceTest-context.xml")
+@ContextConfiguration(locations = "/spring/EidServiceTest-context.xml")
 @Transactional
-public final class ExtIdServiceTest {
-  @Resource ExtIdService.Contract extidService;
+public final class EidServiceTest {
+  @Resource EidService.Contract extidService;
 
   @Test
   public void shouldQueryAllIds() {
     // Given:
-    final ExtId.QueryByInternalIds request = ExtId.QueryByInternalIds.newBuilder()
-        .addTypeIds(10).addIntIds(3).setIncludeAllGroupIds(true)
+    final ExtId.QueryIdPairs request = ExtId.QueryIdPairs.newBuilder()
+        .addIntIds(ExtId.IntId.newBuilder().setId(3).setTypeId(10).build()).setIncludeAllGroupIds(true)
         .build();
 
     // When:
-    final List<ExtId.Id> list = extidService.queryByInternalIds(request);
+    final List<ExtId.IdPair> list = extidService.queryIdPairs(request);
 
     // Then:
     assertFalse(list.isEmpty());
@@ -41,10 +41,10 @@ public final class ExtIdServiceTest {
   @Test
   public void shouldReturnNothingForNoIdsAndTypeIds() {
     // Given:
-    final ExtId.QueryByInternalIds request = ExtId.QueryByInternalIds.newBuilder().setIncludeAllGroupIds(true).build();
+    final ExtId.QueryIdPairs request = ExtId.QueryIdPairs.newBuilder().setIncludeAllGroupIds(true).build();
 
     // When:
-    final List<ExtId.Id> list = extidService.queryByInternalIds(request);
+    final List<ExtId.IdPair> list = extidService.queryIdPairs(request);
 
     // Then:
     assertTrue(list.isEmpty());
@@ -89,7 +89,7 @@ public final class ExtIdServiceTest {
   @Test
   public void shouldDeleteGroup() {
     // When:
-    extidService.deleteByIntIds(Collections.singletonList(3L));
+    extidService.deleteIdPairsByIntIds(Collections.singletonList(ExtId.IntId.newBuilder().setId(3L).setTypeId(10).build()));
     extidService.deleteGroups(Collections.singletonList(20));
 
     // Then:

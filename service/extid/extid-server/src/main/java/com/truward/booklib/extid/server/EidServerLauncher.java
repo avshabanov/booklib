@@ -11,10 +11,10 @@ import java.util.Collections;
 /**
  * @author Alexander Shabanov
  */
-public final class ExtIdServerLauncher extends StandardLauncher {
+public final class EidServerLauncher extends StandardLauncher {
 
   public static void main(String[] args) throws Exception {
-    new ExtIdServerLauncher().setDefaultDirPrefix("classpath:/extidService/").start(args);
+    new EidServerLauncher().setDefaultDirPrefix("classpath:/eidService/").start(args);
   }
 
   //

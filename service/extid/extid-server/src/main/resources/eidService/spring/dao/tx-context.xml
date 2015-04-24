@@ -5,5 +5,5 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-  <tx:annotation-driven transaction-manager="extidService.dao.txManager" proxy-target-class="false" mode="proxy" />
+  <tx:annotation-driven transaction-manager="eidService.dao.txManager" proxy-target-class="false" mode="proxy" />
 </beans>

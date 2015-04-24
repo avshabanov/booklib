@@ -3,11 +3,11 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="extidService.dao.dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+  <bean id="eidService.dao.dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
     <property name="driverClass"      value="org.h2.Driver" />
-    <property name="jdbcUrl"          value="${booklib.extidService.dao.dataSource.url}" />
-    <property name="user"             value="${booklib.extidService.dao.dataSource.username}" />
-    <property name="password"         value="${booklib.extidService.dao.dataSource.password}" />
+    <property name="jdbcUrl"          value="${booklib.eidService.dao.dataSource.url}" />
+    <property name="user"             value="${booklib.eidService.dao.dataSource.username}" />
+    <property name="password"         value="${booklib.eidService.dao.dataSource.password}" />
 
     <property name="minPoolSize"      value="2" /> <!-- ~3-5 for HL app, usually 4 -->
     <property name="initialPoolSize"  value="2" /> <!-- matches minPoolSize -->
@@ -27,16 +27,16 @@
 
   <!-- Book DB initializer -->
 
-  <bean id="extidService.dao.initScripts" class="java.lang.String">
-    <constructor-arg value="${booklib.extidService.dao.initScripts}" />
+  <bean id="eidService.dao.initScripts" class="java.lang.String">
+    <constructor-arg value="${booklib.eidService.dao.initScripts}" />
   </bean>
 
   <bean class="org.springframework.jdbc.datasource.init.DataSourceInitializer">
-    <property name="dataSource" ref="extidService.dao.dataSource" />
+    <property name="dataSource" ref="eidService.dao.dataSource" />
     <property name="databasePopulator">
       <bean class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
         <property name="scripts">
-          <bean factory-bean="extidService.dao.initScripts" factory-method="split">
+          <bean factory-bean="eidService.dao.initScripts" factory-method="split">
             <constructor-arg value=","/>
           </bean>
         </property>

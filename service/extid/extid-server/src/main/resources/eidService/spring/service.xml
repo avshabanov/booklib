@@ -12,7 +12,7 @@
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="locations">
       <util:list>
-        <value>classpath:/extidService/core.properties</value>
+        <value>classpath:/eidService/core.properties</value>
         <value>${brikar.settings.path}</value>
       </util:list>
     </property>
@@ -22,7 +22,7 @@
   <import resource="dao/dao-context.xml"/>
   <import resource="dao/tx-context.xml"/>
 
-  <bean id="extidService.service.extidService" class="com.truward.booklib.extid.server.service.ExtIdService$Impl">
-    <constructor-arg ref="extidService.dao.jdbcTemplate" />
+  <bean id="eidService.service.eidService" class="com.truward.booklib.extid.server.service.EidService$Impl">
+    <constructor-arg ref="eidService.dao.jdbcTemplate" />
   </bean>
 </beans>

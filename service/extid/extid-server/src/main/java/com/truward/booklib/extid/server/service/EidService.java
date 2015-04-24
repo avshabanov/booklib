@@ -16,21 +16,23 @@ import java.util.*;
 /**
  * @author Alexander Shabanov
  */
-public final class ExtIdService {
-  private ExtIdService() {}
+public final class EidService {
+  private EidService() {}
 
   public interface Contract {
     @Nonnull List<ExtId.Type> getTypes();
 
     void saveType(@Nonnull ExtId.Type type);
 
-    @Nonnull List<ExtId.Id> queryByInternalIds(@Nonnull ExtId.QueryByInternalIds request);
+    @Nonnull List<ExtId.IdPair> queryIdPairs(@Nonnull ExtId.QueryIdPairs request);
 
-    void saveIds(@Nonnull List<ExtId.Id> ids);
+    void saveIdPairs(@Nonnull List<ExtId.IdPair> ids);
 
-    void deleteByIntIds(@Nonnull List<Long> idsList);
+    void deleteIdPairsByIntIds(@Nonnull List<ExtId.IntId> idsList);
 
-    void deleteByTypeIds(@Nonnull List<Integer> idsList);
+    void deleteIdPairsByTypeIds(@Nonnull List<Integer> idsList);
+
+    void deleteIdPairsByGroupIds(@Nonnull List<Integer> idsList);
 
     @Nonnull List<ExtId.Group> getGroups();
 
@@ -67,9 +69,8 @@ public final class ExtIdService {
 
     @Override
     @Nonnull
-    public List<ExtId.Id> queryByInternalIds(@Nonnull ExtId.QueryByInternalIds request) {
-      if (request.getIntIdsCount() == 0 || request.getTypeIdsCount() == 0 ||
-          (!request.getIncludeAllGroupIds() && request.getGroupIdsCount() == 0)) {
+    public List<ExtId.IdPair> queryIdPairs(@Nonnull ExtId.QueryIdPairs request) {
+      if (request.getIntIdsCount() == 0 || (!request.getIncludeAllGroupIds() && request.getGroupIdsCount() == 0)) {
         return Collections.emptyList();
       }
 
@@ -79,18 +80,12 @@ public final class ExtIdService {
       sql.append("SELECT int_id, int_type_id, ext_group_id, ext_id FROM ext_id\nWHERE");
 
       // int ids
-      sql.append(" int_id IN (");
+      sql.append(" (int_id, int_type_id) IN (");
       for (int i = 0; i < request.getIntIdsCount(); ++i) {
-        sql.append(i > 0 ? ", ?" : "?");
-        args.add(request.getIntIds(i));
-      }
-      sql.append(')');
-
-      // types
-      sql.append(" AND int_type_id IN (");
-      for (int i = 0; i < request.getTypeIdsCount(); ++i) {
-        sql.append(i > 0 ? ", ?" : "?");
-        args.add(request.getTypeIds(i));
+        sql.append(i > 0 ? ", (?, ?)" : "(?, ?)");
+        final ExtId.IntId intId = request.getIntIds(i);
+        args.add(intId.getId());
+        args.add(intId.getTypeId());
       }
       sql.append(')');
 
@@ -107,11 +102,11 @@ public final class ExtIdService {
 
       sql.append("\nORDER BY int_id"); // order by internal IDs to have pre-determined order
 
-      return jdbc.query(sql.toString(), EXT_ID_MAPPER, args.toArray(new Object[args.size()]));
+      return jdbc.query(sql.toString(), ID_PAIR_MAPPER, args.toArray(new Object[args.size()]));
     }
 
     @Override
-    public void saveIds(@Nonnull final List<ExtId.Id> ids) {
+    public void saveIdPairs(@Nonnull final List<ExtId.IdPair> ids) {
       if (ids.isEmpty()) {
         return;
       }
@@ -119,9 +114,10 @@ public final class ExtIdService {
       jdbc.batchUpdate("INSERT INTO ext_id (int_id, int_type_id, ext_group_id, ext_id) VALUES (?, ?, ?, ?)", new BatchPreparedStatementSetter() {
         @Override
         public void setValues(PreparedStatement ps, int i) throws SQLException {
-          final ExtId.Id id = ids.get(i);
-          ps.setLong(1, id.getIntId());
-          ps.setInt(2, id.getTypeId());
+          final ExtId.IdPair id = ids.get(i);
+          final ExtId.IntId intId = id.getIntId();
+          ps.setLong(1, intId.getId());
+          ps.setInt(2, intId.getTypeId());
           ps.setInt(3, id.getGroupId());
           ps.setString(4, id.getExtId());
         }
@@ -134,15 +130,17 @@ public final class ExtIdService {
     }
 
     @Override
-    public void deleteByIntIds(@Nonnull final List<Long> idsList) {
+    public void deleteIdPairsByIntIds(@Nonnull final List<ExtId.IntId> idsList) {
       if (idsList.isEmpty()) {
         return;
       }
 
-      jdbc.batchUpdate("DELETE FROM ext_id WHERE int_id=?", new BatchPreparedStatementSetter() {
+      jdbc.batchUpdate("DELETE FROM ext_id WHERE int_id=? AND int_type_id=?", new BatchPreparedStatementSetter() {
         @Override
         public void setValues(PreparedStatement ps, int i) throws SQLException {
-          ps.setLong(1, idsList.get(i));
+          final ExtId.IntId intId = idsList.get(i);
+          ps.setLong(1, intId.getId());
+          ps.setLong(2, intId.getTypeId());
         }
 
         @Override
@@ -153,12 +151,31 @@ public final class ExtIdService {
     }
 
     @Override
-    public void deleteByTypeIds(@Nonnull final List<Integer> idsList) {
+    public void deleteIdPairsByTypeIds(@Nonnull final List<Integer> idsList) {
       if (idsList.isEmpty()) {
         return;
       }
 
       jdbc.batchUpdate("DELETE FROM ext_id WHERE int_type_id=?", new BatchPreparedStatementSetter() {
+        @Override
+        public void setValues(PreparedStatement ps, int i) throws SQLException {
+          ps.setInt(1, idsList.get(i));
+        }
+
+        @Override
+        public int getBatchSize() {
+          return idsList.size();
+        }
+      });
+    }
+
+    @Override
+    public void deleteIdPairsByGroupIds(@Nonnull final List<Integer> idsList) {
+      if (idsList.isEmpty()) {
+        return;
+      }
+
+      jdbc.batchUpdate("DELETE FROM ext_id WHERE ext_group_id=?", new BatchPreparedStatementSetter() {
         @Override
         public void setValues(PreparedStatement ps, int i) throws SQLException {
           ps.setInt(1, idsList.get(i));
@@ -305,13 +322,12 @@ public final class ExtIdService {
     }
   }
 
-  private static final class ExtIdRowMapper implements RowMapper<ExtId.Id> {
+  private static final class IdPairRowMapper implements RowMapper<ExtId.IdPair> {
 
     @Override
-    public ExtId.Id mapRow(ResultSet rs, int i) throws SQLException {
-      return ExtId.Id.newBuilder()
-          .setIntId(rs.getLong("int_id"))
-          .setTypeId(rs.getInt("int_type_id"))
+    public ExtId.IdPair mapRow(ResultSet rs, int i) throws SQLException {
+      return ExtId.IdPair.newBuilder()
+          .setIntId(ExtId.IntId.newBuilder().setId(rs.getLong("int_id")).setTypeId(rs.getInt("int_type_id")).build())
           .setExtId(rs.getString("ext_id"))
           .setGroupId(rs.getInt("ext_group_id"))
           .build();
@@ -320,5 +336,5 @@ public final class ExtIdService {
 
   private static final TypeRowMapper TYPE_ROW_MAPPER = new TypeRowMapper();
   private static final GroupRowMapper GROUP_ROW_MAPPER = new GroupRowMapper();
-  private static final ExtIdRowMapper EXT_ID_MAPPER = new ExtIdRowMapper();
+  private static final IdPairRowMapper ID_PAIR_MAPPER = new IdPairRowMapper();
 }

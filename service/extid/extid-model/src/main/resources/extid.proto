@@ -31,34 +31,43 @@ message Group {
   required string code = 2;
 }
 
-message Id {
-  required int64 intId = 1;
-  required int32 typeId = 3;
+message IntId {
+  required int64 id = 1;
+  required int32 typeId = 2;
+}
+
+message IdPair {
+  required IntId intId = 1;
   required string extId = 2;
-  optional int32 groupId = 4;
+  required int32 groupId = 3;
 }
 
-message QueryByInternalIds {
-  repeated int64 intIds = 1;
-  repeated int32 typeIds = 2;
-  repeated int32 groupIds = 3; /* will be ignored if includeAllGroupIds=true */
-  required bool includeAllGroupIds = 4;
+message QueryIdPairs {
+  repeated IntId intIds = 1;
+
+  repeated int32 groupIds = 2; /* will be ignored if includeAllGroupIds=true */
+
+  required bool includeAllGroupIds = 3;
 }
 
-message IdList {
-  repeated Id ids = 1;
+message IdPairList {
+  repeated IdPair idPairs = 1;
 }
 
-message SaveIdRequest {
-  repeated Id ids = 1;
+message SaveIdPairsRequest {
+  repeated IdPair idPairs = 1;
 }
 
-message DeleteByIntIdRequest {
-  repeated int64 intIds = 1;
+message DeleteIdPairsByIntIdsRequest {
+  repeated IntId intIds = 1;
 }
 
-message DeleteByTypeRequest {
+message DeleteIdPairsByTypesRequest {
   repeated int32 typeIds = 1;
+}
+
+message DeleteIdPairsByGroupsRequest {
+  repeated int32 groupIds = 1;
 }
 
 message GetGroupByIdRequest {
