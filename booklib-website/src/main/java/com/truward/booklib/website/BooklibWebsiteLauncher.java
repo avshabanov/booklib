@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Application entry point.
  *
  * @author Alexander Shabanov
  */
