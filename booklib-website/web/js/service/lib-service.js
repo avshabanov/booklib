@@ -108,7 +108,7 @@ AjaxLibService.prototype.getStorefrontPage = function () {
 
 AjaxLibService.prototype.getBooks = function (booksId) {
   var result = [];
-    return devUtil.newResolvableDelayedPromise(result);
+  return devUtil.newResolvableDelayedPromise(result);
 }
 
 //

@@ -2,6 +2,7 @@
 -- NOTE: There should be no zero values assigned to 'id' fields.
 
 INSERT INTO int_type (id, name) VALUES (10, 'BOOK');
+INSERT INTO int_type (id, name) VALUES (11, 'PERSON');
 
 INSERT INTO ext_group (id, name) VALUES (20, 'eBay');
 INSERT INTO ext_group (id, name) VALUES (21, 'AmazonKindleStore');

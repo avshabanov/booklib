@@ -1,5 +1,4 @@
 module.exports = function(grunt) {
-  //var dst = '../target/';
   function target(path) {
     return 'target/' + path;
   }

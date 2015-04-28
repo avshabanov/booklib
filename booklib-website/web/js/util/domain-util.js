@@ -2,17 +2,27 @@
  * This module defines utility functions for working with the domain model.
  */
 
-
-function selectById(list, id) {
+function selectFirst(list, fieldName, fieldValue, defaultValueProviderFn) {
   var i;
 
+  if (defaultValueProviderFn == null) {
+    defaultValueProviderFn = function () {
+      throw new Error('No element in the list=' + list + ' with ' +
+        fieldName + '=' + fieldValue);
+    }
+  }
+
   for (i = 0; i < list.length; ++i) {
-    if (list[i].id == id) {
+    if (list[i][fieldName] == fieldValue) {
       return list[i];
     }
   }
 
-  throw new Error('No element in the list=' + list + ' with id=' + id);
+  return defaultValueProviderFn();
+}
+
+function selectById(list, id) {
+  return selectFirst(list, "id", id);
 }
 
 function selectByIds(itemList, idList) {
@@ -28,5 +38,6 @@ function selectByIds(itemList, idList) {
 // Exports
 //
 
+module.exports.selectFirst = selectFirst;
 module.exports.selectById = selectById;
 module.exports.selectByIds = selectByIds;

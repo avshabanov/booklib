@@ -2,7 +2,7 @@
 
 var rsvp = require('rsvp');
 
-var DELAY = 800;
+var DELAY = 500;
 
 function newResolvableDelayedPromise(data, delay) {
   delay = delay | DELAY;
