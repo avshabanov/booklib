@@ -12,7 +12,7 @@
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="locations">
       <util:list>
-        <value>classpath:/eidService/core.properties</value>
+        <value>classpath:/p13nService/core.properties</value>
         <value>${brikar.settings.path}</value>
       </util:list>
     </property>
@@ -21,5 +21,5 @@
   <import resource="dao/datasource.xml"/>
   <import resource="dao/dao.xml"/>
   <import resource="dao/tx.xml"/>
-  <import resource="service-beans.xml" />
+  <import resource="service-beans.xml"/>
 </beans>

@@ -1,6 +1,6 @@
-package truward.booklib.extid;
+package truward.extid;
 
-option java_package = "com.truward.booklib.extid.model";
+option java_package = "com.truward.extid.model";
 option java_outer_classname = "ExtId";
 
 /* Type of external ID */

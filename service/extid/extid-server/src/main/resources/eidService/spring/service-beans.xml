@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+  <bean id="eidService.service.typesService" class="com.truward.extid.server.service.TypesService$Impl">
+    <constructor-arg ref="eidService.dao.jdbcTemplate" />
+  </bean>
+
+  <bean id="eidService.service.groupsService" class="com.truward.extid.server.service.GroupsService$Impl">
+    <constructor-arg ref="eidService.dao.jdbcTemplate" />
+  </bean>
+
+  <bean id="eidService.service.idPairsService" class="com.truward.extid.server.service.IdPairsService$Impl">
+    <constructor-arg ref="eidService.dao.jdbcTemplate" />
+  </bean>
+</beans>

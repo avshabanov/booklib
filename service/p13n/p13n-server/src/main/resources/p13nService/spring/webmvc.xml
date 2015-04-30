@@ -10,16 +10,8 @@
   <context:annotation-config/>
 
   <!-- Controllers -->
-  <bean class="com.truward.extid.server.controller.TypesRestController">
-    <constructor-arg ref="eidService.service.typesService"/>
-  </bean>
-
-  <bean class="com.truward.extid.server.controller.GroupsRestController">
-    <constructor-arg ref="eidService.service.groupsService"/>
-  </bean>
-
-  <bean class="com.truward.extid.server.controller.IdPairsRestController">
-    <constructor-arg ref="eidService.service.idPairsService"/>
+  <bean class="com.truward.p13n.server.controller.FavoritesRestController">
+    <constructor-arg ref="p13nService.service.favoritesService"/>
   </bean>
 
   <!-- Annotation driven support for MVC controllers -->

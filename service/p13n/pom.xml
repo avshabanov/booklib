@@ -15,7 +15,7 @@
 
   <modules>
     <module>p13n-model</module>
-    <!--<module>p13n-server</module>-->
+    <module>p13n-server</module>
   </modules>
 </project>
 

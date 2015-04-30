@@ -1,7 +1,9 @@
 package com.truward.booklib.book.server.test;
 
-import com.truward.booklib.extid.model.ExtId;
-import com.truward.booklib.extid.server.service.EidService;
+import com.truward.extid.model.ExtId;
+import com.truward.extid.server.service.GroupsService;
+import com.truward.extid.server.service.IdPairsService;
+import com.truward.extid.server.service.TypesService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -13,16 +15,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Alexander Shabanov
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/spring/EidServiceTest-context.xml")
+@ContextConfiguration(locations = "/spring/ServiceTest-context.xml")
 @Transactional
-public final class EidServiceTest {
-  @Resource EidService.Contract extidService;
+public final class ServiceTest {
+  @Resource TypesService.Contract typesService;
+  @Resource GroupsService.Contract groupsService;
+  @Resource IdPairsService.Contract idPairsService;
 
   @Test
   public void shouldQueryAllIds() {
@@ -32,7 +38,7 @@ public final class EidServiceTest {
         .build();
 
     // When:
-    final List<ExtId.IdPair> list = extidService.queryIdPairs(request);
+    final List<ExtId.IdPair> list = idPairsService.queryIdPairs(request);
 
     // Then:
     assertFalse(list.isEmpty());
@@ -44,7 +50,7 @@ public final class EidServiceTest {
     final ExtId.QueryIdPairs request = ExtId.QueryIdPairs.newBuilder().setIncludeAllGroupIds(true).build();
 
     // When:
-    final List<ExtId.IdPair> list = extidService.queryIdPairs(request);
+    final List<ExtId.IdPair> list = idPairsService.queryIdPairs(request);
 
     // Then:
     assertTrue(list.isEmpty());
@@ -53,10 +59,11 @@ public final class EidServiceTest {
   @Test
   public void shouldGetType() {
     // When:
-    final List<ExtId.Type> types = extidService.getTypes();
+    final List<ExtId.Type> types = typesService.getTypes();
 
     // Then:
-    assertEquals(Collections.singletonList(ExtId.Type.newBuilder().setId(10).setName("BOOK").build()), types);
+    assertEquals(Arrays.asList(ExtId.Type.newBuilder().setId(10).setName("BOOK").build(),
+        ExtId.Type.newBuilder().setId(11).setName("PERSON").build()), types);
   }
 
   @Test
@@ -66,11 +73,12 @@ public final class EidServiceTest {
     final ExtId.Type type2 = ExtId.Type.newBuilder().setName("MOVIE").build();
 
     // When:
-    extidService.saveType(type1);
-    extidService.saveType(type2);
+    typesService.saveType(type1);
+    typesService.saveType(type2);
 
     // Then:
-    assertEquals(Arrays.asList(type1, ExtId.Type.newBuilder(type2).setId(50).build()), extidService.getTypes());
+    assertEquals(Arrays.asList(type1, ExtId.Type.newBuilder().setId(11).setName("PERSON").build(),
+        ExtId.Type.newBuilder(type2).setId(50).build()), typesService.getTypes());
   }
 
   @Test
@@ -80,7 +88,7 @@ public final class EidServiceTest {
     final ExtId.Group group2 = ExtId.Group.newBuilder().setCode("7wonders").build();
 
     // When:
-    final List<Integer> ids = extidService.saveGroups(Arrays.asList(group1, group2));
+    final List<Integer> ids = groupsService.saveGroups(Arrays.asList(group1, group2));
 
     // Then:
     assertEquals(Arrays.asList(20, 1500), ids);
@@ -89,11 +97,11 @@ public final class EidServiceTest {
   @Test
   public void shouldDeleteGroup() {
     // When:
-    extidService.deleteIdPairsByIntIds(Collections.singletonList(ExtId.IntId.newBuilder().setId(3L).setTypeId(10).build()));
-    extidService.deleteGroups(Collections.singletonList(20));
+    idPairsService.deleteIdPairsByIntIds(Collections.singletonList(ExtId.IntId.newBuilder().setId(3L).setTypeId(10).build()));
+    groupsService.deleteGroups(Collections.singletonList(20));
 
     // Then:
-    final List<ExtId.Group> groups = extidService.getGroups();
+    final List<ExtId.Group> groups = groupsService.getGroups();
     assertEquals(3, groups.size());
   }
 }

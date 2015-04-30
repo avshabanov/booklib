@@ -33,10 +33,6 @@
 
   <bean id="eidService.dao.dataSource" factory-bean="test.dao.databaseFactory" factory-method="getDatabase" destroy-method="shutdown" />
 
-  <import resource="classpath:/eidService/spring/dao/dao-context.xml" />
-
-  <!-- Service -->
-  <bean class="com.truward.booklib.extid.server.service.EidService$Impl">
-    <constructor-arg ref="eidService.dao.jdbcTemplate" />
-  </bean>
+  <import resource="classpath:/eidService/spring/dao/dao.xml" />
+  <import resource="classpath:/eidService/spring/service-beans.xml" />
 </beans>

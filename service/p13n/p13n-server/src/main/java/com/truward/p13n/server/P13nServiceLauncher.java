@@ -1,4 +1,4 @@
-package com.truward.booklib.extid.server;
+package com.truward.p13n.server;
 
 import com.truward.brikar.server.auth.SimpleAuthenticatorUtil;
 import com.truward.brikar.server.auth.SimpleServiceUser;
@@ -11,10 +11,10 @@ import java.util.Collections;
 /**
  * @author Alexander Shabanov
  */
-public final class EidServerLauncher extends StandardLauncher {
+public final class P13nServiceLauncher extends StandardLauncher {
 
   public static void main(String[] args) throws Exception {
-    new EidServerLauncher().setDefaultDirPrefix("classpath:/eidService/").start(args);
+    new P13nServiceLauncher().setDefaultDirPrefix("classpath:/p13nService/").start(args);
   }
 
   //

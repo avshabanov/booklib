@@ -1,7 +1,12 @@
-package truward.booklib.p13n;
+package truward.p13n;
 
-option java_package = "com.truward.booklib.p13n.model";
+option java_package = "com.truward.p13n.model";
 option java_outer_classname = "P13n";
+
+message ExtId {
+  required int32 type = 1; // from extid
+  required int64 id = 2;
+}
 
 /*
  *
@@ -9,19 +14,46 @@ option java_outer_classname = "P13n";
  *
  */
 
-message GetFavoritesRequest {
+message GetAllFavoritesRequest {
   required int64 userId = 1;
   repeated int32 types = 2;
 }
 
-message GetFavoritesResponse {
-  message Element {
+message GetAllFavoritesResponse {
+  message Entry {
     required int32 type = 1; // from extid
     repeated int64 ids = 2;
   }
 
-  repeated Element elements = 1;
+  repeated Entry entries = 1;
 }
+
+message GetFavoritesRequest {
+  required int64 userId = 1;
+  repeated ExtId extIds = 2;
+}
+
+message GetFavoritesResponse {
+  repeated ExtId extIds = 1;
+}
+
+message SetFavoritesRequest {
+  required int64 userId = 1;
+
+  message Entry {
+    required ExtId extId = 1;
+    required bool favorite = 3;
+  }
+
+  repeated Entry entries = 2;
+}
+
+
+/*
+ *
+ * Comments and overviews
+ *
+ */
 
 enum ContentFormatKind {
   PLAIN_TEXT = 1;
@@ -29,16 +61,14 @@ enum ContentFormatKind {
 
 message Comment {
   optional int64 id = 1;
-  required int64 parentItemId = 2;
-  required int32 parentItemType = 3;
+  required ExtId extId = 2;
   required string content = 4;
   required ContentFormatKind contentFormatKind = 5;
 }
 
 message Overview {
   optional int64 id = 1;
-  required int64 parentItemId = 2;
-  required int32 parentItemType = 3;
+  required ExtId extId = 3;
   required string content = 4;
   required ContentFormatKind contentFormatKind = 5;
 }
