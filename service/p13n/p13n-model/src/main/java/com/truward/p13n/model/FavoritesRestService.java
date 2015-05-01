@@ -14,7 +14,7 @@ public interface FavoritesRestService {
 
   @RequestMapping(value = "/items/query", method = RequestMethod.POST)
   @ResponseBody
-  P13n.GetFavoritesResponse getFavorites(@RequestBody P13n.GetFavoritesResponse request);
+  P13n.GetFavoritesResponse getFavorites(@RequestBody P13n.GetFavoritesRequest request);
 
   @RequestMapping(value = "/items", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.NO_CONTENT)
