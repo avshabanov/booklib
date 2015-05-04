@@ -1,7 +1,9 @@
 package com.truward.booklib.model;
 
 /**
+ * TODO: remove, if needed.
+ *
  * @author Alexander Shabanov
  */
-public class AjaxRestService {
+public interface AjaxRestService {
 }

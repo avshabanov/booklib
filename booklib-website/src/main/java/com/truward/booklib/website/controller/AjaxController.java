@@ -1,8 +1,10 @@
 package com.truward.booklib.website.controller;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.truward.booklib.book.model.BookModel;
 import com.truward.booklib.book.model.BookRestService;
-import com.truward.booklib.model.BooklibModel;
+import com.truward.booklib.model.AjaxRestService;
+import com.truward.booklib.model.Booklib;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +16,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/rest/ajax/")
-public final class AjaxController {
+public final class AjaxController implements AjaxRestService {
   private final BookRestService bookService;
 
   private final List<Long> favBooks = Arrays.asList(1L, 4L, 5L);
@@ -30,20 +32,14 @@ public final class AjaxController {
 
   @RequestMapping(value = "/p13n/favorites", method = RequestMethod.GET)
   @ResponseBody
-  public BooklibModel.GetFavoritesResponse getFavorites() {
-    return BooklibModel.GetFavoritesResponse.newBuilder()
-        .setFavorites(BooklibModel.GetFavoritesResponse.Favorites.newBuilder()
+  public Booklib.GetFavoritesResponse getFavorites() {
+    return Booklib.GetFavoritesResponse.newBuilder()
+        .setFavorites(Booklib.GetFavoritesResponse.Favorites.newBuilder()
             .addAllBookIds(favBooks)
             .addAllPersonIds(favPersons)
             .build())
         .build();
   }
-
-//  @RequestMapping(value = "/p13n/favorites", method = RequestMethod.PUT)
-//  @ResponseBody
-//  public BookModel.BookPageIds savePage() {
-//    return bookService.savePage(request);
-//  }
 
   //
   // Book API
@@ -51,15 +47,16 @@ public final class AjaxController {
 
   @RequestMapping(value = "/books/page", method = RequestMethod.PUT)
   @ResponseBody
-  public BookModel.BookPageIds savePage(@RequestBody BookModel.BookPageData request) {
-    return bookService.savePage(request);
+  public Booklib.BookPageIds savePage(@RequestBody BookModel.BookPageData request) {
+    return from(bookService.savePage(request));
   }
 
   @RequestMapping(value = "/books/page", method = RequestMethod.DELETE)
   @ResponseBody
-  public BookModel.BookPageIds delete(@RequestBody BookModel.BookPageIds request) {
-    return bookService.delete(request);
+  public Booklib.BookPageIds delete(@RequestBody BookModel.BookPageIds request) {
+    return from(bookService.delete(request));
   }
+
 
   @RequestMapping(value = "/books/query", method = RequestMethod.POST)
   @ResponseBody
@@ -98,5 +95,20 @@ public final class AjaxController {
   @RequestMapping(value = "/series/query", method = RequestMethod.POST)
   public BookModel.NamedValueList querySeries(@RequestBody BookModel.SeriesQuery query) {
     return bookService.querySeries(query);
+  }
+
+  //
+  // Private
+  //
+
+  private static Booklib.BookPageIds from(BookModel.BookPageIds value) {
+    try {
+      return Booklib.BookPageIds.newBuilder()
+          // TODO: this is *VERY* hacky way of copying protobuf objects with the same layout, it needs to be replaced
+          .mergeFrom(value.toByteString())
+          .build();
+    } catch (InvalidProtocolBufferException e) {
+      throw new IllegalStateException(e);
+    }
   }
 }
