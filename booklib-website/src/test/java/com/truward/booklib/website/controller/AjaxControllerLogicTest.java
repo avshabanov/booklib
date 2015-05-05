@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Alexander Shabanov
  */
-public class AjaxControllerTest {
+public class AjaxControllerLogicTest {
   private BookRestService bookRestService = mock(BookRestService.class);
   private AjaxController controller = new AjaxController(bookRestService);
 

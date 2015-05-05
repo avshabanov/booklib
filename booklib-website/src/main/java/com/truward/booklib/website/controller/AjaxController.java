@@ -1,6 +1,5 @@
 package com.truward.booklib.website.controller;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.truward.booklib.book.model.BookModel;
 import com.truward.booklib.book.model.BookRestService;
 import com.truward.booklib.model.AjaxRestService;
@@ -72,19 +71,19 @@ public final class AjaxController implements AjaxRestService {
 
   @RequestMapping(value = "/genres", method = RequestMethod.GET)
   @ResponseBody
-  public BookModel.NamedValueList getGenres() {
-    return bookService.getGenres();
+  public Booklib.NamedValueList getGenres() {
+    return from(bookService.getGenres());
   }
 
   @RequestMapping(value = "/languages", method = RequestMethod.GET)
   @ResponseBody
-  public BookModel.NamedValueList getLanguages() {
-    return bookService.getLanguages();
+  public Booklib.NamedValueList getLanguages() {
+    return from(bookService.getLanguages());
   }
 
   @RequestMapping(value = "/persons/query", method = RequestMethod.POST)
-  public BookModel.NamedValueList queryPersons(@RequestBody BookModel.PersonListQuery query) {
-    return bookService.queryPersons(query);
+  public Booklib.NamedValueList queryPersons(@RequestBody BookModel.PersonListQuery query) {
+    return from(bookService.queryPersons(query));
   }
 
   @RequestMapping(value = "/persons/hint", method = RequestMethod.POST)
@@ -93,22 +92,37 @@ public final class AjaxController implements AjaxRestService {
   }
 
   @RequestMapping(value = "/series/query", method = RequestMethod.POST)
-  public BookModel.NamedValueList querySeries(@RequestBody BookModel.SeriesQuery query) {
-    return bookService.querySeries(query);
+  public Booklib.NamedValueList querySeries(@RequestBody BookModel.SeriesQuery query) {
+    return from(bookService.querySeries(query));
   }
 
   //
   // Private
   //
 
-  private static Booklib.BookPageIds from(BookModel.BookPageIds value) {
-    try {
-      return Booklib.BookPageIds.newBuilder()
-          // TODO: this is *VERY* hacky way of copying protobuf objects with the same layout, it needs to be replaced
-          .mergeFrom(value.toByteString())
-          .build();
-    } catch (InvalidProtocolBufferException e) {
-      throw new IllegalStateException(e);
+  private static Booklib.NamedValueList from(BookModel.NamedValueList value) {
+    final Booklib.NamedValueList.Builder builder = Booklib.NamedValueList.newBuilder();
+    for (final BookModel.NamedValue v : value.getValuesList()) {
+      builder.addValues(from(v));
     }
+    return builder.build();
+  }
+
+  private static Booklib.NamedValue from(BookModel.NamedValue value) {
+    return Booklib.NamedValue.newBuilder()
+        .setId(value.getId())
+        .setName(value.getName())
+        .build();
+  }
+
+  private static Booklib.BookPageIds from(BookModel.BookPageIds value) {
+    return Booklib.BookPageIds.newBuilder()
+        .addAllGenreIds(value.getGenreIdsList())
+        .addAllPersonIds(value.getPersonIdsList())
+        .addAllOriginIds(value.getOriginIdsList())
+        .addAllLanguageIds(value.getLanguageIdsList())
+        .addAllBookIds(value.getBookIdsList())
+        .addAllSeriesIds(value.getSeriesIdsList())
+        .build();
   }
 }
