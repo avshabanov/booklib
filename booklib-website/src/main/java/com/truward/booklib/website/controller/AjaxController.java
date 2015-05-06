@@ -4,6 +4,7 @@ import com.truward.booklib.book.model.BookModel;
 import com.truward.booklib.book.model.BookRestService;
 import com.truward.booklib.model.AjaxRestService;
 import com.truward.booklib.model.Booklib;
+import com.truward.p13n.model.FavoritesRestService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,12 +18,13 @@ import java.util.List;
 @RequestMapping("/rest/ajax/")
 public final class AjaxController implements AjaxRestService {
   private final BookRestService bookService;
+  private final FavoritesRestService favoritesRestService;
 
   private final List<Long> favBooks = Arrays.asList(1L, 4L, 5L);
   private final List<Long> favPersons = Arrays.asList(1L, 2L);
 
   public AjaxController(BookRestService bookService) {
-    this.bookService = bookService;
+    this.bookService = bookService; this.favoritesRestService = null; // TODO: init
   }
 
   //
@@ -32,6 +34,7 @@ public final class AjaxController implements AjaxRestService {
   @RequestMapping(value = "/p13n/favorites", method = RequestMethod.GET)
   @ResponseBody
   public Booklib.GetFavoritesResponse getFavorites() {
+    // TODO: p13n favs
     return Booklib.GetFavoritesResponse.newBuilder()
         .setFavorites(Booklib.GetFavoritesResponse.Favorites.newBuilder()
             .addAllBookIds(favBooks)

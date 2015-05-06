@@ -33,6 +33,16 @@
       <groupId>com.truward.booklib</groupId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <artifactId>p13n-model</artifactId>
+      <groupId>com.truward.booklib</groupId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <artifactId>extid-model</artifactId>
+      <groupId>com.truward.booklib</groupId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Exposure Base -->
     <dependency>
