@@ -18,12 +18,4 @@
       </util:list>
     </property>
   </bean>
-
-  <import resource="classpath:/bookService/spring/dao/datasource-context.xml"/>
-  <import resource="classpath:/bookService/spring/dao/dao-context.xml"/>
-  <import resource="classpath:/bookService/spring/dao/tx-context.xml"/>
-
-  <bean id="bookService.service.bookService" class="com.truward.booklib.book.server.service.BookService">
-    <constructor-arg ref="bookService.dao.jdbcTemplate" />
-  </bean>
 </beans>

@@ -10,7 +10,7 @@
 
   <artifactId>book-model</artifactId>
 
-  <name>Booklib Book Service Model</name>
+  <name>BookService Model</name>
 
   <dependencies>
     <dependency>

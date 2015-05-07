@@ -1,6 +1,6 @@
-package truward.booklib.book;
+package truward.book;
 
-option java_package = "com.truward.booklib.book.model";
+option java_package = "com.truward.book.model";
 option java_outer_classname = "BookModel";
 
 message NamedValue {

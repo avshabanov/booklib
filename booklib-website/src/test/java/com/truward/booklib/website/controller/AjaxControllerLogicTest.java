@@ -1,8 +1,12 @@
 package com.truward.booklib.website.controller;
 
-import com.truward.booklib.book.model.BookModel;
-import com.truward.booklib.book.model.BookRestService;
+import com.truward.book.model.BookModel;
+import com.truward.book.model.BookRestService;
 import com.truward.booklib.model.Booklib;
+import com.truward.extid.model.GroupsRestService;
+import com.truward.extid.model.IdPairsRestService;
+import com.truward.extid.model.TypesRestService;
+import com.truward.p13n.model.FavoritesRestService;
 import org.junit.Test;
 
 import static java.util.Collections.singletonList;
@@ -15,9 +19,15 @@ import static org.mockito.Mockito.when;
 /**
  * @author Alexander Shabanov
  */
-public class AjaxControllerLogicTest {
-  private BookRestService bookRestService = mock(BookRestService.class);
-  private AjaxController controller = new AjaxController(bookRestService);
+public final class AjaxControllerLogicTest {
+  final BookRestService bookRestService = mock(BookRestService.class);
+  final FavoritesRestService favoritesRestService = mock(FavoritesRestService.class);
+  final TypesRestService typesRestService = mock(TypesRestService.class);
+  final GroupsRestService groupsRestService = mock(GroupsRestService.class);
+  final IdPairsRestService idPairsRestService = mock(IdPairsRestService.class);
+
+  final AjaxController controller = new AjaxController(bookRestService, favoritesRestService, typesRestService,
+      groupsRestService, idPairsRestService);
 
   @Test
   public void shouldCopyBookPageIds() {

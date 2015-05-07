@@ -10,7 +10,7 @@
 
   <artifactId>extid-model</artifactId>
 
-  <name>Booklib ExtID Service Model</name>
+  <name>ExtID Service Model</name>
 
   <dependencies>
     <dependency>

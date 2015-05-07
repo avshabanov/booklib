@@ -23,13 +23,16 @@
       <artifactId>logback-classic</artifactId>
     </dependency>
 
+    <!-- Server model dependency -->
     <dependency>
       <artifactId>booklib-model</artifactId>
       <groupId>com.truward.booklib</groupId>
       <version>${project.version}</version>
     </dependency>
+
+    <!-- Client model dependencies -->
     <dependency>
-      <artifactId>book-server</artifactId>
+      <artifactId>book-model</artifactId>
       <groupId>com.truward.booklib</groupId>
       <version>${project.version}</version>
     </dependency>

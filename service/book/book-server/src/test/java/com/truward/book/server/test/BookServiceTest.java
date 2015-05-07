@@ -1,7 +1,7 @@
-package com.truward.booklib.book.server.test;
+package com.truward.book.server.test;
 
-import com.truward.booklib.book.model.BookModel;
-import com.truward.booklib.book.model.BookRestService;
+import com.truward.book.model.BookModel;
+import com.truward.book.server.service.BookService;
 import com.truward.time.UtcTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 @ContextConfiguration(locations = "/spring/BookServiceTest-context.xml")
 @Transactional
 public final class BookServiceTest {
-  @Resource BookRestService bookService;
+  @Resource BookService.Contract bookService;
 
   @Test
   public void shouldFindAndDeleteAll() {

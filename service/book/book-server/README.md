@@ -1,4 +1,18 @@
 
+## Quick Start
+
+In book-server run the following:
+
+```
+mvn exec:java -Dexec.args="--port 9091"
+```
+
+Quick check:
+
+```
+curl -u testonly:test -H 'Accept: application/json' -H "Content-Type: application/json" -X POST -d '{"pageIds": {"bookIds": [1,2,3,4,5,18]}, "fetchBookDependencies": true}' http://127.0.0.1:9091/rest/book/books/page/fetch -s | python -mjson.tool
+```
+
 ## How to create a database
 
 Sample:

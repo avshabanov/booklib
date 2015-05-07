@@ -1,4 +1,4 @@
-package com.truward.booklib.book.server;
+package com.truward.book.server;
 
 import com.truward.brikar.server.auth.SimpleAuthenticatorUtil;
 import com.truward.brikar.server.auth.SimpleServiceUser;

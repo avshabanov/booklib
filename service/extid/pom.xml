@@ -11,7 +11,7 @@
   <artifactId>extid</artifactId>
 
   <packaging>pom</packaging>
-  <name>Booklib ExtID Service</name>
+  <name>ExtID Service</name>
 
   <modules>
     <module>extid-model</module>

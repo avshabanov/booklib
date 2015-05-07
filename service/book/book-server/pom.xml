@@ -110,6 +110,19 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <!-- Execution from the command line - mvn exec:java starts the server -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <configuration>
+          <mainClass>${launcher.mainClass}</mainClass>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
       <id>assembly</id>
@@ -154,16 +167,6 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>
-
-          <!-- Execution from the command line - mvn exec:java starts the server -->
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.2.1</version>
-            <configuration>
-              <mainClass>${launcher.mainClass}</mainClass>
-            </configuration>
           </plugin>
         </plugins>
       </build>

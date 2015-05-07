@@ -34,9 +34,5 @@
   <bean id="bookService.dao.dataSource" factory-bean="test.dao.databaseFactory" factory-method="getDatabase" destroy-method="shutdown" />
 
   <import resource="classpath:/bookService/spring/dao/dao-context.xml" />
-
-  <!-- Service -->
-  <bean class="com.truward.booklib.book.server.service.BookService">
-    <constructor-arg ref="bookService.dao.jdbcTemplate" />
-  </bean>
+  <import resource="classpath:/bookService/spring/service-beans.xml"/>
 </beans>

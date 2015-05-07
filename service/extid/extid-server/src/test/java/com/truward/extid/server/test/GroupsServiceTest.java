@@ -1,4 +1,4 @@
-package com.truward.booklib.book.server.test;
+package com.truward.extid.server.test;
 
 import com.truward.extid.model.ExtId;
 import com.truward.extid.server.service.GroupsService;

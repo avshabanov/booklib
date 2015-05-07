@@ -10,7 +10,7 @@
   <context:annotation-config/>
 
   <!-- Controllers -->
-  <bean class="com.truward.booklib.book.server.controller.BookRestController">
+  <bean class="com.truward.book.server.controller.BookRestController">
     <constructor-arg ref="bookService.service.bookService"/>
   </bean>
 

@@ -1,6 +1,6 @@
-package com.truward.booklib.book.server.util;
+package com.truward.book.server.util;
 
-import com.truward.booklib.book.model.BookModel;
+import com.truward.book.model.BookModel;
 
 import javax.annotation.Nonnull;
 

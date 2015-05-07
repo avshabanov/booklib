@@ -1,7 +1,7 @@
-package com.truward.booklib.book.server.test;
+package com.truward.book.server.test;
 
-import com.truward.booklib.book.model.BookModel;
-import com.truward.booklib.book.model.BookRestService;
+import com.truward.book.model.BookModel;
+import com.truward.book.server.service.BookService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 @ContextConfiguration(locations = "/spring/BookServiceTest-context.xml")
 @Transactional
 public final class BookServiceQueryTest {
-  @Resource BookRestService bookService;
+  @Resource BookService.Contract bookService;
 
   @Test
   public void shouldReturnEmptyList() {

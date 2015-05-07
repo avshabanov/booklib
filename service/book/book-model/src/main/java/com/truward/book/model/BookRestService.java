@@ -1,4 +1,4 @@
-package com.truward.booklib.book.model;
+package com.truward.book.model;
 
 import org.springframework.web.bind.annotation.*;
 

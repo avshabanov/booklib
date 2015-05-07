@@ -1,3 +1,13 @@
+
+
+## Quick Start
+
+In extid-server run the following:
+
+```
+mvn exec:java -Dexec.args="--port 9093"
+```
+
 ## Sample invocation
 
 Query IDs:

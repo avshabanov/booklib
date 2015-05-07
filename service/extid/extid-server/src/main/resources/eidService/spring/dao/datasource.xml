@@ -5,9 +5,9 @@
 
   <bean id="eidService.dao.dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
     <property name="driverClass"      value="org.h2.Driver" />
-    <property name="jdbcUrl"          value="${booklib.eidService.dao.dataSource.url}" />
-    <property name="user"             value="${booklib.eidService.dao.dataSource.username}" />
-    <property name="password"         value="${booklib.eidService.dao.dataSource.password}" />
+    <property name="jdbcUrl"          value="${eidService.dao.dataSource.url}" />
+    <property name="user"             value="${eidService.dao.dataSource.username}" />
+    <property name="password"         value="${eidService.dao.dataSource.password}" />
 
     <property name="minPoolSize"      value="2" /> <!-- ~3-5 for HL app, usually 4 -->
     <property name="initialPoolSize"  value="2" /> <!-- matches minPoolSize -->
@@ -28,7 +28,7 @@
   <!-- Book DB initializer -->
 
   <bean id="eidService.dao.initScripts" class="java.lang.String">
-    <constructor-arg value="${booklib.eidService.dao.initScripts}" />
+    <constructor-arg value="${eidService.dao.initScripts}" />
   </bean>
 
   <bean class="org.springframework.jdbc.datasource.init.DataSourceInitializer">

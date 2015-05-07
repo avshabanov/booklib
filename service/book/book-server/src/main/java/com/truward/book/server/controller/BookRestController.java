@@ -1,10 +1,13 @@
-package com.truward.booklib.book.server.controller;
+package com.truward.book.server.controller;
 
-import com.truward.booklib.book.model.BookModel;
-import com.truward.booklib.book.model.BookRestService;
+import com.truward.book.model.BookModel;
+import com.truward.book.model.BookRestService;
+import com.truward.book.server.service.BookService;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Nonnull;
 
@@ -15,9 +18,9 @@ import javax.annotation.Nonnull;
 @Controller
 @RequestMapping("/rest/book")
 public final class BookRestController implements BookRestService {
-  private final BookRestService bookService;
+  private final BookService.Contract bookService;
 
-  public BookRestController(@Nonnull BookRestService bookService) {
+  public BookRestController(@Nonnull BookService.Contract bookService) {
     Assert.notNull(bookService, "bookService");
     this.bookService = bookService;
   }
