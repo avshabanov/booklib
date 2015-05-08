@@ -18,4 +18,6 @@
       </util:list>
     </property>
   </bean>
+
+  <import resource="service-3p-clients.xml" />
 </beans>

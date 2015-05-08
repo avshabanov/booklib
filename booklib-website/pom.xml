@@ -53,6 +53,12 @@
       <artifactId>brikar-server</artifactId>
     </dependency>
 
+    <!-- Client binder -->
+    <dependency>
+      <groupId>com.truward.brikar</groupId>
+      <artifactId>brikar-client</artifactId>
+    </dependency>
+
     <!-- Protobuf Message Converters -->
     <dependency>
       <groupId>com.truward.brikar.protobuf</groupId>

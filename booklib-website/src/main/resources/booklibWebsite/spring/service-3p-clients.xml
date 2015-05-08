@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="booklib.restBinder" class="com.truward.brikar.client.rest.support.StandardRestBinder">
+    <constructor-arg>
+      <bean class="com.truward.brikar.protobuf.http.ProtobufHttpMessageConverter" />
+    </constructor-arg>
+  </bean>
+
+  <bean id="booklib.p13n.favoritesRestClientBuilder" factory-bean="booklib.restBinder" factory-method="newClient">
+    <constructor-arg value="com.truward.p13n.model.FavoritesRestService" />
+    <property name="username" value="" />
+    <property name="password" value="" />
+  </bean>
+</beans>
