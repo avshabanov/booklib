@@ -31,8 +31,8 @@ CREATE TABLE ext_id (
 -- Sequences
 --
 
-CREATE SEQUENCE seq_type        START WITH 50;
-CREATE SEQUENCE seq_group       START WITH 1500;
+CREATE SEQUENCE seq_type        START WITH 1000000;
+CREATE SEQUENCE seq_group       START WITH 2000000;
 
 --
 -- Indexes

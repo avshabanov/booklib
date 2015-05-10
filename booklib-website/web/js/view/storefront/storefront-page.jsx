@@ -11,7 +11,7 @@ module.exports = React.createClass({
     var booksPromise = this.props.services.libService.getStorefrontPage();
     booksPromise.then(function (storefrontModel) {
       if (!this.isMounted()) { return; } // ignore
-
+      document.title = "Booklib \u00BB Favorites";
       var favs = storefrontModel.favorites;
       this.setState({loading: false, books: favs.books, persons: favs.persons});
     }.bind(this));

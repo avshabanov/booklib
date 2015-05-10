@@ -51,8 +51,8 @@ module.exports = React.createClass({
   componentDidMount: function() {
     var bookPromise = this.props.services.libService.getBookPage(this.props.bookId);
     bookPromise.then(function (pageModel) {
-      if (!this.isMounted()) { return; } // ignore
-
+      if (!this.isMounted()) { return; }
+      document.title = "Booklib \u00BB " + pageModel.book.title;
       this.setState({loading: false, book: pageModel.book});
     }.bind(this));
   },
@@ -69,54 +69,3 @@ module.exports = React.createClass({
     return renderBook(this.state.book);
   }
 });
-
-/*
-    <h2>${book.meta.title}</h2>
-
-    <hr/>
-
-    <table className="book-info">
-      <tbody>
-        <tr>
-          <td>ID:</td>
-          <td>${book.meta.id?c}</td>
-        </tr>
-        <tr>
-          <td>Authors:</td>
-          <td>
-            <#list book.authors as author>
-              <a href="/g/author/${author.id?c}" title="${author.name?html}">${author.name?html}</a><#if author_has_next>,&nbsp</#if>
-            </#list>
-          </td>
-        </tr>
-        <tr>
-          <td>Genres:</td>
-          <td>
-            <#list book.genres as genre>
-              <a href="/g/genre/${genre.id?c}" title="${genre.name?html}">${genre.name}</a><#if genre_has_next>,&nbsp</#if>
-            </#list>
-          </td>
-        </tr>
-        <tr>
-          <td>File Size:</td>
-          <td>${book.meta.fileSize?c} byte(s)</td>
-        </tr>
-        <tr>
-          <td>Add Date:</td>
-          <td>${book.meta.addDate}</td>
-        </tr>
-        <tr>
-          <td>Language:</td>
-          <td><a href="/g/language/{book.landId}">${book.meta.lang.name?html}</a></td>
-        </tr>
-        <tr>
-          <td>Origin:</td>
-          <td>${book.meta.origin?html}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <hr/>
-
-    <h3><a href="/g/book/{book.id}/download">Download&nbsp;<span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></h3>
-*/

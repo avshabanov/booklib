@@ -4,7 +4,6 @@ var Dispatcher = require('./view/dispatcher.js');
 var LibService = require('./service/lib-service.js').LibService;
 
 window.onload = function () {
-  console.log("main (5)");
   var services = {
     libService: new LibService()
   };

@@ -38,6 +38,14 @@ This is the sample configuration for logging used for dev purposes:
 This configuration tells slf4j to use ROLLING_FILE appender and log everything to the files starting
 with ``/tmp/devlog-booklib`` path.
 
+### Grunt Dev
+
+```
+npm install --save-dev
+./node_modules/grunt-cli/bin/grunt
+./node_modules/grunt-cli/bin/grunt watch
+```
+
 ### How to run web client test
 
 ``npm test`` in web dir.
