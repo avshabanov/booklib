@@ -27,7 +27,7 @@ function getBookData(page, book) {
   return {
     id: book["id"],
     title: book["title"],
-    addDate: book["addDate"],
+    addDate: new Date(book["addDate"]).toGMTString(),
     lang: domainUtil.selectById(page["languages"], book["langId"]),
     origin: domainUtil.selectById(page["origins"], book["originId"]),
     persons: persons,
@@ -111,10 +111,47 @@ AjaxLibService.prototype.getBooks = function (booksId) {
   return devUtil.newResolvableDelayedPromise(result);
 }
 
-//
-// StubLibService
-//
+AjaxLibService.prototype.getBookPage = function (bookId) {
+  if (typeof(bookId) === "string") {
+    bookId = parseInt(bookId); // TODO: remove this, make sure dispatcher makes all the appropriate conversions
+  }
 
+  var promise = ajax.request("POST", "/rest/ajax/books/page/fetch", {
+    "pageIds": {
+      "bookIds": [bookId],
+      "personIds": []
+    },
+    "fetchBookDependencies": true
+  });
+
+  // [2] transform the data
+  promise = promise.then(function (response) {
+    return new rsvp.Promise(function (resolve, reject) {
+      if (!("books" in response) || (response["books"].length != 1)) {
+        // TODO: reusable error reporting function
+        console.error("source data is malformed: response", response);
+      }
+      var bm = response["books"][0];
+      //console.log("bm=", bm)
+      var bookData = getBookData(response, bm);
+      //console.log("bookData=", bookData)
+      return resolve({book: bookData});
+    });
+  }, ajax.onError);
+
+  return promise;
+}
+
+/*
+{
+  id: 123,
+  title: 'Sample Book',
+  addDate: 123000000,
+  lang: {id: 1000, name: "en"},
+  persons: [{id: 3000, name: "Alex"}],
+  genres: [{id: 4000, name: "sf"}]
+}
+*/
 
 //
 // exports

@@ -40,7 +40,9 @@ function request(method, url, requestBody) {
 
 function onError(xmlHttpRequest) {
   // TODO: better error handling
-  console.error("AJAX error: " + xmlHttpRequest);
+  window.lastXhr = xmlHttpRequest; // TODO: hooks, make sure this is used for debug purposes only: record last XHR
+  console.error("AJAX error, status:", xmlHttpRequest.status, xmlHttpRequest.statusText,
+    "responseURL:", xmlHttpRequest.responseURL);
 }
 
 //

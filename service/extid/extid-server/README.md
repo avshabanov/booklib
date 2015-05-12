@@ -8,6 +8,8 @@ In extid-server run the following:
 mvn exec:java -Dexec.args="--port 9093"
 ```
 
+Or do just ``mvn exec:java``, port will be picked from default args which is ``9093``.
+
 ## Sample invocation
 
 Query IDs:

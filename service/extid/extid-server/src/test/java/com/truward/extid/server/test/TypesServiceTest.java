@@ -45,6 +45,6 @@ public final class TypesServiceTest {
 
     // Then:
     assertEquals(Arrays.asList(type1, ExtId.Type.newBuilder().setId(11).setName("PERSON").build(),
-        ExtId.Type.newBuilder(type2).setId(50).build()), typesService.getTypes());
+        ExtId.Type.newBuilder(type2).setId(1000000).build()), typesService.getTypes());
   }
 }

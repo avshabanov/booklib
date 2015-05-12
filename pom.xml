@@ -31,7 +31,7 @@
     <spring.security.version>4.0.0.RELEASE</spring.security.version>
 
 
-    <apache.httpcomponents.version>4.2.1</apache.httpcomponents.version>
+    <apache.httpcomponents.version>4.4</apache.httpcomponents.version>
 
     <jackson.version>2.4.2</jackson.version>
 
@@ -374,5 +374,17 @@
       <artifactId>mockito-all</artifactId>
     </dependency>
   </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.2.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>
 

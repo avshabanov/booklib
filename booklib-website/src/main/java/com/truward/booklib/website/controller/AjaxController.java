@@ -64,7 +64,7 @@ public final class AjaxController implements AjaxRestService {
 
   @PostConstruct
   public void initTypes() {
-    if (typesRestService.hashCode() == 100) {
+    if (System.currentTimeMillis() == 100) {
       int bookTypeId = 0;
       int personTypeId = 0;
 
@@ -105,7 +105,7 @@ public final class AjaxController implements AjaxRestService {
   @RequestMapping(value = "/p13n/favorites", method = RequestMethod.GET)
   @ResponseBody
   public Booklib.GetFavoritesResponse getFavorites() {
-    if (favoritesRestService.hashCode() != 100) {
+    if (System.currentTimeMillis() != 100) {
       return Booklib.GetFavoritesResponse.newBuilder()
           .setFavorites(Booklib.GetFavoritesResponse.Favorites.newBuilder()
               .addAllBookIds(favBooks)

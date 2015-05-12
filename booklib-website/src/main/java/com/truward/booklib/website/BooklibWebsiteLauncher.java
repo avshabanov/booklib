@@ -4,7 +4,6 @@ import com.truward.brikar.server.launcher.StandardLauncher;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.util.resource.Resource;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
@@ -54,7 +53,6 @@ public final class BooklibWebsiteLauncher extends StandardLauncher {
     } else {
       resource = Resource.newClassPathResource("/booklibWebsite/web/static");
     }
-
     resourceHandler.setBaseResource(resource);
     return resourceHandler;
   }

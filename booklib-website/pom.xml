@@ -59,6 +59,16 @@
       <artifactId>brikar-client</artifactId>
     </dependency>
 
+    <!-- Apache HTTP components -->
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
+
     <!-- Protobuf Message Converters -->
     <dependency>
       <groupId>com.truward.brikar.protobuf</groupId>

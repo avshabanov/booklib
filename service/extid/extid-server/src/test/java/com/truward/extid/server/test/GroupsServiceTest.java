@@ -36,7 +36,7 @@ public final class GroupsServiceTest {
     final List<Integer> ids = groupsService.saveGroups(Arrays.asList(group1, group2));
 
     // Then:
-    assertEquals(Arrays.asList(20, 1500), ids);
+    assertEquals(Arrays.asList(20, 2000000), ids);
   }
 
   @Test

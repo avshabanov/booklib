@@ -13,7 +13,7 @@
   <name>Book Server</name>
 
   <properties>
-    <launcher.mainClass>com.truward.booklib.book.server.BookServerLauncher</launcher.mainClass>
+    <launcher.mainClass>com.truward.book.server.BookServerLauncher</launcher.mainClass>
   </properties>
 
   <dependencies>
@@ -118,6 +118,10 @@
         <artifactId>exec-maven-plugin</artifactId>
         <configuration>
           <mainClass>${launcher.mainClass}</mainClass>
+          <arguments>
+            <argument>--port</argument>
+            <argument>9091</argument>
+          </arguments>
         </configuration>
       </plugin>
     </plugins>

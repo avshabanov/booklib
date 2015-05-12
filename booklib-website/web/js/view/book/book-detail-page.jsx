@@ -51,6 +51,7 @@ module.exports = React.createClass({
   componentDidMount: function() {
     var bookPromise = this.props.services.libService.getBookPage(this.props.bookId);
     bookPromise.then(function (pageModel) {
+      //console.log("[Book DP] pageModel", pageModel);
       if (!this.isMounted()) { return; }
       document.title = "Booklib \u00BB " + pageModel.book.title;
       this.setState({loading: false, book: pageModel.book});

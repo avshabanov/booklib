@@ -9,10 +9,47 @@
     </constructor-arg>
   </bean>
 
-  <bean id="booklib.p13n.favoritesRestClientBuilder" factory-bean="booklib.restBinder" factory-method="newClient">
-    <constructor-arg value="com.truward.p13n.model.FavoritesRestService" />
+  <!-- 3P service builders -->
+  <bean id="booklib.book.bookRestClientBuilder" factory-bean="booklib.restBinder" factory-method="newClient">
+    <constructor-arg value="com.truward.book.model.BookRestService" />
     <property name="uri" value="${booklib.3p.book.uri}" />
     <property name="username" value="${booklib.3p.book.username}" />
     <property name="password" value="${booklib.3p.book.password}" />
   </bean>
+
+  <bean id="booklib.p13n.favoritesRestClientBuilder" factory-bean="booklib.restBinder" factory-method="newClient">
+    <constructor-arg value="com.truward.p13n.model.FavoritesRestService" />
+    <property name="uri" value="${booklib.3p.p13n.favorites.uri}" />
+    <property name="username" value="${booklib.3p.p13n.username}" />
+    <property name="password" value="${booklib.3p.p13n.password}" />
+  </bean>
+
+  <bean id="booklib.extid.groupsRestClientBuilder" factory-bean="booklib.restBinder" factory-method="newClient">
+    <constructor-arg value="com.truward.extid.model.GroupsRestService" />
+    <property name="uri" value="${booklib.3p.extid.groups.uri}" />
+    <property name="username" value="${booklib.3p.extid.username}" />
+    <property name="password" value="${booklib.3p.extid.password}" />
+  </bean>
+
+  <bean id="booklib.extid.typesRestClientBuilder" factory-bean="booklib.restBinder" factory-method="newClient">
+    <constructor-arg value="com.truward.extid.model.TypesRestService" />
+    <property name="uri" value="${booklib.3p.extid.types.uri}" />
+    <property name="username" value="${booklib.3p.extid.username}" />
+    <property name="password" value="${booklib.3p.extid.password}" />
+  </bean>
+
+  <bean id="booklib.extid.idPairsRestClientBuilder" factory-bean="booklib.restBinder" factory-method="newClient">
+    <constructor-arg value="com.truward.extid.model.IdPairsRestService" />
+    <property name="uri" value="${booklib.3p.extid.idPairs.uri}" />
+    <property name="username" value="${booklib.3p.extid.username}" />
+    <property name="password" value="${booklib.3p.extid.password}" />
+  </bean>
+
+  <!-- Services -->
+
+  <bean id="booklib.book.bookRestClient" factory-bean="booklib.book.bookRestClientBuilder" factory-method="build"/>
+  <bean id="booklib.p13n.favoritesRestClient" factory-bean="booklib.p13n.favoritesRestClientBuilder" factory-method="build"/>
+  <bean id="booklib.extid.groupsRestClient" factory-bean="booklib.extid.groupsRestClientBuilder" factory-method="build"/>
+  <bean id="booklib.extid.typesRestClient" factory-bean="booklib.extid.typesRestClientBuilder" factory-method="build"/>
+  <bean id="booklib.extid.idPairsRestClient" factory-bean="booklib.extid.idPairsRestClientBuilder" factory-method="build"/>
 </beans>

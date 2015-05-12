@@ -111,6 +111,10 @@
         <artifactId>exec-maven-plugin</artifactId>
         <configuration>
           <mainClass>${launcher.mainClass}</mainClass>
+          <arguments>
+            <argument>--port</argument>
+            <argument>9097</argument>
+          </arguments>
         </configuration>
       </plugin>
     </plugins>

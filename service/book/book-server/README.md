@@ -7,6 +7,8 @@ In book-server run the following:
 mvn exec:java -Dexec.args="--port 9091"
 ```
 
+Or do just ``mvn exec:java``, port will be picked from default args which is ``9091``.
+
 Quick check:
 
 ```
