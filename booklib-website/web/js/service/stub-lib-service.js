@@ -32,16 +32,8 @@ StubLibService.prototype.getStorefrontPage = function ajaxGetStorefrontPage() {
   return devUtil.newResolvableDelayedPromise(result);
 }
 
-StubLibService.prototype.getBooks = function (booksId) {
+StubLibService.prototype.getBooks = function () {
   var result = [];
-  return devUtil.newResolvableDelayedPromise(result);
-}
-
-StubLibService.prototype.getBookPage = function (bookId) {
-  var result = {
-    book: domainUtil.selectById(BOOKS, bookId)
-  };
-
   return devUtil.newResolvableDelayedPromise(result);
 }
 

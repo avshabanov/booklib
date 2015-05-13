@@ -10,6 +10,18 @@ var StubLibService = require('./stub-lib-service.js').StubLibService;
 // Helpers
 //
 
+function getAdaptedIds(entityIds) {
+  var ids = [];
+  for (var i = 0; i < entityIds.length; ++i) {
+    var entityId = entityIds[i];
+    if (typeof(entityId) === "string") {
+      entityId = parseInt(entityId); // TODO: remove this, make sure dispatcher makes all the appropriate conversions
+    }
+    ids.push(entityId);
+  }
+  return ids;
+}
+
 function getBookData(page, book) {
   var i;
 
@@ -106,20 +118,15 @@ AjaxLibService.prototype.getStorefrontPage = function () {
   return promise; // end of processing
 }
 
-AjaxLibService.prototype.getBooks = function (booksId) {
-  var result = [];
-  return devUtil.newResolvableDelayedPromise(result);
-}
+AjaxLibService.prototype.getBooks = function (request) {
+  var bookIds = getAdaptedIds(request.bookIds || []);
+  var personIds = getAdaptedIds(request.personIds || []);
 
-AjaxLibService.prototype.getBookPage = function (bookId) {
-  if (typeof(bookId) === "string") {
-    bookId = parseInt(bookId); // TODO: remove this, make sure dispatcher makes all the appropriate conversions
-  }
-
+  // [1] fetch book page
   var promise = ajax.request("POST", "/rest/ajax/books/page/fetch", {
     "pageIds": {
-      "bookIds": [bookId],
-      "personIds": []
+      "bookIds": bookIds,
+      "personIds": personIds
     },
     "fetchBookDependencies": true
   });
@@ -127,31 +134,32 @@ AjaxLibService.prototype.getBookPage = function (bookId) {
   // [2] transform the data
   promise = promise.then(function (response) {
     return new rsvp.Promise(function (resolve, reject) {
-      if (!("books" in response) || (response["books"].length != 1)) {
+      var books = [];
+      var responseBooks = response["books"];
+
+      if (responseBooks.length != bookIds.length) {
         // TODO: reusable error reporting function
         console.error("source data is malformed: response", response);
       }
-      var bm = response["books"][0];
-      //console.log("bm=", bm)
-      var bookData = getBookData(response, bm);
-      //console.log("bookData=", bookData)
-      return resolve({book: bookData});
+
+      for (var j = 0; j < responseBooks.length; ++j) {
+        var bookMeta = responseBooks[j];
+        //console.log("bookMeta:", bookMeta);
+        var bookData = getBookData(response, bookMeta);
+        //console.log("bookData:", bookData);
+        books.push(bookData);
+      }
+
+      return resolve({
+        books: books,
+        persons: response.persons,
+        genres: response.genres
+      });
     });
   }, ajax.onError);
 
   return promise;
 }
-
-/*
-{
-  id: 123,
-  title: 'Sample Book',
-  addDate: 123000000,
-  lang: {id: 1000, name: "en"},
-  persons: [{id: 3000, name: "Alex"}],
-  genres: [{id: 4000, name: "sf"}]
-}
-*/
 
 //
 // exports

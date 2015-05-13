@@ -49,12 +49,12 @@ module.exports = React.createClass({
   },
 
   componentDidMount: function() {
-    var bookPromise = this.props.services.libService.getBookPage(this.props.bookId);
-    bookPromise.then(function (pageModel) {
-      //console.log("[Book DP] pageModel", pageModel);
+    var promise = this.props.services.libService.getBooks({bookIds: [this.props.bookId]});
+    promise.then(function (pageModel) {
       if (!this.isMounted()) { return; }
-      document.title = "Booklib \u00BB " + pageModel.book.title;
-      this.setState({loading: false, book: pageModel.book});
+      var book = pageModel.books[0];
+      document.title = "Booklib \u00BB " + book.title;
+      this.setState({loading: false, book: book});
     }.bind(this));
   },
 
