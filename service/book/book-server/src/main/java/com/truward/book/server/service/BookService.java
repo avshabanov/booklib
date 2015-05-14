@@ -475,11 +475,11 @@ public final class BookService {
 
       // [1] Joined tables
       if (query.hasGenreId()) {
-        queryBuilder.append("INNER JOIN book_genre AS bg\n");
+        queryBuilder.append("INNER JOIN book_genre AS bg ON bg.book_id=bm.id\n");
       }
 
       if (query.hasPersonId()) {
-        queryBuilder.append("INNER JOIN book_person AS bp\n");
+        queryBuilder.append("INNER JOIN book_person AS bp ON bp.book_id=bm.id\n");
       }
 
       // [2] 'WHERE' clause
@@ -498,6 +498,11 @@ public final class BookService {
       if (query.hasOriginId()) {
         queryBuilder.append(" AND bm.origin_id=?");
         args.add(query.getOriginId());
+      }
+
+      if (query.hasLanguageId()) {
+        queryBuilder.append(" AND bm.lang_id=?");
+        args.add(query.getLanguageId());
       }
     }
 

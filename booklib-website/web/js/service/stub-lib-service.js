@@ -1,19 +1,23 @@
 var domainUtil = require('../util/domain-util.js');
 var devUtil = require('../util/dev-util.js');
 
+var PERSONS = [
+  {id: 3000, name: "Alex"}
+];
+
+var GENRES = [
+  {id: 4000, name: "sf"}
+];
+
 var BOOKS = [
   {
     id: 123,
     title: 'Sample Book',
     addDate: 123000000,
     lang: {id: 1000, name: "en"},
-    persons: [{id: 3000, name: "Alex"}],
-    genres: [{id: 4000, name: "sf"}]
+    persons: PERSONS,
+    genres: GENRES
   }
-];
-
-var PERSONS = [
-  {id: 3000, name: "Alex"}
 ];
 
 var FAV_BOOKS = BOOKS;
@@ -32,8 +36,21 @@ StubLibService.prototype.getStorefrontPage = function ajaxGetStorefrontPage() {
   return devUtil.newResolvableDelayedPromise(result);
 }
 
-StubLibService.prototype.getBooks = function () {
-  var result = [];
+StubLibService.prototype.getBooks = function (request) {
+  var result = {books: [], persons: [], genres: []};
+  var bookIds = request.bookIds || [];
+  var personIds = request.personIds || [];
+  if (bookIds.length !== 0 || personIds.length !== 0) {
+    result = {books: BOOKS, persons: PERSONS, genres: GENRES};
+  }
+  return devUtil.newResolvableDelayedPromise(result);
+}
+
+StubLibService.prototype.queryBooks = function (request) {
+  var result = {bookIds: [], offsetToken: null};
+  if (request.personId == 3000 && request.offsetToken == null) {
+    result.bookIds = [123];
+  }
   return devUtil.newResolvableDelayedPromise(result);
 }
 

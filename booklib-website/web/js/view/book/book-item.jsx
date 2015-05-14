@@ -12,7 +12,6 @@ function createGenreInlineItem(genre) {
 
 module.exports = React.createClass({
   render: function() {
-    console.log("book = " + JSON.stringify(this.props.book));
     var isFavorite = true; // TODO: fetch...
     return (
       <li>

@@ -129,7 +129,7 @@ module.exports = React.createClass({
         return (<AuthorListPage services={this.props.services} />);
 
       case Nav.PERSON_DETAILS:
-        setStartTitle("Person");
+        setStartTitle();
         return (<PersonDetailPage services={this.props.services} personId={this.state.personId} />);
 
       case Nav.PERSON_LIST:

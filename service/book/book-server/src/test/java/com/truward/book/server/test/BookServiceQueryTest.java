@@ -132,11 +132,69 @@ public final class BookServiceQueryTest {
     assertFalse(list.hasOffsetToken());
   }
 
-  // TODO: language
+  @Test
+  public void shouldQueryBookByPerson() {
+    // Given:
+    final BookModel.BookPageQuery query = BookModel.BookPageQuery.newBuilder()
+        .setPersonId(5L)
+        .setLimit(4)
+        .setSortType(BookModel.BookPageQuery.SortType.ID)
+        .build();
 
-  // TODO: origin
+    // When:
+    final BookModel.BookList list = bookService.queryBooks(query);
 
-  // TODO: person
+    // Then:
+    assertEquals(Arrays.asList(1L, 4L, 9L, 10L), list.getBookIdsList());
+  }
 
-  // TODO: genre
+  @Test
+  public void shouldQueryBookByGenre() {
+    // Given:
+    final BookModel.BookPageQuery query = BookModel.BookPageQuery.newBuilder()
+        .setGenreId(4L)
+        .setLimit(64)
+        .setSortType(BookModel.BookPageQuery.SortType.TITLE)
+        .build();
+
+    // When:
+    final BookModel.BookList list = bookService.queryBooks(query);
+
+    // Then:
+    assertEquals(Arrays.asList(18L, 22L, 16L, 1L, 13L, 8L, 4L, 20L, 34L, 37L, 30L, 36L, 33L, 19L, 17L,
+            11L, 21L, 14L, 31L, 35L, 12L, 32L, 10L, 9L, 15L, 7L),
+        list.getBookIdsList());
+  }
+
+  @Test
+  public void shouldQueryBookByLanguage() {
+    // Given:
+    final BookModel.BookPageQuery query = BookModel.BookPageQuery.newBuilder()
+        .setLanguageId(1L)
+        .setLimit(5)
+        .setSortType(BookModel.BookPageQuery.SortType.ID)
+        .build();
+
+    // When:
+    final BookModel.BookList list = bookService.queryBooks(query);
+
+    // Then:
+    assertEquals(Arrays.asList(3L, 5L, 6L, 7L, 8L), list.getBookIdsList());
+  }
+
+  @Test
+  public void shouldQueryBookByOrigin() {
+    // Given:
+    final BookModel.BookPageQuery query = BookModel.BookPageQuery.newBuilder()
+        .setOriginId(1L)
+        .setLimit(4)
+        .setSortType(BookModel.BookPageQuery.SortType.TITLE)
+        .build();
+
+    // When:
+    final BookModel.BookList list = bookService.queryBooks(query);
+
+    // Then:
+    assertEquals(Arrays.asList(18L, 19L, 17L), list.getBookIdsList());
+  }
 }

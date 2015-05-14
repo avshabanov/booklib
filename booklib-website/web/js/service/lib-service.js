@@ -1,7 +1,6 @@
 // dev-only post-service
 
 var domainUtil = require('../util/domain-util.js');
-var devUtil = require('../util/dev-util.js');
 var ajax = require('../util/ajax-util.js');
 var rsvp = require('rsvp');
 var StubLibService = require('./stub-lib-service.js').StubLibService;
@@ -10,14 +9,23 @@ var StubLibService = require('./stub-lib-service.js').StubLibService;
 // Helpers
 //
 
+function getAdaptedId(entityId) {
+  var entityType = typeof(entityId);
+  if (entityType === "number") {
+    return entityId;
+  }
+
+  if (entityType === "string") {
+    return parseInt(entityId); // TODO: remove this, make sure dispatcher makes all the appropriate conversions
+  }
+
+  throw new Error("Unknown type of entityId=" + entityId);
+}
+
 function getAdaptedIds(entityIds) {
   var ids = [];
   for (var i = 0; i < entityIds.length; ++i) {
-    var entityId = entityIds[i];
-    if (typeof(entityId) === "string") {
-      entityId = parseInt(entityId); // TODO: remove this, make sure dispatcher makes all the appropriate conversions
-    }
-    ids.push(entityId);
+    ids.push(getAdaptedId(entityIds[i])); // TODO: remove this, make sure dispatcher makes all the appropriate conversions
   }
   return ids;
 }
@@ -116,6 +124,23 @@ AjaxLibService.prototype.getStorefrontPage = function () {
   });
 
   return promise; // end of processing
+}
+
+AjaxLibService.prototype.queryBooks = function (request) {
+  var searchRequest = {
+    "sortType": request.sortType || "TITLE",
+    "limit": request.limit || 8
+  };
+
+  if (request.offsetToken != null) {
+    searchRequest["offsetToken"] = request.offsetToken;
+  }
+
+  if (request.personId != null) {
+    searchRequest["personId"] = getAdaptedId(request.personId);
+  }
+
+  return ajax.request("POST", "/rest/ajax/books/query", searchRequest);
 }
 
 AjaxLibService.prototype.getBooks = function (request) {

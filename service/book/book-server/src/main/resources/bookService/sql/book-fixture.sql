@@ -159,19 +159,19 @@ INSERT INTO book_genre (book_id, genre_id) VALUES (16, 4);
 
 -- The Cruise of the Dazzler
 INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
-  VALUES (17, 'The Cruise of the Dazzler', 0, '2014-08-10', 1, 2);
+  VALUES (17, 'The Cruise of the Dazzler', 0, '2014-08-10', 1, 1);
 INSERT INTO book_person (book_id, person_id) VALUES (17, 1);
 INSERT INTO book_genre (book_id, genre_id) VALUES (17, 4);
 
 -- A Daughter of the Snows
 INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
-  VALUES (18, 'A Daughter of the Snows', 0, '2014-08-10', 1, 2);
+  VALUES (18, 'A Daughter of the Snows', 0, '2014-08-10', 1, 1);
 INSERT INTO book_person (book_id, person_id) VALUES (18, 1);
 INSERT INTO book_genre (book_id, genre_id) VALUES (18, 4);
 
 -- The Call of the Wild
 INSERT INTO book_meta (id, title, f_size, add_date, lang_id, origin_id)
-  VALUES (19, 'The Call of the Wild', 0, '2014-08-10', 1, 2);
+  VALUES (19, 'The Call of the Wild', 0, '2014-08-10', 1, 1);
 INSERT INTO book_person (book_id, person_id) VALUES (19, 1);
 INSERT INTO book_genre (book_id, genre_id) VALUES (19, 4);
 
