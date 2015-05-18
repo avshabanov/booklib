@@ -174,16 +174,19 @@ public final class AjaxController implements AjaxRestService {
   }
 
   @RequestMapping(value = "/persons/query", method = RequestMethod.POST)
+  @ResponseBody
   public Booklib.NamedValueList queryPersons(@RequestBody BookModel.PersonListQuery query) {
     return from(bookService.queryPersons(query));
   }
 
   @RequestMapping(value = "/persons/hint", method = RequestMethod.POST)
+  @ResponseBody
   public BookModel.PersonNameHints getPersonHints(@RequestParam(value = "prefix", required = false) String prefix) {
     return bookService.getPersonHints(prefix);
   }
 
   @RequestMapping(value = "/series/query", method = RequestMethod.POST)
+  @ResponseBody
   public Booklib.NamedValueList querySeries(@RequestBody BookModel.SeriesQuery query) {
     return from(bookService.querySeries(query));
   }

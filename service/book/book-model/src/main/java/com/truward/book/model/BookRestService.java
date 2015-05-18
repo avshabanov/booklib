@@ -32,11 +32,14 @@ public interface BookRestService {
   BookModel.NamedValueList getLanguages();
 
   @RequestMapping(value = "/persons/query", method = RequestMethod.POST)
+  @ResponseBody
   BookModel.NamedValueList queryPersons(@RequestBody BookModel.PersonListQuery query);
 
   @RequestMapping(value = "/persons/hint", method = RequestMethod.POST)
+  @ResponseBody
   BookModel.PersonNameHints getPersonHints(@RequestParam(value = "prefix", required = false) String prefix);
 
   @RequestMapping(value = "/series/query", method = RequestMethod.POST)
+  @ResponseBody
   BookModel.NamedValueList querySeries(@RequestBody BookModel.SeriesQuery query);
 }

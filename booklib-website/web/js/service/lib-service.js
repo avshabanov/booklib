@@ -6,8 +6,53 @@ var rsvp = require('rsvp');
 var StubLibService = require('./stub-lib-service.js').StubLibService;
 
 //
-// Helpers
+// Loader helper
 //
+
+function triggerDataLoading(promise) {
+  // TODO: trigger load
+  promise.then(function () {
+    // TODO: trigger load complete
+    // TODO: error handling
+  });
+}
+
+//
+// Empty Response Generators (used when something goes wrong)
+//
+
+function getEmptyBooksResponse() {
+  return {
+    books: [],
+    persons: [],
+    genres: []
+  };
+}
+
+function getEmptyNamedValueList() {
+  return {
+    values: [],
+    offsetToken: null
+  };
+}
+
+//
+// Data Transformation Helpers
+//
+
+function transformNamedValueList(namedValueList) {
+  return new rsvp.Promise(function (resolve) {
+    // check data
+    if (namedValueList == null || !("values" in namedValueList)) {
+      return resolve(getEmptyNamedValueList());
+    }
+
+    resolve({
+      values: namedValueList["values"],
+      offsetToken: namedValueList["offsetToken"] || null
+    });
+  });
+}
 
 function getAdaptedId(entityId) {
   var entityType = typeof(entityId);
@@ -165,6 +210,7 @@ AjaxLibService.prototype.getBooks = function (request) {
       if (responseBooks.length != bookIds.length) {
         // TODO: reusable error reporting function
         console.error("source data is malformed: response", response);
+        return resolve(getEmptyBooksResponse()); // return empty data to not to confuse the user
       }
 
       for (var j = 0; j < responseBooks.length; ++j) {
@@ -175,13 +221,50 @@ AjaxLibService.prototype.getBooks = function (request) {
         books.push(bookData);
       }
 
-      return resolve({
+      resolve({
         books: books,
         persons: response.persons,
         genres: response.genres
       });
     });
   }, ajax.onError);
+
+  return promise;
+}
+
+AjaxLibService.prototype.getPersonHints = function (prefix) {
+  var url = "/rest/ajax/persons/hint";
+  if (prefix != null) {
+    url += "?prefix=" + encodeURIComponent(prefix);
+  }
+
+  var promise = ajax.request("POST", url);
+
+  promise = promise.then(function (data) {
+    var nameParts = data["nameParts"];
+    if (nameParts == null) {
+      console.error("Malformed response:", data);
+      nameParts = [];
+    }
+
+    return new rsvp.Promise(function (resolve) {
+      resolve(nameParts);
+    });
+  });
+
+  return promise;
+}
+
+AjaxLibService.prototype.getPersons = function (prefix, offsetToken) {
+  // [1] query persons
+  var promise = ajax.request("POST", "/rest/ajax/persons/query", {
+    "startName": prefix,
+    "offsetToken": offsetToken,
+    "limit": 64 // TODO: configurable limit value
+  });
+
+  // [2] transform fetched data
+  promise = promise.then(transformNamedValueList);
 
   return promise;
 }

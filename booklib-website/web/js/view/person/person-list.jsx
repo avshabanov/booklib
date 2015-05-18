@@ -1,16 +1,14 @@
 var React = require('React');
-var PersonItem = require('./person-item.js');
+var CodedNamedItem = require('../generic/coded-named-item.js');
 
 module.exports = React.createClass({
   render: function() {
     var personNodes = this.props.persons.map(function (person) {
-      return (<PersonItem key={person.id} person={person} />);
+      var url = "#/person/" + person.id;
+      return (<CodedNamedItem key={person.id} url={url} item={person} />);
     });
-    return (
-      <ul className="person-list">
-        {personNodes}
-      </ul>
-    );
+
+    return (<p>{personNodes}</p>);
   }
 });
 

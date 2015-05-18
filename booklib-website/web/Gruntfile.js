@@ -46,7 +46,7 @@ module.exports = function(grunt) {
           {
             cwd: 'js',                    // source js dir
             src: ['**', '!**/*.jsx'],     // copy all files and subfolders to the temporary dor, except for jsx
-            dest: target('tmp/js'),   // destination folder, used by browserify
+            dest: target('tmp/js'),       // destination folder, used by browserify
             expand: true                  // required when using cwd
           }
         ]

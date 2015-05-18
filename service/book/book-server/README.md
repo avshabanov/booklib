@@ -13,6 +13,8 @@ Quick check:
 
 ```
 curl -u testonly:test -H 'Accept: application/json' -H "Content-Type: application/json" -X POST -d '{"pageIds": {"bookIds": [1,2,3,4,5,18]}, "fetchBookDependencies": true}' http://127.0.0.1:9091/rest/book/books/page/fetch -s | python -mjson.tool
+curl -u testonly:test -H 'Accept: application/json' -X POST http://127.0.0.1:9091/rest/book/persons/hint -s
+curl -u testonly:test -H 'Accept: application/json' -X POST http://127.0.0.1:9091/rest/book/persons/hint?prefix=A -s
 ```
 
 ## How to create a database
