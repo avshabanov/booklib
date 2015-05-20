@@ -1,5 +1,5 @@
 var React = require('React');
-var PersonList = require('../person/person-list.js');
+var PersonList = require('./person-list.js');
 
 function updatePrefix(prefix) {
   var promise;

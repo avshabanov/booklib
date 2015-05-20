@@ -185,17 +185,29 @@ AjaxLibService.prototype.queryBooks = function (request) {
     searchRequest["personId"] = getAdaptedId(request.personId);
   }
 
+  if (request.genreId != null) {
+    searchRequest["genreId"] = getAdaptedId(request.genreId);
+  }
+
+  if (request.languageId != null) {
+    searchRequest["languageId"] = getAdaptedId(request.languageId);
+  }
+
   return ajax.request("POST", "/rest/ajax/books/query", searchRequest);
 }
 
 AjaxLibService.prototype.getBooks = function (request) {
   var bookIds = getAdaptedIds(request.bookIds || []);
   var personIds = getAdaptedIds(request.personIds || []);
+  var genreIds = getAdaptedIds(request.genreIds || []);
+  var languageIds = getAdaptedIds(request.languageIds || []);
 
   // [1] fetch book page
   var promise = ajax.request("POST", "/rest/ajax/books/page/fetch", {
     "pageIds": {
       "bookIds": bookIds,
+      "genreIds": genreIds,
+      "languageIds": languageIds,
       "personIds": personIds
     },
     "fetchBookDependencies": true
@@ -215,16 +227,15 @@ AjaxLibService.prototype.getBooks = function (request) {
 
       for (var j = 0; j < responseBooks.length; ++j) {
         var bookMeta = responseBooks[j];
-        //console.log("bookMeta:", bookMeta);
         var bookData = getBookData(response, bookMeta);
-        //console.log("bookData:", bookData);
         books.push(bookData);
       }
 
       resolve({
         books: books,
-        persons: response.persons,
-        genres: response.genres
+        persons: response["persons"],
+        languages: response["languages"],
+        genres: response["genres"]
       });
     });
   }, ajax.onError);
@@ -262,6 +273,26 @@ AjaxLibService.prototype.getPersons = function (prefix, offsetToken) {
     "offsetToken": offsetToken,
     "limit": 64 // TODO: configurable limit value
   });
+
+  // [2] transform fetched data
+  promise = promise.then(transformNamedValueList);
+
+  return promise;
+}
+
+AjaxLibService.prototype.getGenres = function () {
+  // [1] get genres
+  var promise = ajax.request("GET", "/rest/ajax/genres");
+
+  // [2] transform fetched data
+  promise = promise.then(transformNamedValueList);
+
+  return promise;
+}
+
+AjaxLibService.prototype.getLanguages = function () {
+  // [1] get languages
+  var promise = ajax.request("GET", "/rest/ajax/languages");
 
   // [2] transform fetched data
   promise = promise.then(transformNamedValueList);

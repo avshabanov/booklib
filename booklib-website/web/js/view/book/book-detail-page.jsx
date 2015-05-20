@@ -10,6 +10,7 @@ function createGenreInlineItem(genre) {
 }
 
 function renderBook(book) {
+  var langUrl = "#/language/" + book.lang.id;
   return (
     <div className="container">
       <h2>{book.title}</h2>
@@ -34,7 +35,7 @@ function renderBook(book) {
           </tr>
           <tr>
             <td>Language:</td>
-            <td><a href="#/g/language/{book.lang.id}">{book.lang.name}</a></td>
+            <td><a href={langUrl}>{book.lang.name}</a></td>
           </tr>
         </tbody>
       </table>

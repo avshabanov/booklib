@@ -4,13 +4,13 @@ var StorefrontPage = require('./storefront/storefront-page.js');
 var BookDetailPage = require('./book/book-detail-page.js');
 
 var PersonDetailPage = require('./person/person-detail-page.js');
-var PersonHintsOrListPage = require('./person/person-hints-or-list.js');
+var PersonHintsOrListPage = require('./person/person-hints-or-list-page.js');
 
 var LanguageDetailPage = require('./language/language-detail-page.js');
-var LanguageListPage = require('./language/language-list.js');
+var LanguageListPage = require('./language/language-list-page.js');
 
 var GenreDetailPage = require('./genre/genre-detail-page.js');
-var GenreListPage = require('./genre/genre-list.js');
+var GenreListPage = require('./genre/genre-list-page.js');
 
 var AboutPage = require('./about/about-page.js');
 

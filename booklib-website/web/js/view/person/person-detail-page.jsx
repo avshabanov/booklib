@@ -2,7 +2,7 @@ var React = require('React');
 var FavStar = require('../generic/fav-star.js');
 var BookList = require('../book/book-list.js');
 
-function loadAuthorBooks() {
+function loadBookPage() {
   var promise =  this.props.services.libService.queryBooks({
     personId: this.props.personId,
     offsetToken: null
@@ -19,23 +19,36 @@ function loadAuthorBooks() {
   }.bind(this));
 }
 
+function fetchBooks(personId) {
+  var promise = this.props.services.libService.getBooks({personIds: [personId]});
+  promise.then(function (pageModel) {
+    if (!this.isMounted()) { return; }
+
+    var person = pageModel.persons[0];
+    document.title = "Booklib \u00BB " + person.name;
+    this.setState({loading: false, person: person, books: null});
+
+    // start another query - request books
+    loadBookPage.call(this);
+  }.bind(this));
+}
+
+//
+// Class definition
+//
+
 module.exports = React.createClass({
   getInitialState: function() {
     return {loading: true};
   },
 
   componentDidMount: function() {
-    var promise = this.props.services.libService.getBooks({personIds: [this.props.personId]});
-    promise.then(function (pageModel) {
-      if (!this.isMounted()) { return; }
+    fetchBooks.call(this, this.props.personId);
+  },
 
-      var person = pageModel.persons[0];
-      document.title = "Booklib \u00BB " + person.name;
-      this.setState({loading: false, person: person, books: null});
-
-      // start another query - request books
-      loadAuthorBooks.call(this);
-    }.bind(this));
+  componentWillReceiveProps: function(nextProps) {
+    //if (nextProps.personId == this.props.personId) { return; }
+    fetchBooks.call(this, nextProps.personId);
   },
 
   render: function() {
