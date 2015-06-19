@@ -1,17 +1,27 @@
 
 jest.dontMock('../js/util/domain-util.js');
+var s = require('../js/util/domain-util.js');
 
-describe('selectById', function () {
+var ELEMENTS = [{id: 1, name: 'one'}, {id: 2, name: 'two'}];
+
+describe('select elements', function () {
   it('selects one element', function () {
-    var s = require('../js/util/domain-util.js');
-    var elements = [{id: 1, name: 'one'}, {id: 2, name: 'two'}];
-    expect(s.selectById(elements, 2)).toBe(elements[1]);
+    expect(s.selectById(ELEMENTS, 1)).toBe(ELEMENTS[0]);
   });
 
   it('selects one element', function () {
-    var s = require('../js/util/domain-util.js');
-    var elements = [{id: 1, name: 'one'}, {id: 2, name: 'two'}];
-    expect(s.selectById(elements, 2)).toBe(elements[1]);
+    expect(s.selectById(ELEMENTS, 2)).toBe(ELEMENTS[1]);
+  });
+
+  it('selects first elements', function () {
+    expect(s.selectFirst(ELEMENTS, 1)).toBe(ELEMENTS[0]);
+  });
+
+  it('selects no elements', function () {
+    expect(s.selectByIds(ELEMENTS, [])).toEqual([]);
+  });
+
+  it('selects two elements', function () {
+    expect(s.selectByIds(ELEMENTS, [1, 2])).toEqual([ELEMENTS[0], ELEMENTS[1]]);
   });
 });
-
