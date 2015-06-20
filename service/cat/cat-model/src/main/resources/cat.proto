@@ -1,7 +1,8 @@
 package truward.booklib.book;
 
+// catalog model
 option java_package = "com.truward.booklib.cat.model";
-option java_outer_classname = "CatModel";
+option java_outer_classname = "Cat";
 
 message NamedValue {
   optional int64 id = 1;
@@ -34,15 +35,80 @@ message Item {
   required string title = 2;
 }
 
-message BookItemData {
-  optional int64 id = 1; /* matches Item.id */
+/* + item metadata (fileSize, ext) */
 
+
+
+/* LEGACY - to be refactored */
+
+message BookMeta {
+  optional int64 id = 1;
+  required string title = 2;
   required int32 fileSize = 3;
   optional int64 addDate = 4;
-
   required int64 langId = 5;
-
-  repeated int64 genreIds = 8;
-  repeated SeriesPos seriesPos = 10;
+  required int64 originId = 6;
   repeated PersonRelation personRelations = 7;
+  repeated int64 genreIds = 8;
+  repeated SeriesPos seriesPos = 9;
+}
+
+message BookPageIds {
+  repeated int64 bookIds = 1;
+  repeated int64 originIds = 2;
+  repeated int64 languageIds = 3;
+  repeated int64 personIds = 4;
+  repeated int64 genreIds = 5;
+  repeated int64 seriesIds = 6;
+}
+
+message BookPageIdsRequest {
+  required BookPageIds pageIds = 1;
+  required bool fetchBookDependencies = 2 [default = false];
+}
+
+message BookPageData {
+  repeated BookMeta books = 1;
+  repeated NamedValue origins = 2;
+  repeated NamedValue languages = 3;
+  repeated NamedValue persons = 4;
+  repeated NamedValue genres = 5;
+  repeated NamedValue series = 6;
+}
+
+message BookPageQuery {
+  optional int64 languageId = 1;
+  optional int64 genreId = 2;
+  optional int64 personId = 3;
+  optional int64 originId = 4;
+
+  optional string offsetToken = 10;
+
+  enum SortType {
+    ID = 1;
+    TITLE = 2;
+  }
+  required SortType sortType = 11 [default = ID];
+
+  required int32 limit = 12 [default = 8];
+}
+
+message BookList {
+  repeated int64 bookIds = 1;
+  optional string offsetToken = 2;
+}
+
+message PersonNameHints {
+  repeated string nameParts = 1;
+}
+
+message PersonListQuery {
+  optional string startName = 1;
+  optional string offsetToken = 2;
+  required int32 limit = 3 [default = 8];
+}
+
+message SeriesQuery {
+  optional string offsetToken = 1;
+  required int32 limit = 2 [default = 8];
 }
