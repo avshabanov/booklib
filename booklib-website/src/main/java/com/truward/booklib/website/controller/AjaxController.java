@@ -12,10 +12,12 @@ import com.truward.p13n.model.FavoritesRestService;
 import com.truward.p13n.model.P13n;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nonnull;
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
@@ -132,6 +134,21 @@ public final class AjaxController implements AjaxRestService {
     return Booklib.GetFavoritesResponse.newBuilder().setFavorites(builder.build()).build();
   }
 
+  @RequestMapping(value = "/items", method = RequestMethod.PUT)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  void setFavorites(@RequestBody Booklib.SetFavoritesRequest request) {
+    final P13n.SetFavoritesRequest.Builder builder = P13n.SetFavoritesRequest.newBuilder();
+
+    addEntries(builder, request.getFavBookIdsList(), true, bookType);
+    addEntries(builder, request.getUnfavBookIdsList(), false, bookType);
+
+    addEntries(builder, request.getFavPersonIdsList(), true, personType);
+    addEntries(builder, request.getUnfavPersonIdsList(), false, personType);
+
+    request.getFavBookIdsList();
+    favoritesRestService.setFavorites(builder.setUserId(getUserId()).build());
+  }
+
   //
   // Book API
   //
@@ -194,6 +211,18 @@ public final class AjaxController implements AjaxRestService {
   //
   // Private
   //
+
+  private static void addEntries(@Nonnull P13n.SetFavoritesRequest.Builder builder,
+                                 @Nonnull List<Long> ids,
+                                 boolean isFavorite,
+                                 int type) {
+    for (final Long id : ids) {
+      builder.addEntries(P13n.SetFavoritesRequest.Entry.newBuilder()
+          .setFavorite(isFavorite)
+          .setExtId(P13n.ExtId.newBuilder().setId(id).setType(type).build())
+          .build());
+    }
+  }
 
   private static Booklib.NamedValueList from(BookModel.NamedValueList value) {
     final Booklib.NamedValueList.Builder builder = Booklib.NamedValueList.newBuilder();
