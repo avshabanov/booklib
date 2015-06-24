@@ -46,6 +46,32 @@ StubLibService.prototype.getBooks = function (request) {
   return devUtil.newResolvableDelayedPromise(result);
 }
 
+StubLibService.prototype.getPersonHints = function (prefix) {
+  var result = [];
+  return devUtil.newResolvableDelayedPromise(result);
+}
+
+StubLibService.prototype.getPersons = function () {
+  var result = {
+    values: []
+  };
+  return devUtil.newResolvableDelayedPromise(result);
+}
+
+StubLibService.prototype.getGenres = function () {
+  var result = {
+    values: []
+  };
+  return devUtil.newResolvableDelayedPromise(result);
+}
+
+StubLibService.prototype.getLanguages = function () {
+  var result = {
+    values: []
+  };
+  return devUtil.newResolvableDelayedPromise(result);
+}
+
 StubLibService.prototype.queryBooks = function (request) {
   var result = {bookIds: [], offsetToken: null};
   if (request.personId == 3000 && request.offsetToken == null) {

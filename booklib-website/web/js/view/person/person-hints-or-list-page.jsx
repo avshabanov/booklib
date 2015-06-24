@@ -37,7 +37,6 @@ module.exports = React.createClass({
   },
 
   render: function() {
-    //console.log("[render] state", this.state);
     if (this.state.loading) {
       return (<p>Loading person name hints...</p>);
     }
@@ -45,6 +44,10 @@ module.exports = React.createClass({
     if (this.state.personList != null) {
       // ok, we have person list - it takes precedence over name parts
       return (<PersonList persons={this.state.personList.values} />)
+    }
+
+    if (this.state.nameParts.length == 0) {
+      return (<p>Person name parts are not available.</p>);
     }
 
     var nameParts = this.state.nameParts.map(function (part) {
