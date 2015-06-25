@@ -1,5 +1,11 @@
 var React = require('React');
 
+var FavStatus = {
+  UNDECIDED,    // state fetching is in progress
+  FAVORITE,     // this element is a favorite
+  NOT_FAVORITE  // this element is not a favorite
+};
+
 module.exports = React.createClass({
   getInitialState: function() {
     return {
@@ -13,14 +19,9 @@ module.exports = React.createClass({
       newFavStatus = false;
     }
 
-    // TODO: service call
+    // TODO: service call (bulk?)
     var isFavorite = newFavStatus;
     this.setState({isFavorite: isFavorite});
-
-//    var promise = app.BookService.setFavorite(this.props.id, this.props.type, newFavStatus);
-//    promise.done(function (isFavorite) {
-//      this.setState({isFavorite: isFavorite});
-//    }.bind(this));
   },
 
   render: function () {
