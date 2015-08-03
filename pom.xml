@@ -22,6 +22,10 @@
 
     <awssdk.version>1.9.13</awssdk.version>
 
+    <user-service.version>1.0.1</user-service.version>
+
+    <brikar.version>(,2.0)</brikar.version>
+
     <aspectj.version>1.6.10</aspectj.version>
     <spring.version>3.2.3.RELEASE</spring.version>
 
@@ -84,6 +88,30 @@
         <groupId>com.truward.time</groupId>
         <artifactId>utc-time-sql</artifactId>
         <version>${utc-time.version}</version>
+      </dependency>
+
+      <!-- User Service Model -->
+      <dependency>
+        <groupId>com.truward.orion</groupId>
+        <artifactId>user-service-model</artifactId>
+        <version>${user-service.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.truward.orion</groupId>
+        <artifactId>user-service-spring-security</artifactId>
+        <version>${user-service.version}</version>
+      </dependency>
+
+      <!-- Brikar -->
+      <dependency>
+        <groupId>com.truward.brikar</groupId>
+        <artifactId>brikar-server</artifactId>
+        <version>${brikar.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.truward.brikar</groupId>
+        <artifactId>brikar-client</artifactId>
+        <version>${brikar.version}</version>
       </dependency>
 
       <!-- AWS SDK -->
