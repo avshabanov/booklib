@@ -11,10 +11,10 @@ import org.springframework.dao.TypeMismatchDataAccessException
 
 fun queryForNumber(db: JdbcOperations, sql: String, args: Array<out Any>): Number {
   val n = if (args.isEmpty()) db.queryForObject(sql, javaClass<Number>())
-              else db.queryForObject(sql, javaClass<Number>(), *args)
-  if (n == null) {
-    throw TypeMismatchDataAccessException("Returned number is null")
-  }
+
+  else db.queryForObject(sql, javaClass<Number>(), *args) ?:
+      throw TypeMismatchDataAccessException("Returned number is null")
+
   return n
 }
 

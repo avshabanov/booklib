@@ -38,7 +38,7 @@ data class RegistrationData(val nickname: String,
 
 
 
-trait UserProfileService : UserDetailsService {
+interface UserProfileService : UserDetailsService {
   fun registerUser(reg: RegistrationData): Long
 
   fun hasAccounts(): Boolean

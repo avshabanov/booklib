@@ -11,7 +11,7 @@ import org.springframework.jdbc.core.JdbcOperations
 
 val DEFAULT_LIMIT = 8
 
-trait BookDao {
+interface BookDao {
 
   fun getBookById(bookId: Long): BookMeta
 
@@ -30,7 +30,7 @@ trait BookDao {
   fun getBooksByLanguage(languageId: Long, nextBookId: Long? = null, limit: Int = DEFAULT_LIMIT): List<BookMeta>
 }
 
-trait NamedValueDao {
+interface NamedValueDao {
 
   fun getAuthorsOfBooks(bookIds: List<Long>): Map<Long, List<NamedValue>>
 
@@ -55,7 +55,7 @@ trait NamedValueDao {
 // Impl
 //
 
-private val BOOK_META_ROW_MAPPER = RowMapper() {(rs: java.sql.ResultSet, i: Int) ->
+private val BOOK_META_ROW_MAPPER = RowMapper() { rs: java.sql.ResultSet, i: Int ->
   BookMeta(id = rs.getLong("id"), title = rs.getString("title"), fileSize = rs.getInt("f_size"),
       lang = NamedValue(rs.getLong("lang_id"), rs.getString("lang_name")), origin = rs.getString("origin_name"),
       addDate = com.truward.time.jdbc.UtcTimeSqlUtil.getUtcTime(rs, "add_date"))
@@ -121,11 +121,11 @@ class BookDaoImpl(val db: JdbcOperations): BookDao {
 // NamedValue DAO
 //
 
-private val NAMED_VALUE_ROW_MAPPER = RowMapper() {(rs: java.sql.ResultSet, i: Int) ->
+private val NAMED_VALUE_ROW_MAPPER = RowMapper() { rs: java.sql.ResultSet, i: Int ->
   NamedValue(id = rs.getInt("id").toLong(), name = rs.getString("name"))
 }
 
-private val BOOK_ID_WITH_NAMED_VALUE_ROW_MAPPER = RowMapper() {(rs: java.sql.ResultSet, i: Int) ->
+private val BOOK_ID_WITH_NAMED_VALUE_ROW_MAPPER = RowMapper() { rs: java.sql.ResultSet, i: Int ->
   Pair(rs.getLong("book_id"), NamedValue(id = rs.getInt("id").toLong(), name = rs.getString("name")))
 }
 

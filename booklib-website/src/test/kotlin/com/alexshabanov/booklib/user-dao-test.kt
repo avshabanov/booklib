@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional
 import kotlin.test.assertTrue
 import kotlin.test.assertFalse
 
-RunWith(javaClass<SpringJUnit4ClassRunner>())
-ContextConfiguration(locations = array("/spring/DaoTest-context.xml"))
+RunWith(SpringJUnit4ClassRunner::class)
+ContextConfiguration(locations = arrayOf("/spring/DaoTest-context.xml"))
 Transactional(value = "userTxManager") class UserDaoTest {
-  Resource(name = "dao.user.userAccountDao") var userDao: UserAccountDao = mock(javaClass())
+  Resource(name = "dao.user.userAccountDao") private var userDao: UserAccountDao = mock(javaClass())
 
   Test fun shouldRegisterUser() {
     // Given:

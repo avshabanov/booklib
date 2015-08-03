@@ -10,8 +10,8 @@ data class BookMeta(val id: Long?, val title: String, val fileSize: Int, val add
 data class NamedValue(val id: Long?, val name: String)
 
 enum class FavoriteStatus {
-  NONE
-  FAVORITE
+  NONE,
+  FAVORITE,
   UNDECIDED
 }
 

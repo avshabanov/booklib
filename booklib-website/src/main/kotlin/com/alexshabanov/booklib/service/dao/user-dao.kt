@@ -13,16 +13,17 @@ import com.alexshabanov.booklib.model.InvitationToken
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.annotation.Propagation
 import com.alexshabanov.booklib.model.FavoriteKind
+import java.sql.ResultSet
 
 
-trait UserAccountDao {
+interface UserAccountDao {
 
   /**
    * Method, that fetches profile information, needed for Spring Security
    *
    * @param name User login name or email
    * @return User Account
-   * @throws EmptyResultDataAccessException on error
+   * Throws EmptyResultDataAccessException on error
    */
   fun getUserAccountByName(name: String): UserAccount
 
@@ -82,11 +83,11 @@ private fun toInt(v: FavoriteKind) = when (v) {
 
 private val ROLE_NAME_SQL = "SELECT r.role_name FROM role AS r INNER JOIN user_role AS ur ON r.id=ur.role_id WHERE ur.user_id=?"
 
-private val INVITATION_TOKEN_ROW_MAPPER = RowMapper() {(rs: java.sql.ResultSet, i: Int) ->
+private val INVITATION_TOKEN_ROW_MAPPER = RowMapper() { rs: ResultSet, i: Int ->
   InvitationToken(code = rs.getString("code"), note = rs.getString("note"))
 }
 
-private val FAVORITE_ENTRY_ROW_MAPPER = RowMapper() {(rs: java.sql.ResultSet, i: Int) ->
+private val FAVORITE_ENTRY_ROW_MAPPER = RowMapper() { rs: ResultSet, i: Int ->
   FavoriteEntry(kind = toFavoriteKind(rs.getInt("entity_kind")), entityId = rs.getLong("entity_id"))
 }
 
@@ -98,7 +99,7 @@ class UserAccountDaoImpl(val db: JdbcOperations):
     // fetch profile
     val account = db.queryForObject(
         "SELECT id, nickname, password_hash FROM user_profile WHERE nickname=? OR email=?",
-        RowMapper {(rs: java.sql.ResultSet, i: Int) ->
+        RowMapper { rs: ResultSet, i: Int ->
           UserAccount(id = rs.getLong("id"), nickname = rs.getString("nickname"),
               passwordHash = rs.getString("password_hash"))
         }, name, name)
@@ -106,7 +107,7 @@ class UserAccountDaoImpl(val db: JdbcOperations):
     // fetch roles
     account.authorityList = db.query(
         ROLE_NAME_SQL,
-        RowMapper {(rs: java.sql.ResultSet, i: Int) ->
+        RowMapper { rs: ResultSet, i: Int ->
           SimpleGrantedAuthority(rs.getString("role_name"))
         }, account.id)
 
@@ -117,7 +118,7 @@ class UserAccountDaoImpl(val db: JdbcOperations):
     val authorityList = db.queryForList(ROLE_NAME_SQL, javaClass<String>(), id)
     return db.queryForObject(
         "SELECT id, nickname, email, password_hash, created FROM user_profile WHERE id=?",
-        RowMapper() {(rs: java.sql.ResultSet, i: Int) ->
+        RowMapper() { rs: ResultSet, i: Int ->
           UserProfileData(id = rs.getInt("id").toLong(), nickname = rs.getString("nickname"),
               authorityList = authorityList,
               passwordHash = rs.getString("password_hash"),

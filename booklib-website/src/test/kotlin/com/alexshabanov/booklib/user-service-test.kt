@@ -18,8 +18,8 @@ import com.alexshabanov.booklib.model.InvitationToken
 import com.alexshabanov.booklib.model.FavoriteEntry
 import com.alexshabanov.booklib.model.FavoriteKind
 
-RunWith(javaClass<SpringJUnit4ClassRunner>())
-ContextConfiguration(locations = array("/spring/UserServiceTest-context.xml"))
+RunWith(SpringJUnit4ClassRunner::class)
+ContextConfiguration(locations = arrayOf("/spring/UserServiceTest-context.xml"))
 Transactional(value = "userTxManager") class UserServiceTest {
   // HERE: mocks to silence compiler
   Resource(name = "svc.sec.userProfileService") var userService: UserProfileService = mock(javaClass())
@@ -38,7 +38,7 @@ Transactional(value = "userTxManager") class UserServiceTest {
     assertEquals("admin", admin.getUsername())
   }
 
-  Test(expected = javaClass<InvalidInvitationTokenException>()) fun shouldNotRegisterUserWithWrongInvitationToken() {
+  Test(expected = InvalidInvitationTokenException::class) fun shouldNotRegisterUserWithWrongInvitationToken() {
     userService.registerUser(regData)
   }
 

@@ -1,4 +1,4 @@
-package com.alexshabanov.booklib.bookdaotest
+package com.alexshabanov.booklib
 
 import org.junit.Test
 import org.springframework.test.context.ContextConfiguration
@@ -31,8 +31,8 @@ private fun parseUtcTime(str: String): UtcTime {
   return UtcTime.valueOf(format.parse(str).getTime())
 }
 
-RunWith(javaClass<SpringJUnit4ClassRunner>())
-ContextConfiguration(locations = array("/spring/DaoTest-context.xml"))
+RunWith(SpringJUnit4ClassRunner::class)
+ContextConfiguration(locations = arrayOf("/spring/DaoTest-context.xml"))
 class BookDaoTest {
   Resource(name = "dao.book.bookDao") var bookDao: BookDao = mock(javaClass()) // HERE: mocks to silence compiler
   Resource(name = "dao.book.namedValueDao") var namedValueDao: NamedValueDao = mock(javaClass())

@@ -1,4 +1,4 @@
-package com.alexshabanov.booklib.web.controllers
+package com.alexshabanov.booklib.web
 
 import org.springframework.stereotype.Controller as controller
 import org.springframework.web.bind.annotation.RequestMapping as req
@@ -10,13 +10,12 @@ import com.alexshabanov.booklib.service.BookService
 import javax.servlet.http.HttpServletResponse
 import com.alexshabanov.booklib.service.BookDownloadService
 import com.truward.time.UtcTime
-import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.authentication.InternalAuthenticationServiceException
 import com.alexshabanov.booklib.model.UserAccount
 import com.alexshabanov.booklib.model.FavoriteKind
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.*
 
 //
 // Spring MVC controllers
@@ -25,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody
 val MAX_NAME_HINT_LENGTH = 3
 
 /** Base HTML controller. */
-req(array("/g")) controller open class StandardHtmlController {
+org.springframework.web.bind.annotation.RequestMapping("/g") org.springframework.stereotype.Controller open class StandardHtmlController {
   ModelAttribute("userAccount") fun getUserAccount(): UserAccount? {
     val auth = SecurityContextHolder.getContext().getAuthentication()
     if (auth != null) {
@@ -52,7 +51,7 @@ req(array("/g")) controller open class StandardHtmlController {
 /** Generic pages controller. */
 class GenericController(val bookService: BookService): StandardHtmlController() {
 
-  req(array("/index")) fun index(): ModelAndView {
+  org.springframework.web.bind.annotation.RequestMapping("/index") fun index(): ModelAndView {
     val userId = getUserId()
     val favs = bookService.userService.getFavorites(userId)
 
@@ -69,9 +68,9 @@ class GenericController(val bookService: BookService): StandardHtmlController() 
         Pair("favAuthors", favAuthors)))
   }
 
-  req(array("/about")) fun about() = "about"
+  org.springframework.web.bind.annotation.RequestMapping("/about") fun about() = "about"
 
-  req(array("/login")) fun login(par("error", required = false) loginError: String?): ModelAndView {
+  org.springframework.web.bind.annotation.RequestMapping("/login") fun login(org.springframework.web.bind.annotation.RequestParam("error", required = false) loginError: String?): ModelAndView {
     return ModelAndView("login", mapOf(Pair("loginError", loginError), Pair("currentTime", UtcTime.now())))
   }
 }
@@ -79,10 +78,10 @@ class GenericController(val bookService: BookService): StandardHtmlController() 
 /** Book-specific pages */
 class BookController(val bookService: BookService, val downloadService: BookDownloadService): StandardHtmlController() {
 
-  req(array("/book/{id}")) fun book(pathVar("id") bookId: Long) =
+  org.springframework.web.bind.annotation.RequestMapping("/book/{id}") fun book(org.springframework.web.bind.annotation.PathVariable("id") bookId: Long) =
       ModelAndView("book", "book", bookService.getBookById(getUserId(), bookId))
 
-  req(array("/book/{id}/download")) fun downloadBook(pathVar("id") bookId: Long, response: HttpServletResponse) {
+  org.springframework.web.bind.annotation.RequestMapping("/book/{id}/download") fun downloadBook(org.springframework.web.bind.annotation.PathVariable("id") bookId: Long, response: HttpServletResponse) {
     downloadService.download(bookId, response)
   }
 }
@@ -90,26 +89,26 @@ class BookController(val bookService: BookService, val downloadService: BookDown
 /** Genre-specific pages */
 class GenreController(val bookService: BookService): StandardHtmlController() {
 
-  req(array("/genre/{id}")) fun genre(pathVar("id") genreId: Long,
-                                      par("startBookId", required = false) startBookId: Long?) =
+  org.springframework.web.bind.annotation.RequestMapping("/genre/{id}") fun genre(org.springframework.web.bind.annotation.PathVariable("id") genreId: Long,
+                                      org.springframework.web.bind.annotation.RequestParam("startBookId", required = false) startBookId: Long?) =
       ModelAndView("genre", mapOf(
           Pair("curBookId", startBookId),
           Pair("pageModel", bookService.getGenrePageModel(getUserId(), genreId, startBookId))))
 
-  req(array("/genres")) fun genres() = ModelAndView("genre-list", "genreList", bookService.getGenres())
+  org.springframework.web.bind.annotation.RequestMapping("/genres") fun genres() = ModelAndView("genre-list", "genreList", bookService.getGenres())
 }
 
 /** Author-specific pages */
 class AuthorController(val bookService: BookService): StandardHtmlController() {
 
-  req(array("/author/{id}")) fun author(pathVar("id") authorId: Long,
-                                        par("startBookId", required = false) startBookId: Long?) =
+  org.springframework.web.bind.annotation.RequestMapping("/author/{id}") fun author(org.springframework.web.bind.annotation.PathVariable("id") authorId: Long,
+                                        org.springframework.web.bind.annotation.RequestParam("startBookId", required = false) startBookId: Long?) =
       ModelAndView("author", mapOf(
           Pair("curBookId", startBookId),
           Pair("pageModel", bookService.getAuthorPageModel(getUserId(), authorId, startBookId))))
 
-  req(array("/authors")) fun authors(par("namePrefix", required = false) namePrefix: String?,
-                                     par("startName", required = false) startName: String?): ModelAndView {
+  org.springframework.web.bind.annotation.RequestMapping("/authors") fun authors(org.springframework.web.bind.annotation.RequestParam("namePrefix", required = false) namePrefix: String?,
+                                     org.springframework.web.bind.annotation.RequestParam("startName", required = false) startName: String?): ModelAndView {
     if (namePrefix != null && namePrefix.length() >= MAX_NAME_HINT_LENGTH) {
       // author full name list
       val limit = Integer.MAX_VALUE // TODO: support pagination for author list?
@@ -120,10 +119,10 @@ class AuthorController(val bookService: BookService): StandardHtmlController() {
     return ModelAndView("author-names", "prefixList", bookService.getAuthorNameHint(namePrefix))
   }
 
-  req(value = array("/author/rest/favorite/toggle"), method = array(RequestMethod.POST))
+  org.springframework.web.bind.annotation.RequestMapping(value = "/author/rest/favorite/toggle", method = arrayOf(RequestMethod.POST))
   ResponseBody
   fun changeFavStatus(
-      par("kind") kind: FavoriteKind, par("entityId") entityId: Long): Boolean {
+      org.springframework.web.bind.annotation.RequestParam("kind") kind: FavoriteKind, org.springframework.web.bind.annotation.RequestParam("entityId") entityId: Long): Boolean {
     val userId = getUserId()
     if (bookService.userService.isFavorite(userId, kind, entityId)) {
       bookService.userService.resetFavorite(userId, kind, entityId)
@@ -138,11 +137,11 @@ class AuthorController(val bookService: BookService): StandardHtmlController() {
 /* Language-specific pages */
 class LangController(val bookService: BookService): StandardHtmlController() {
 
-  req(array("/language/{id}")) fun language(pathVar("id") languageId: Long,
-                                            par("startBookId", required = false) startBookId: Long?) =
+  org.springframework.web.bind.annotation.RequestMapping("/language/{id}") fun language(org.springframework.web.bind.annotation.PathVariable("id") languageId: Long,
+                                            org.springframework.web.bind.annotation.RequestParam("startBookId", required = false) startBookId: Long?) =
       ModelAndView("language", mapOf(
           Pair("curBookId", startBookId),
           Pair("pageModel", bookService.getLanguagePageModel(getUserId(), languageId, startBookId))))
 
-  req(array("/languages")) fun languages() = ModelAndView("language-list", "langList", bookService.getLanguages())
+  org.springframework.web.bind.annotation.RequestMapping("/languages") fun languages() = ModelAndView("language-list", "langList", bookService.getLanguages())
 }

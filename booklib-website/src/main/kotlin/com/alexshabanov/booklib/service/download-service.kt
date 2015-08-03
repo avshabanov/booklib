@@ -12,7 +12,7 @@ import java.util.Date
 import org.springframework.util.Assert
 
 /** Encapsulates download service for books. */
-trait BookDownloadService {
+interface BookDownloadService {
 
   fun download(id: Long, response: HttpServletResponse)
 }

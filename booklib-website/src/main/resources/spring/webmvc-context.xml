@@ -10,11 +10,11 @@
   <context:annotation-config/>
 
   <!-- Controllers -->
-  <bean class="com.alexshabanov.booklib.web.controllers.GenericController" autowire="constructor"/>
-  <bean class="com.alexshabanov.booklib.web.controllers.BookController" autowire="constructor"/>
-  <bean class="com.alexshabanov.booklib.web.controllers.AuthorController" autowire="constructor"/>
-  <bean class="com.alexshabanov.booklib.web.controllers.GenreController" autowire="constructor"/>
-  <bean class="com.alexshabanov.booklib.web.controllers.LangController" autowire="constructor"/>
+  <bean class="com.alexshabanov.booklib.web.GenericController" autowire="constructor"/>
+  <bean class="com.alexshabanov.booklib.web.BookController" autowire="constructor"/>
+  <bean class="com.alexshabanov.booklib.web.AuthorController" autowire="constructor"/>
+  <bean class="com.alexshabanov.booklib.web.GenreController" autowire="constructor"/>
+  <bean class="com.alexshabanov.booklib.web.LangController" autowire="constructor"/>
 
 
   <!-- Annotation driven support for MVC controllers -->
