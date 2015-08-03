@@ -1,4 +1,4 @@
-package com.alexshabanov.booklib
+package com.alexshabanov.booklib.test
 
 import org.junit.Test
 import org.springframework.test.context.ContextConfiguration
@@ -24,6 +24,8 @@ import com.alexshabanov.booklib.service.dao.NamedValueDao
 import com.alexshabanov.booklib.service.dao.BookDao
 import com.alexshabanov.booklib.service.dao.DEFAULT_LIMIT
 import com.alexshabanov.booklib.service.UserProfileService
+import org.springframework.transaction.annotation.Transactional
+import java.io.Serializable
 
 private fun parseUtcTime(str: String): UtcTime {
   val format = SimpleDateFormat("yyyy-MM-dd");
@@ -33,7 +35,7 @@ private fun parseUtcTime(str: String): UtcTime {
 
 RunWith(SpringJUnit4ClassRunner::class)
 ContextConfiguration(locations = arrayOf("/spring/DaoTest-context.xml"))
-class BookDaoTest {
+Transactional(value = "userTxManager") class BookDaoTest: Serializable {
   Resource(name = "dao.book.bookDao") var bookDao: BookDao = mock(javaClass()) // HERE: mocks to silence compiler
   Resource(name = "dao.book.namedValueDao") var namedValueDao: NamedValueDao = mock(javaClass())
 

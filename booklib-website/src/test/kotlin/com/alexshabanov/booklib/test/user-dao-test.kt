@@ -1,4 +1,4 @@
-package com.alexshabanov.booklib
+package com.alexshabanov.booklib.test
 
 import org.junit.runner.RunWith
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
@@ -10,12 +10,13 @@ import com.alexshabanov.booklib.model.UserProfileData
 import kotlin.test.assertEquals
 import com.alexshabanov.booklib.service.dao.UserAccountDao
 import org.springframework.transaction.annotation.Transactional
+import java.io.Serializable
 import kotlin.test.assertTrue
 import kotlin.test.assertFalse
 
 RunWith(SpringJUnit4ClassRunner::class)
 ContextConfiguration(locations = arrayOf("/spring/DaoTest-context.xml"))
-Transactional(value = "userTxManager") class UserDaoTest {
+Transactional(value = "userTxManager") class UserDaoTest: Serializable {
   Resource(name = "dao.user.userAccountDao") private var userDao: UserAccountDao = mock(javaClass())
 
   Test fun shouldRegisterUser() {

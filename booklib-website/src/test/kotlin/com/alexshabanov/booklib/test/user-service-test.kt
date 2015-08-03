@@ -1,4 +1,4 @@
-package com.alexshabanov.booklib
+package com.alexshabanov.booklib.test
 
 import org.junit.runner.RunWith
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
@@ -17,10 +17,11 @@ import kotlin.test.fail
 import com.alexshabanov.booklib.model.InvitationToken
 import com.alexshabanov.booklib.model.FavoriteEntry
 import com.alexshabanov.booklib.model.FavoriteKind
+import java.io.Serializable
 
 RunWith(SpringJUnit4ClassRunner::class)
 ContextConfiguration(locations = arrayOf("/spring/UserServiceTest-context.xml"))
-Transactional(value = "userTxManager") class UserServiceTest {
+Transactional(value = "userTxManager") class UserServiceTest: Serializable {
   // HERE: mocks to silence compiler
   Resource(name = "svc.sec.userProfileService") var userService: UserProfileService = mock(javaClass())
 
