@@ -1,10 +1,9 @@
-package com.alexshabanov.booklib.launcher
+package com.alexshabanov.booklib
 
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
 import org.eclipse.jetty.servlet.DefaultServlet
 import org.springframework.web.filter.CharacterEncodingFilter
-import java.util.EnumSet
 import javax.servlet.DispatcherType
 import org.springframework.web.context.ContextLoaderListener
 import org.springframework.web.servlet.DispatcherServlet
@@ -15,10 +14,45 @@ import org.eclipse.jetty.util.resource.Resource
 import com.alexshabanov.booklib.util.ArgParser
 import org.springframework.web.filter.DelegatingFilterProxy
 import org.eclipse.jetty.servlet.FilterHolder
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.BeanInitializationException
+import org.springframework.context.ApplicationContextInitializer
+import org.springframework.core.env.PropertiesPropertySource
+import org.springframework.core.io.ResourceLoader
+import org.springframework.core.io.support.EncodedResource
+import org.springframework.core.io.support.PropertiesLoaderUtils
+import org.springframework.web.context.ConfigurableWebApplicationContext
+import java.io.IOException
+import java.util.*
 
+class AppContextInitializer : ApplicationContextInitializer<ConfigurableWebApplicationContext> {
+  override fun initialize(applicationContext: ConfigurableWebApplicationContext?) {
+    if (applicationContext !is ResourceLoader) {
+      throw IllegalStateException("Application context should be ResourceLoader")
+    }
+
+    val coreProperties = applicationContext.getResource("classpath:/settings/core.properties")
+    val props = PropertiesLoaderUtils.loadProperties(coreProperties)
+
+    // add override settings
+    val overrideSettingsPath = System.getProperty("booklib.settings.path");
+    if (overrideSettingsPath != null) {
+      PropertiesLoaderUtils.fillProperties(props, applicationContext.getResource(overrideSettingsPath))
+    } else {
+      throw IllegalStateException("No path registered at booklib.settings.path")
+    }
+
+    LoggerFactory.getLogger(javaClass).debug("AppContextInitializer props={}", props)
+
+    val ps = PropertiesPropertySource("profile", props)
+    applicationContext.getEnvironment()?.getPropertySources()?.addFirst(ps)
+  }
+}
 
 private fun initSpringContext(context: ServletContextHandler) {
-  context.setInitParameter("contextConfigLocation", "classpath:/spring/service-context.xml,classpath:/spring/security-context.xml")
+  context.setInitParameter("contextConfigLocation", "classpath:/spring/service-context.xml")
+  val appContextInitializerLocation = javaClass<AppContextInitializer>().getName()
+  context.setInitParameter("contextInitializerClasses", appContextInitializerLocation)
 
   // Enforce UTF-8 encoding
   val encFilterHolder = context.addFilter(javaClass<CharacterEncodingFilter>(), "/*", EnumSet.allOf(javaClass<DispatcherType>()))
