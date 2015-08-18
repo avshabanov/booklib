@@ -24,6 +24,7 @@ import org.springframework.core.io.support.PropertiesLoaderUtils
 import org.springframework.web.context.ConfigurableWebApplicationContext
 import java.io.IOException
 import java.util.*
+import javax.annotation.PostConstruct
 
 class AppContextInitializer : ApplicationContextInitializer<ConfigurableWebApplicationContext> {
   override fun initialize(applicationContext: ConfigurableWebApplicationContext?) {
@@ -87,7 +88,7 @@ private fun startServer(port: Int, configPath: String) {
   initSpringContext(contextHandler)
 
   val handlerList = HandlerCollection()
-  handlerList.setHandlers(array<Handler>(resourceHandler, contextHandler))
+  handlerList.setHandlers(arrayOf<Handler>(resourceHandler, contextHandler))
   server.setHandler(handlerList)
 
   server.start()
