@@ -6,7 +6,7 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
   <context:annotation-config/>
-  <context:property-placeholder location="classpath:/settings/default.properties"/>
+  <context:property-placeholder location="classpath:/booklibWebsite/core.properties"/>
 
   <!-- All Data Sources-in-one -->
 
@@ -24,9 +24,9 @@
       <bean class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
         <property name="scripts">
           <array>
-            <value>classpath:/sql/h2/book/book-schema.sql</value>
-            <value>classpath:/sql/h2/book/book-fixture.sql</value>
-            <value>classpath:/sql/h2/user/user-schema.sql</value>
+            <value>classpath:/booklibWebsite/h2/book/book-schema.sql</value>
+            <value>classpath:/booklibWebsite/h2/book/book-fixture.sql</value>
+            <value>classpath:/booklibWebsite/h2/user/user-schema.sql</value>
           </array>
         </property>
       </bean>
@@ -36,5 +36,5 @@
   <bean id="dao.book.dataSource" factory-bean="test.dao.databaseFactory" factory-method="getDatabase" destroy-method="shutdown" />
   <alias alias="dao.user.dataSource" name="dao.book.dataSource" />
 
-  <import resource="classpath:/spring/dao/dao-context.xml" />
+  <import resource="classpath:/booklibWebsite/spring/dao/dao.xml" />
 </beans>

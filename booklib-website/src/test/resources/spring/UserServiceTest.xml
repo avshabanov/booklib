@@ -4,6 +4,6 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <import resource="DaoTest-context.xml" />
-  <import resource="classpath:/spring/service/user-service-context.xml" />
+  <import resource="DaoTest.xml" />
+  <import resource="classpath:/booklibWebsite/spring/service/user-service.xml" />
 </beans>

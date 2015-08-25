@@ -34,7 +34,7 @@ private fun parseUtcTime(str: String): UtcTime {
 }
 
 RunWith(SpringJUnit4ClassRunner::class)
-ContextConfiguration(locations = arrayOf("/spring/DaoTest-context.xml"))
+ContextConfiguration(locations = arrayOf("/spring/DaoTest.xml"))
 Transactional(value = "userTxManager") class BookDaoTest: Serializable {
   Resource(name = "dao.book.bookDao") var bookDao: BookDao = mock(javaClass()) // HERE: mocks to silence compiler
   Resource(name = "dao.book.namedValueDao") var namedValueDao: NamedValueDao = mock(javaClass())

@@ -39,6 +39,8 @@ req("/g") controller open class StandardHtmlController {
     return null
   }
 
+  fun hasUserId() = getUserAccount() != null
+
   fun getUserId(): Long {
     val account = getUserAccount()
     if (account != null) {

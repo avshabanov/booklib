@@ -24,7 +24,7 @@
 
     <user-service.version>1.0.1</user-service.version>
 
-    <brikar.version>(,1.1)</brikar.version>
+    <brikar.version>1.2.17</brikar.version>
 
     <aspectj.version>1.6.10</aspectj.version>
     <spring.version>3.2.14.RELEASE</spring.version>

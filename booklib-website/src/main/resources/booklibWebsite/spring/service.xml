@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-  <context:annotation-config/>
-  <context:property-placeholder/>
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+  <import resource="classpath:/spring/default-service-base.xml"/>
 
   <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
     <property name="basename" value="classpath:/messages"/>
@@ -14,19 +10,19 @@
   </bean>
 
   <!-- DAO -->
-  <import resource="dao/data-source-context.xml" />
-  <import resource="dao/dao-context.xml" />
+  <import resource="dao/data-source.xml" />
+  <import resource="dao/dao.xml" />
 
   <!-- Services -->
-  <import resource="service/book-service-context.xml"/>
-  <import resource="service/user-service-context.xml"/>
-  <import resource="service/download-service-context.xml"/>
+  <import resource="service/book-service.xml"/>
+  <import resource="service/user-service.xml"/>
+  <import resource="service/download-service.xml"/>
 
   <!-- Authentication Context (LOCAL or REMOTE) -->
   <import resource="auth/auth-${booklib.security.mode}.xml"/>
 
   <!-- Spring Security -->
-  <import resource="security-context.xml"/>
+  <import resource="security.xml"/>
 
   <!-- User Initializer -->
   <bean class="com.alexshabanov.booklib.service.DefaultUserInitializer" autowire="constructor"/>

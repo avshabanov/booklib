@@ -28,6 +28,18 @@
       <artifactId>kotlin-stdlib</artifactId>
     </dependency>
 
+    <!-- Brikar -->
+    <dependency>
+      <groupId>com.truward.brikar</groupId>
+      <artifactId>brikar-server</artifactId>
+      <version>${brikar.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.truward.brikar</groupId>
+      <artifactId>brikar-client</artifactId>
+      <version>${brikar.version}</version>
+    </dependency>
+
     <!-- Jetty -->
     <dependency>
       <groupId>org.eclipse.jetty</groupId>

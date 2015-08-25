@@ -20,7 +20,7 @@ import com.alexshabanov.booklib.model.FavoriteKind
 import java.io.Serializable
 
 RunWith(SpringJUnit4ClassRunner::class)
-ContextConfiguration(locations = arrayOf("/spring/UserServiceTest-context.xml"))
+ContextConfiguration(locations = arrayOf("/spring/UserServiceTest.xml"))
 Transactional(value = "userTxManager") class UserServiceTest: Serializable {
   // HERE: mocks to silence compiler
   Resource(name = "svc.sec.userProfileService") var userService: UserProfileService = mock(javaClass())

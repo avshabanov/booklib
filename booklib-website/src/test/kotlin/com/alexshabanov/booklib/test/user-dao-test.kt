@@ -15,7 +15,7 @@ import kotlin.test.assertTrue
 import kotlin.test.assertFalse
 
 RunWith(SpringJUnit4ClassRunner::class)
-ContextConfiguration(locations = arrayOf("/spring/DaoTest-context.xml"))
+ContextConfiguration(locations = arrayOf("/spring/DaoTest.xml"))
 Transactional(value = "userTxManager") class UserDaoTest: Serializable {
   Resource(name = "dao.user.userAccountDao") private var userDao: UserAccountDao = mock(javaClass())
 
