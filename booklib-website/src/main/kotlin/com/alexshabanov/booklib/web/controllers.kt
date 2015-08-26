@@ -13,6 +13,7 @@ import com.truward.time.UtcTime
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.authentication.InternalAuthenticationServiceException
 import com.alexshabanov.booklib.model.FavoriteKind
+import com.truward.orion.user.service.spring.UserIdRoleUtil
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
@@ -42,13 +43,8 @@ req("/g") controller open class StandardHtmlController {
   fun getUserId(): Long {
     val account = getUserAccount()
     if (account != null) {
-      for (a in account.getAuthorities()) {
-        if ("ROLE_TEST_USER1".equals(a.getAuthority())) {
-          return 100L
-        }
-      }
-
-      return account.getUsername().toLong()
+      return UserIdRoleUtil.tryGetUserId(account.getAuthorities()) ?:
+          throw InternalAuthenticationServiceException("RoleID is not included as a role in ${account}")
     }
     throw InternalAuthenticationServiceException("UserAccount has not been found")
   }

@@ -8,7 +8,7 @@
     <authentication-provider>
       <password-encoder hash="md5"/>
       <user-service>
-        <user name="testonly" password="098f6bcd4621d373cade4e832627b4f6" authorities="ROLE_GENERIC_USER,ROLE_TEST_USER1" />
+        <user name="testonly" password="098f6bcd4621d373cade4e832627b4f6" authorities="ROLE_GENERIC_USER,ROLE_ID_123" />
       </user-service>
     </authentication-provider>
   </authentication-manager>
