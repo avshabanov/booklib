@@ -3,7 +3,25 @@
              xsi:schemaLocation="
                 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
-  <!--<authentication-manager>-->
-    <!--<authentication-provider ref="svc.sec.daoAuthenticationProvider"/>-->
-  <!--</authentication-manager>-->
+
+  <beans:import resource="remote-beans.xml"/>
+
+  <beans:bean id="svc.sec.passwordEncoder"
+        class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+
+  <!-- Spring's UserProfileService that uses Orion user service client -->
+  <beans:bean id="svc.sec.userProfileService" class="com.truward.orion.user.service.spring.UserProfileService">
+    <beans:constructor-arg ref="svc.userServiceClient"/>
+  </beans:bean>
+
+  <!-- Authentication -->
+  <beans:bean id="svc.sec.remoteAuthenticationProvider"
+              class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+    <beans:property name="passwordEncoder" ref="svc.sec.passwordEncoder" />
+    <beans:property name="userDetailsService" ref="svc.sec.userProfileService" />
+  </beans:bean>
+
+  <authentication-manager>
+    <authentication-provider ref="svc.sec.remoteAuthenticationProvider"/>
+  </authentication-manager>
 </beans:beans>

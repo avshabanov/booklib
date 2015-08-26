@@ -40,6 +40,16 @@
       <version>${brikar.version}</version>
     </dependency>
 
+    <!-- User Service Client + Spring Security Adapter -->
+    <dependency>
+      <groupId>com.truward.orion</groupId>
+      <artifactId>user-service-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.truward.orion</groupId>
+      <artifactId>user-service-spring-security</artifactId>
+    </dependency>
+
     <!-- Jetty -->
     <dependency>
       <groupId>org.eclipse.jetty</groupId>

@@ -3,7 +3,14 @@
              xsi:schemaLocation="
                 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
-  <!--<authentication-manager>-->
-    <!--<authentication-provider ref="svc.sec.daoAuthenticationProvider"/>-->
-  <!--</authentication-manager>-->
+
+  <authentication-manager>
+    <authentication-provider>
+      <password-encoder hash="md5"/>
+      <user-service>
+        <user name="testonly" password="098f6bcd4621d373cade4e832627b4f6" authorities="ROLE_GENERIC_USER,ROLE_TEST_USER1" />
+      </user-service>
+    </authentication-provider>
+  </authentication-manager>
+
 </beans:beans>

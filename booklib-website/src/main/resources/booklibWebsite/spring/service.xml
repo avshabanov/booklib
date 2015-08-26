@@ -23,7 +23,4 @@
 
   <!-- Spring Security -->
   <import resource="security.xml"/>
-
-  <!-- User Initializer -->
-  <bean class="com.alexshabanov.booklib.service.DefaultUserInitializer" autowire="constructor"/>
 </beans>

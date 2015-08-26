@@ -12,8 +12,8 @@ import com.alexshabanov.booklib.service.BookDownloadService
 import com.truward.time.UtcTime
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.authentication.InternalAuthenticationServiceException
-import com.alexshabanov.booklib.model.UserAccount
 import com.alexshabanov.booklib.model.FavoriteKind
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 
@@ -25,11 +25,11 @@ val MAX_NAME_HINT_LENGTH = 3
 
 /** Base HTML controller. */
 req("/g") controller open class StandardHtmlController {
-  ModelAttribute("userAccount") fun getUserAccount(): UserAccount? {
+  ModelAttribute("userAccount") fun getUserAccount(): UserDetails? {
     val auth = SecurityContextHolder.getContext().getAuthentication()
     if (auth != null) {
       val details = auth.getPrincipal()
-      if (details is UserAccount) {
+      if (details is UserDetails) {
         return details
       } else {
         throw InternalAuthenticationServiceException("Unexpected principal type: ${details}")
@@ -39,12 +39,16 @@ req("/g") controller open class StandardHtmlController {
     return null
   }
 
-  fun hasUserId() = getUserAccount() != null
-
   fun getUserId(): Long {
     val account = getUserAccount()
     if (account != null) {
-      return account.id
+      for (a in account.getAuthorities()) {
+        if ("ROLE_TEST_USER1".equals(a.getAuthority())) {
+          return 100L
+        }
+      }
+
+      return account.getUsername().toLong()
     }
     throw InternalAuthenticationServiceException("UserAccount has not been found")
   }
