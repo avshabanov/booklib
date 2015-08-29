@@ -39,6 +39,21 @@
       <artifactId>brikar-client</artifactId>
       <version>${brikar.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.truward.brikar.protobuf</groupId>
+      <artifactId>brikar-protobuf-http-bin</artifactId>
+      <version>${brikar.version}</version>
+    </dependency>
+
+    <!-- Apache HTTP components -->
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
 
     <!-- User Service Client + Spring Security Adapter -->
     <dependency>

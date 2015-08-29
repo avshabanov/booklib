@@ -27,3 +27,21 @@ sudo cp $DIST/target/booklib-website.jar /usr/local/booklib/app.jar
 ```
 sudo ln -s $DIST/server.sh /usr/local/booklib/server.sh
 ```
+
+## Development Mode
+
+(Optional) point to the your dev version of ``booklib.properties``:
+
+```
+-Dbrikar.settings.path=file:/Path/to/your/booklib.properties
+```
+
+and in booklib.properties you can have something like that:
+
+```
+booklib.security.mode=remote
+
+booklib.security.remote.username=YOURUSERNAME
+booklib.security.remote.password=YOURPASSWORD
+booklib.security.remote.uri=http://path.to.user.service:8080/rest/user
+```
